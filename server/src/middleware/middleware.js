@@ -23,6 +23,7 @@ export function isLoggedIn(req, res, next) {
 }
 
 export function isAdmin(req, res, next) {
+    console.log('called middleware isAdmin function')
     // Extract token from the Authorization header
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Assuming "Bearer <token>"

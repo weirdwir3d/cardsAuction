@@ -30,20 +30,15 @@ router.post("/register", async (req, res) => {
             });
 
             console.log(hashedPassword)
-            let highestId = 0
-            try {
-                highestId = sortedUsers[sortedUsers.length - 1].id;
-            } catch {
-                highestId = 0
-            }
+            let highestId = (sortedUsers.length > 0) ? sortedUsers[sortedUsers.length - 1].id : -1;
 
             console.log('highest id', highestId)
             usersData.push({
-                id: (highestId === 0 ? 0 : highestId + 1),
+                id: highestId + 1,
                 username: req.body.username,
                 email: email,
                 password: hashedPassword,
-                isAdmin: (isAdmin ? true : false)
+                isAdmin: (isAdmin)
             })
 
             await login(req, res)
