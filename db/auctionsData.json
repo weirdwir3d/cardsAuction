@@ -1,0 +1,86 @@
+[
+    {
+        "id": 0,
+        "cardId": 4,
+        "basePrice": 500,
+        "publishedDate": "23-10-2024",
+        "endDate": "28-10-2024"
+    },
+    {
+        "id": 1,
+        "cardId": 0,
+        "basePrice": 270,
+        "publishedDate": "30-09-2024",
+        "endDate": "07-10-2024"
+    },
+    {
+        "id": 2,
+        "cardId": 9,
+        "basePrice": 270,
+        "publishedDate": "19-09-2024",
+        "endDate": "22-09-2024"
+    },
+    {
+        "id": 3,
+        "cardId": 1,
+        "basePrice": 650,
+        "publishedDate": "01-10-2024",
+        "endDate": "06-10-2024"
+    },
+    {
+        "id": 4,
+        "cardId": 2,
+        "basePrice": 320,
+        "publishedDate": "05-10-2024",
+        "endDate": "12-10-2024"
+    },
+    {
+        "id": 5,
+        "cardId": 3,
+        "basePrice": 550,
+        "publishedDate": "07-10-2024",
+        "endDate": "14-10-2024"
+    },
+    {
+        "id": 6,
+        "cardId": 5,
+        "basePrice": 700,
+        "publishedDate": "09-10-2024",
+        "endDate": "16-10-2024"
+    },
+    {
+        "id": 7,
+        "cardId": 6,
+        "basePrice": 300,
+        "publishedDate": "10-10-2024",
+        "endDate": "17-10-2024"
+    },
+    {
+        "id": 8,
+        "cardId": 7,
+        "basePrice": 800,
+        "publishedDate": "11-10-2024",
+        "endDate": "18-10-2024"
+    },
+    {
+        "id": 9,
+        "cardId": 8,
+        "basePrice": 450,
+        "publishedDate": "12-10-2024",
+        "endDate": "19-10-2024"
+    },
+    {
+        "id": 10,
+        "cardId": 10,
+        "basePrice": 600,
+        "publishedDate": "13-10-2024",
+        "endDate": "20-10-2024"
+    },
+    {
+        "id": 11,
+        "cardId": 11,
+        "basePrice": 350,
+        "publishedDate": "14-10-2024",
+        "endDate": "21-10-2024"
+    }
+]

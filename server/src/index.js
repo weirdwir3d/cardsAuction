@@ -6,13 +6,15 @@ const app = express();
 import auth from './routes/auth.js';
 import users from './routes/users.js';
 import cards from './routes/cards.js';
+import auctions from './routes/auctions.js';
 
 app.use(express.json()) 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser()); // For parsing cookies
+app.use(cookieParser()); // parsing cookies
 app.use("/auth", auth);
 app.use("/users", users);
 app.use("/cards", cards);
+app.use("/auctions", auctions);
 
 app.get('/', (req, res) => {
   // console.log(req);

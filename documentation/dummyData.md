@@ -23,3 +23,14 @@ Wanna try adding a new card? Here is the data you need:
     "imageUrl": "https://www.cardtrader.com/uploads/blueprints/image/267562/show_emblema-oath-ultra-rare-valiant-smashers.jpg"
 }
 `
+
+# Auction
+Wanna try adding a new auction? Here is the data you need:
+`
+{
+    "cardId": 12,
+    "basePrice": 7000,
+    "publishedDate": "21-09-2024 08:52:00",
+    "endDate": "22-10-2024 12:00:00"
+}
+`
