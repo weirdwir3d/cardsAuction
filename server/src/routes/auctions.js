@@ -1,5 +1,6 @@
 import express from 'express';
 import auctionsData from '../../../db/auctionsData.json' assert { type: 'json' };
+import cardsData from '../../../db/cardsData.json' assert { type: 'json' };
 import * as middleware from '../middleware/middleware.js';
 const router = express.Router();
 
@@ -15,8 +16,8 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     }
 
     const basePrice = updatedAuction.basePrice || foundAuction.basePrice;
-    const publishedDate = updatedAuction.publishedDate || foundAuction.publishedDate;
-    const endDate = updatedAuction.endDate || foundAuction.endDate;
+    const publishedDateTime = updatedAuction.publishedDateTime || foundAuction.publishedDateTime;
+    const endDateTime = updatedAuction.endDateTime || foundAuction.endDateTime;
 
     // Validation for base price
     if (basePrice <= 0) {
@@ -24,31 +25,31 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     }
 
     // Validation for dates
-    if (!isValidDate(publishedDate)) {
+    if (!isValidDateTime(publishedDateTime)) {
         return res.status(400).json({ error: "Invalid published date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
     }
 
-    if (!isValidDate(endDate)) {
+    if (!isValidDateTime(endDateTime)) {
         return res.status(400).json({ error: "Invalid end date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
     }
 
-    const parsedPublishedDate = parseDate(publishedDate);
-    const parsedEndDate = parseDate(endDate);
-    const currentDate = new Date();
-    currentDate.setMilliseconds(0); // Set currentDate to the start of the second
+    const parsedPublishedDateTime = parseDate(publishedDateTime);
+    const parsedEndDateTime = parseDate(endDateTime);
+    const currentDateTime = new Date();
+    currentDateTime.setMilliseconds(0); // Set currentDate to the start of the second
 
-    if (parsedPublishedDate < currentDate) {
+    if (parsedPublishedDateTime < currentDateTime) {
         return res.status(400).json({ error: "Published date cannot be in the past." });
     }
 
-    if (parsedEndDate <= parsedPublishedDate) {
+    if (parsedEndDateTime <= parsedPublishedDateTime) {
         return res.status(400).json({ error: "End date must be after the published date." });
     }
 
     // Update the auction with the new details
     foundAuction.basePrice = basePrice;
-    foundAuction.publishedDate = publishedDate;
-    foundAuction.endDate = endDate;
+    foundAuction.publishedDateTime = publishedDateTime;
+    foundAuction.endDateTime = endDateTime;
 
     // Respond with a success message
     res.status(200).json({
@@ -77,31 +78,31 @@ router.post('/', middleware.isAdmin, (req, res) => {
     }
 
     const basePrice = auction.basePrice;
-    const publishedDate = auction.publishedDate;
-    const endDate = auction.endDate;
+    const publishedDateTime = auction.publishedDateTime;
+    const endDateTime = auction.endDateTime;
 
     if (basePrice <= 0) {
         return res.status(403).json({ error: "Base price cannot be zero or less" });
     }
 
-    if (!isValidDate(publishedDate)) {
+    if (!isValidDateTime(publishedDateTime)) {
         return res.status(400).json({ error: "Invalid published date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
     }
 
-    if (!isValidDate(endDate)) {
+    if (!isValidDateTime(endDateTime)) {
         return res.status(400).json({ error: "Invalid end date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
     }
 
-    const parsedPublishedDate = parseDate(publishedDate);
-    const parsedEndDate = parseDate(endDate);
-    const currentDate = new Date();
-    currentDate.setMilliseconds(0); // Set currentDate to the start of the second
+    const parsedPublishedDateTime = parseDate(publishedDateTime);
+    const parsedEndDateTime = parseDate(endDateTime);
+    const currentDateTime = new Date();
+    currentDateTime.setMilliseconds(0); // Set currentDate to the start of the second
 
-    if (parsedPublishedDate < currentDate) {
+    if (parsedPublishedDateTime < currentDateTime) {
         return res.status(400).json({ error: "Published date cannot be in the past." });
     }
 
-    if (parsedEndDate <= parsedPublishedDate) {
+    if (parsedEndDateTime <= parsedPublishedDateTime) {
         return res.status(400).json({ error: "End date must be after the published date." });
     }
 
@@ -113,8 +114,8 @@ router.post('/', middleware.isAdmin, (req, res) => {
     auctionsData.push({
         id: highestId + 1,
         cardId: auction.cardId,
-        publishedDate: auction.publishedDate,
-        endDate: auction.endDate,
+        publishedDateTime: auction.publishedDateTime,
+        endDateTime: auction.endDateTime,
         basePrice: auction.basePrice
     });
 
@@ -133,7 +134,7 @@ function parseDate(dateString) {
 }
 
 // Helper function to validate the date and time format "dd-mm-yyyy hh:mm:ss"
-function isValidDate(dateString) {
+function isValidDateTime(dateString) {
     const regex = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}$/;
     if (!regex.test(dateString)) {
         return false;
@@ -148,26 +149,80 @@ function isValidDate(dateString) {
         && date.getHours() === hours && date.getMinutes() === minutes && date.getSeconds() === seconds;
 }
 
-// Get all auctions or only active ones based on query parameters
 router.get("/", async (req, res) => {
-    const { active } = req.query;
+    const { active, search, type, rarity, price, sort, order } = req.query;
     const currentDate = new Date();
 
     let auctions = auctionsData;
 
+    // Filter active auctions
     if (active === "true") {
-        auctions = auctionsData.filter(auction => {
-            const publishedDate = parseDate(auction.publishedDate);
-            const endDate = parseDate(auction.endDate);
-
+        auctions = auctions.filter(auction => {
+            const publishedDate = parseDate(auction.publishedDateTime);
+            const endDate = parseDate(auction.endDateTime);
             return currentDate >= publishedDate && currentDate <= endDate;
         });
     }
 
+    // Search auctions by card name
+    if (search) {
+        const searchLower = search.toLowerCase();
+        const filteredCards = cardsData.filter(card => card.name.toLowerCase().includes(searchLower));
+        const filteredCardIds = filteredCards.map(card => card.id);
+        auctions = auctions.filter(auction => filteredCardIds.includes(auction.cardId));
+    }
+
+    // Filter auctions by card type
+    if (type) {
+        const filteredCards = cardsData.filter(card => card.type === type);
+        const filteredCardIds = filteredCards.map(card => card.id);
+        auctions = auctions.filter(auction => filteredCardIds.includes(auction.cardId));
+    }
+
+    // Filter auctions by card rarity
+    if (rarity) {
+        const filteredCards = cardsData.filter(card => card.rarity === rarity);
+        const filteredCardIds = filteredCards.map(card => card.id);
+        auctions = auctions.filter(auction => filteredCardIds.includes(auction.cardId));
+    }
+
+    // Filter by price range (gte and lte)
+    if (price) {
+        const [operator, value] = price.split(':');
+        const priceValue = parseInt(value);
+
+        if (operator === 'gte') {
+            auctions = auctions.filter(auction => auction.basePrice >= priceValue);
+        } else if (operator === 'lte') {
+            auctions = auctions.filter(auction => auction.basePrice <= priceValue);
+        }
+    }
+
+    // Sorting logic
+    if (sort) {
+        if (sort === 'price') {
+            auctions.sort((a, b) => (order === 'asc' ? a.basePrice - b.basePrice : b.basePrice - a.basePrice));
+        } else if (sort === 'publishedDateTime') {
+            auctions.sort((a, b) => {
+                const dateA = parseDate(a.publishedDateTime);
+                const dateB = parseDate(b.publishedDateTime);
+                return order === 'asc' ? dateA - dateB : dateB - dateA;
+            });
+        } else if (sort === 'endDateTime') {
+            auctions.sort((a, b) => {
+                const dateA = parseDate(a.endDateTime);
+                const dateB = parseDate(b.endDateTime);
+                return order === 'asc' ? dateA - dateB : dateB - dateA;
+            });
+        }
+    }
+
+    // If no auctions or no matching auctions are found, return a message
     if (auctions.length === 0) {
         return res.json({ error: "No auctions found" });
     }
 
+    // Return the filtered and sorted auctions
     return res.json({ auctions });
 });
 

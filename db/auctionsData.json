@@ -3,84 +3,84 @@
         "id": 0,
         "cardId": 4,
         "basePrice": 500,
-        "publishedDate": "23-10-2024",
-        "endDate": "28-10-2024"
+        "publishedDateTime": "15-09-2024 10:15:20",
+        "endDateTime": "20-09-2024 15:30:00"
     },
     {
         "id": 1,
         "cardId": 0,
         "basePrice": 270,
-        "publishedDate": "30-09-2024",
-        "endDate": "07-10-2024"
+        "publishedDateTime": "05-09-2024 09:42:15",
+        "endDateTime": "12-09-2024 14:00:00"
     },
     {
         "id": 2,
         "cardId": 9,
         "basePrice": 270,
-        "publishedDate": "19-09-2024",
-        "endDate": "22-09-2024"
+        "publishedDateTime": "19-09-2024 11:27:30",
+        "endDateTime": "22-09-2024 18:45:00"
     },
     {
         "id": 3,
         "cardId": 1,
         "basePrice": 650,
-        "publishedDate": "01-10-2024",
-        "endDate": "06-10-2024"
+        "publishedDateTime": "30-08-2024 08:50:45",
+        "endDateTime": "05-09-2024 10:15:00"
     },
     {
         "id": 4,
         "cardId": 2,
         "basePrice": 320,
-        "publishedDate": "05-10-2024",
-        "endDate": "12-10-2024"
+        "publishedDateTime": "05-09-2024 14:12:50",
+        "endDateTime": "10-09-2024 09:00:00"
     },
     {
         "id": 5,
         "cardId": 3,
         "basePrice": 550,
-        "publishedDate": "07-10-2024",
-        "endDate": "14-10-2024"
+        "publishedDateTime": "07-09-2024 15:25:30",
+        "endDateTime": "14-09-2024 12:00:00"
     },
     {
         "id": 6,
         "cardId": 5,
         "basePrice": 700,
-        "publishedDate": "09-10-2024",
-        "endDate": "16-10-2024"
+        "publishedDateTime": "09-09-2024 16:10:00",
+        "endDateTime": "16-09-2024 17:30:00"
     },
     {
         "id": 7,
         "cardId": 6,
         "basePrice": 300,
-        "publishedDate": "10-10-2024",
-        "endDate": "17-10-2024"
+        "publishedDateTime": "10-09-2024 12:48:30",
+        "endDateTime": "17-09-2024 11:15:00"
     },
     {
         "id": 8,
         "cardId": 7,
         "basePrice": 800,
-        "publishedDate": "11-10-2024",
-        "endDate": "18-10-2024"
+        "publishedDateTime": "20-09-2024 17:55:10",
+        "endDateTime": "28-09-2024 19:00:00"
     },
     {
         "id": 9,
         "cardId": 8,
         "basePrice": 450,
-        "publishedDate": "12-10-2024",
-        "endDate": "19-10-2024"
+        "publishedDateTime": "12-09-2024 18:23:50",
+        "endDateTime": "19-09-2024 16:30:00"
     },
     {
         "id": 10,
         "cardId": 10,
         "basePrice": 600,
-        "publishedDate": "13-10-2024",
-        "endDate": "20-10-2024"
+        "publishedDateTime": "10-10-2024 13:02:43",
+        "endDateTime": "17-10-2024 20:00:00"
     },
     {
         "id": 11,
         "cardId": 11,
         "basePrice": 350,
-        "publishedDate": "14-10-2024",
-        "endDate": "21-10-2024"
+        "publishedDateTime": "12-10-2024 14:45:22",
+        "endDateTime": "19-10-2024 18:30:00"
     }
 ]
