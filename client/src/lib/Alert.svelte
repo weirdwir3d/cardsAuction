@@ -9,6 +9,16 @@
         warning: "bg-yellow-100 text-yellow-700 border-yellow-500",
     };
 
+    // Watch for changes in isVisible and set a timeout to close the alert
+    $: if (isVisible) {
+        const timeout = setTimeout(() => {
+            isVisible = false;
+                    // Clear the timeout if the alert is closed manually
+        return () => clearTimeout(timeout);
+        }, 4000); // 4 seconds
+
+    }
+
     function closeAlert() {
         isVisible = false;
     }

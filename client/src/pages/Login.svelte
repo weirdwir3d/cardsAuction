@@ -1,43 +1,115 @@
 <script>
-    import TextInput from "../lib/TextInput.svelte";
-    import PasswordInput from "../lib/PasswordInput.svelte";
-    import Button from "../lib/Button.svelte"; // Importing the Button component
+  import PasswordInput from "../lib/PasswordInput.svelte";
+  import EmailInput from "../lib/EmailInput.svelte";
+  import Button from "../lib/Button.svelte";
+  import Alert from "../lib/Alert.svelte"; // Include the alert
+  import WelcomeSection from "../lib/WelcomeSection.svelte";
+  import { tokenStore } from "../TokenStore";
+  import { checkLoggedIn, checkIsAdmin } from "../middleware";
 
-    let username = "";
-    let password = "";
+  let email = "";
+  let password = "";
 
-    function handleLogin(event) {
-        event.preventDefault(); // Prevent the default form submission behavior
-        console.log("Logging in with", username, password);
-        // TODO: Add your login logic here
+  let alertMessage = "";
+  let alertType = "error";
+  let isAlertVisible = false;
+  let username = "";
+  let isLoggedIn = false;
+  let isAdmin = false;
+
+  // Reset alert and login state
+  function resetAlert() {
+    alertMessage = "";
+    alertType = "error";
+    isAlertVisible = false;
+  }
+
+  async function handleLogin(event) {
+    event.preventDefault();
+    console.log("Logging in with", email, password);
+
+    // Reset any previous alert and state before attempting login
+    resetAlert();
+
+    try {
+      const response = await fetch("http://localhost:3000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      console.log("Received response from server:", data);
+
+      if (data.httpStatusCode === 200) {
+        console.log("Login successful, updating token store");
+        tokenStore.set({ token: data.token });
+
+        tokenStore.subscribe((value) => {
+          console.log("Token stored in tokenStore:", value.token);
+          isLoggedIn = checkLoggedIn(value.token);
+          isAdmin = isLoggedIn && checkIsAdmin(value.token);
+
+          const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
+          username = decodedToken.username || "User";
+        })();
+
+        // Set success message
+        alertMessage = "Login successful!";
+        alertType = "success";
+        isAlertVisible = true;
+      } else {
+        handleLoginError(data);
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      alertMessage = "An unexpected error occurred. Please try again later.";
+      alertType = "error";
+      isAlertVisible = true;
     }
+  }
+
+  function handleLoginError(data) {
+    if (data.httpStatusCode === 401) {
+      alertMessage = "Incorrect password. Please try again.";
+    } else if (data.httpStatusCode === 404) {
+      alertMessage = "User not found. Please check your email or register.";
+    } else if (data.httpStatusCode === 500) {
+      alertMessage = "Server error. Please contact admin.";
+    } else {
+      alertMessage = data.message || "Login failed. Please try again.";
+    }
+    alertType = "error";
+    isAlertVisible = true; // Ensure the alert is visible
+  }
 </script>
 
-<h1 class="text-3xl font-bold strikethrough">Log in</h1>
+<h1 class="text-3xl font-bold">Log in</h1>
 
-<!-- Form element to wrap the inputs -->
-<form on:submit={handleLogin} class="p-4">
-    <TextInput 
-        placeholder="Username" 
-        bind:value={username} 
-        type=""
+<!-- Display the alert when an error or success message exists -->
+{#if isAlertVisible}
+  <Alert message={alertMessage} type={alertType} isVisible={isAlertVisible} />
+{/if}
+
+{#if isLoggedIn}
+  <WelcomeSection {username} {isAdmin} />
+{:else}
+  <!-- Show the form when the user is not logged in -->
+  <form on:submit={handleLogin} class="p-4">
+    <EmailInput placeholder="Email" bind:value={email} />
+    <PasswordInput
+      placeholder="Type your password here"
+      bind:value={password}
     />
-    <PasswordInput 
-        placeholder="Type your password here" 
-        bind:value={password} 
-    />
-    
     <div class="flex items-center justify-between mt-4">
-        <!-- Use the Button component here -->
-        <Button 
-            label="Log in" 
-            onClick={handleLogin} 
-            type="submit"
-        />
-        
-        <!-- Underlined anchor tag for registration -->
-        <a href="/register" class="text-tertiary underline hover:text-secondary transition duration-150 ease-in-out">
-            Register
-        </a>
+      <Button label="Log in" type="submit" />
+      <a
+        href="/register"
+        class="text-tertiary underline hover:text-secondary transition duration-150 ease-in-out"
+        >Register</a
+      >
     </div>
-</form>
+  </form>
+{/if}

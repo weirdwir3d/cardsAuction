@@ -3,7 +3,9 @@
     import EmailInput from "../lib/EmailInput.svelte";
     import PasswordInput from "../lib/PasswordInput.svelte";
     import Button from "../lib/Button.svelte";
-    import Alert from "../lib/Alert.svelte"; // Import the custom Alert component
+    import Alert from "../lib/Alert.svelte"; 
+    import WelcomeSection from "../lib/WelcomeSection.svelte";
+    import { tokenStore } from '../TokenStore'; // Import the tokenStore
 
     let username = "";
     let email = "";
@@ -11,8 +13,17 @@
     let confirmPassword = "";
 
     let alertMessage = "";
-    let alertType = "error"; // Default to error
-    let isAlertVisible = false; // Control alert visibility
+    let alertType = "error";
+    let isAlertVisible = false;
+    let isLoggedIn = false;
+    let isAdmin = false;
+
+    // Reset alert and login state
+    function resetAlert() {
+        alertMessage = "";
+        alertType = "error";
+        isAlertVisible = false;
+    }
 
     // Helper function to validate email format
     function isValidEmail(email) {
@@ -23,8 +34,13 @@
     async function handleRegister(event) {
         event.preventDefault();
 
-        // Frontend validation
+        // Frontend validation with console logs
+        console.log('Starting registration process');
+
+        resetAlert();
+
         if (username.length < 4) {
+            console.log('Username validation failed');
             alertMessage = "Username must be at least 4 characters long.";
             alertType = "error";
             isAlertVisible = true;
@@ -32,6 +48,7 @@
         }
 
         if (!isValidEmail(email)) {
+            console.log('Email validation failed');
             alertMessage = "Please enter a valid email address.";
             alertType = "error";
             isAlertVisible = true;
@@ -39,6 +56,7 @@
         }
 
         if (!password) {
+            console.log('Password is empty');
             alertMessage = "Password cannot be empty.";
             alertType = "error";
             isAlertVisible = true;
@@ -46,13 +64,15 @@
         }
 
         if (password !== confirmPassword) {
+            console.log('Passwords do not match');
             alertMessage = "Passwords don't match!";
             alertType = "error";
             isAlertVisible = true;
             return;
         }
 
-        // If all validations pass, proceed with registration
+        // Proceed with registration if validations pass
+        console.log('All validations passed, sending registration request');
         const response = await fetch("http://localhost:3000/auth/register", {
             method: "POST",
             headers: {
@@ -62,18 +82,29 @@
         });
 
         const data = await response.json();
+        console.log('Received response from server:', data);
 
         if (response.ok) {
+            console.log('Registration successful, updating token store');
+            tokenStore.set({ token: data.token }); // Update the tokenStore
+
+            // Immediately check the stored token
+            tokenStore.subscribe(value => {
+                console.log('Token stored in tokenStore:', value.token); // Log the token
+                
+                if (value.token) {
+                    // Decode the token to get the username and admin status
+                    const decodedToken = JSON.parse(atob(value.token.split('.')[1]));
+                    username = decodedToken.username || "User";
+                    isAdmin = decodedToken.isAdmin || false;
+
+                    // Set isLoggedIn to true after successful registration
+                    isLoggedIn = true;
+                }
+            })();
+
             alertMessage = "Registration successful!";
             alertType = "success";
-            isAlertVisible = true;
-            // Redirect to Auctions page
-            setTimeout(() => {
-                window.location.href = '/auctions'; // Replace with your Auctions page route
-            }, 1500); // 1.5 seconds delay before redirect
-        } else {
-            alertMessage = data.message || "Registration error!";
-            alertType = "error";
             isAlertVisible = true;
         }
     }
@@ -81,9 +112,14 @@
 
 <h1 class="text-3xl font-bold">Register</h1>
 
-<Alert message={alertMessage} type={alertType} isVisible={isAlertVisible} />
+{#if isAlertVisible}
+  <Alert message={alertMessage} type={alertType} isVisible={isAlertVisible} />
+{/if}
 
-<form on:submit={handleRegister} class="p-4">
+{#if isLoggedIn}
+  <WelcomeSection {username} {isAdmin} /> <!-- Show welcome section when logged in -->
+{:else}
+  <form on:submit={handleRegister} class="p-4">
     <TextInput placeholder="Username" bind:value={username} />
     <EmailInput placeholder="Email" bind:value={email} />
     <PasswordInput placeholder="Type your password here" bind:value={password} />
@@ -95,4 +131,5 @@
             Log in
         </a>
     </div>
-</form>
+  </form>
+{/if}

@@ -8,7 +8,6 @@
   import Cards from "./pages/Cards.svelte";
   import Bids from "./pages/Bids.svelte";
   import Logout from "./pages/Logout.svelte";
-  import Profile from "./pages/Profile.svelte";
   import Login from "./pages/Login.svelte";
   import Register from "./pages/Register.svelte";
   
@@ -61,10 +60,11 @@
 </script>
 
 <main>
-  <Navbar active={currentRoute} />
+  <!-- <Navbar active={currentRoute} /> -->
 </main>
 
 <body class="bg-background">
+  <Navbar active={currentRoute} />
   <svelte:component this={page} {params} />
 </body>
 
@@ -78,6 +78,7 @@
     :root {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
         Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        color: purple;
     }
   }
 </style>
