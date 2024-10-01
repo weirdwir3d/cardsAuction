@@ -5,7 +5,8 @@
         "description": "This monster cannot be Special Summoned. When this card destroys a monster as a result of battle and sends it to the Graveyard, inflict damage to your opponent's Life Points equal to the ATK of the destroyed monster.",
         "type": "monster",
         "rarity": "unique",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Tyler_The_Great_Warrior_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Tyler_The_Great_Warrior_1.jpg",
+        "auctionId": 1
     },
     {
         "id": 1,
@@ -13,7 +14,8 @@
         "description": "Must be Xyz Summoned and cannot be Special Summoned by other ways. If this card attacks your opponent directly and reduces their LP to 0, while it has an Xyz Material attached that was originally Spellcaster-Type, you win the Match.",
         "type": "monster",
         "rarity": "super rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Legendary_Magician_Of_Dark_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Legendary_Magician_Of_Dark_1.jpg",
+        "auctionId": 3
     },
     {
         "id": 2,
@@ -21,7 +23,8 @@
         "description": "When your opponent declares an attack while you control a monster: Target 1 face-up monster your opponent controls, except the attacking monster; take control of that target until the end of the Battle Phase, and if you do, it is attacked instead, and you proceed to damage calculation.",
         "type": "trap",
         "rarity": "ultra rare",
-        "imageUrl": "https://m.media-amazon.com/images/I/71G+cR1JNAL._AC_UF1000,1000_QL80_.jpg"
+        "imageUrl": "https://m.media-amazon.com/images/I/71G+cR1JNAL._AC_UF1000,1000_QL80_.jpg",
+        "auctionId": -1
     },
     {
         "id": 3,
@@ -29,7 +32,8 @@
         "description": "Tribute 1 DARK monster with 1000 or less ATK; your opponent takes no damage until the end of the next turn after this card resolves.",
         "type": "trap",
         "rarity": "ultra rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Crush_Card_Virus_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Crush_Card_Virus_1.jpg",
+        "auctionId": -1
     },
     {
         "id": 4,
@@ -37,7 +41,8 @@
         "description": "This card cannot be Special Summoned except by Synchro Summon. If this card attacks your opponent directly and reduces their Life Points to 0, you win the Match.",
         "type": "monster",
         "rarity": "super rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Stardust_Divinity_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Stardust_Divinity_1.jpg",
+        "auctionId": 0
     },
     {
         "id": 5,
@@ -45,7 +50,8 @@
         "description": "A dragon that can wipe out a monster on the foe's field. At the same time, it hits the foe with 500 LP worth of damage.",
         "type": "monster",
         "rarity": "ultra rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Des_Volstgalph_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Des_Volstgalph_1.jpg",
+        "auctionId": 6
     },
     {
         "id": 6,
@@ -53,7 +59,8 @@
         "description": "Target 1 face-up monster on the field; its original ATK becomes halved until the end of this turn.",
         "type": "spell",
         "rarity": "ultra rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Shrink_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Shrink_1.jpg",
+        "auctionId": -1
     },
     {
         "id": 7,
@@ -61,7 +68,8 @@
         "description": "If only your opponent controls a monster, you can Special Summon this card (from your hand).",
         "type": "monster",
         "rarity": "ultra rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Cyber_Dragon_1_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Cyber_Dragon_1_1.jpg",
+        "auctionId": -1
     },
     {
         "id": 8,
@@ -69,7 +77,8 @@
         "description": "Must be Xyz Summoned and cannot be Special Summoned by other ways. If this card attacks your opponent directly and reduces their Life Points to 0, while it has an Xyz Material attached that was originally Machine-Type, you win the Match.",
         "type": "monster",
         "rarity": "rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Grandopolis_The_Eternal_City_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Grandopolis_The_Eternal_City_1.jpg",
+        "auctionId": -1
     },
     {
         "id": 9,
@@ -77,7 +86,8 @@
         "description": "Banish 1 card from your Deck, face-up. During your 2nd Standby Phase after this card's activation, add that card to the hand.",
         "type": "spell",
         "rarity": "ultra rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Gold_Sacrophagus_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Gold_Sacrophagus_1.jpg",
+        "auctionId": -1
     },
     {
         "id": 10,
@@ -85,7 +95,8 @@
         "description": "The ultimate wizard in terms of attack and defense.",
         "type": "monster",
         "rarity": "ultra rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Dark_Magician_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Dark_Magician_1.jpg",
+        "auctionId": 10
     },
     {
         "id": 11,
@@ -93,7 +104,8 @@
         "description": "When an opponent`s monster declares an attack: Target the attacking monster; destroy that target.",
         "type": "trap",
         "rarity": "super rare",
-        "imageUrl": "https://m.media-amazon.com/images/I/41Eiv33EcUL._AC_UF1000,1000_QL80_.jpg"
+        "imageUrl": "https://m.media-amazon.com/images/I/41Eiv33EcUL._AC_UF1000,1000_QL80_.jpg",
+        "auctionId": -1
     },
     {
         "id": 12,
@@ -101,7 +113,8 @@
         "description": "Discard 2 cards, then target 1 Spell in your GY; add it to your hand.",
         "type": "spell",
         "rarity": "ultra rare",
-        "imageUrl": "https://static-7.studiobebop.net/ygo_data/card_images/Magical_Stone_Excavation.jpg"
+        "imageUrl": "https://static-7.studiobebop.net/ygo_data/card_images/Magical_Stone_Excavation.jpg",
+        "auctionId": -1
     },
     {
         "id": 13,
@@ -109,7 +122,8 @@
         "description": "Must be Xyz Summoned and cannot be Special Summoned by other ways. If this card attacks your opponent directly and reduces their LP to 0, while it has an Xyz Material attached that was originally Dragon-Type, you win the Match.",
         "type": "monster",
         "rarity": "rare",
-        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Legendary_Dragon_Of_White_1.jpg"
+        "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Legendary_Dragon_Of_White_1.jpg",
+        "auctionId": -1
     },
     {
         "id": 14,
@@ -117,6 +131,7 @@
         "description": "When your opponent Summons a monster(s) with 1500 or more ATK: Destroy that monster(s) with 1500 or more ATK, and if you do, banish it.",
         "type": "trap",
         "rarity": "rare",
-        "imageUrl": "https://www.cardtrader.com/uploads/blueprints/image/151343/bottomless-trap-hole-genesis-impact.jpg"
+        "imageUrl": "https://www.cardtrader.com/uploads/blueprints/image/151343/bottomless-trap-hole-genesis-impact.jpg",
+        "auctionId": -1
     }
 ]
