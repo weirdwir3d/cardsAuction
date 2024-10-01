@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 const app = express();
@@ -12,6 +13,13 @@ import bids from './routes/bids.js';
 app.use(express.json()) 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser()); // parsing cookies
+// Enable CORS for all origins
+app.use(cors({
+  origin: '*', // Allow any origin
+  methods: 'GET,POST,PUT,DELETE', // Specify allowed HTTP methods
+  credentials: true, // Allow credentials (cookies, etc.)
+}));
+
 app.use("/auth", auth);
 app.use("/users", users);
 app.use("/cards", cards);

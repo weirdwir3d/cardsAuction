@@ -1,26 +1,56 @@
 import express from 'express';
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 import usersData from '../../../db/usersData.json' assert { type: 'json' };
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import * as middleware from '../middleware/middleware.js';
-const router = express.Router();
 
+const router = express.Router();
 dotenv.config();
+
+// Helper function to validate email format
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
 
 router.post("/register", async (req, res) => {
     let { password, confirmPassword, email, isAdmin, username } = req.body;
 
-    //check if passwords are the same
+    // Validate if password is not empty
+    if (!password) {
+        return res.json({
+            httpStatusCode: 400,
+            message: "Password cannot be empty"
+        });
+    }
+
+    // Validate if passwords are the same
     if (password !== confirmPassword) {
         return res.json({
             httpStatusCode: 401,
             message: "Passwords don't match"
-        })
+        });
+    }
+
+    // Validate email format
+    if (!isValidEmail(email)) {
+        return res.json({
+            httpStatusCode: 400,
+            message: "Invalid email format"
+        });
+    }
+
+    // Validate username length (must be at least 4 characters)
+    if (username.length < 4) {
+        return res.json({
+            httpStatusCode: 400,
+            message: "Username must be at least 4 characters long"
+        });
     }
 
     let foundUser = usersData.find(user => user.email === email);
-    //register if email is unused
+    // Register if email is unused
     if (!foundUser) {
         try {
             let hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUNDS));
@@ -29,19 +59,19 @@ router.post("/register", async (req, res) => {
                 return (a.id - b.id);
             });
 
-            console.log(hashedPassword)
+            console.log(hashedPassword);
             let highestId = (sortedUsers.length > 0) ? sortedUsers[sortedUsers.length - 1].id : -1;
 
-            console.log('highest id', highestId)
+            console.log('highest id', highestId);
             usersData.push({
                 id: highestId + 1,
                 username: req.body.username,
                 email: email,
                 password: hashedPassword,
                 isAdmin: (isAdmin)
-            })
+            });
 
-            await login(req, res)
+            await login(req, res);
 
         } catch (err) {
             return res.json({
@@ -54,71 +84,71 @@ router.post("/register", async (req, res) => {
         return res.json({
             httpStatusCode: 409,
             message: "Email address already in use"
-        })
+        });
     }
 });
 
 router.post("/login", async (req, res) => {
-    await login(req, res)
+    await login(req, res);
 });
 
 router.post("/logout", middleware.isLoggedIn, async (req, res) => {
     res.cookie('authToken', '', {
         httpOnly: true,
         maxAge: 0
-    })
+    });
 
     return res.json({
         httpStatusCode: 200,
-        message: "Logged out succesfully"
-    })
-})
+        message: "Logged out successfully"
+    });
+});
 
 async function login(req, res) {
-    console.log('trying to log in')
+    console.log('trying to log in');
     let email = req.body.email;
     let password = req.body.password;
 
     let foundUser = usersData.find(user => user.email === email);
 
-    console.log(`found user: ${JSON.stringify(foundUser)}`)
+    console.log(`found user: ${JSON.stringify(foundUser)}`);
 
-    //find user
+    // Find user
     if (foundUser) {
 
         let isPasswordValid = await bcrypt.compare(password, foundUser.password);
 
         if (isPasswordValid) {
             jwt.sign(foundUser, process.env.SECRET, { expiresIn: '1h' }, (err, token) => {
-                console.log('signing')
+                console.log('signing');
                 if (err) {
                     console.log(err);
                     return res.json({
                         httpStatusCode: 500,
                         message: "Server error while logging in, please contact admin",
                         token: token
-                    })
+                    });
                 }
-                
-                // set cookie in http response
+
+                // Set cookie in HTTP response
                 res.cookie('authToken', token, {
                     httpOnly: true,
                     maxAge: 60 * 60 * 1000, // 1h
                 });
 
-                console.log('logged in')
+                console.log('logged in');
                 return res.json({
                     httpStatusCode: 200,
                     message: "Logged in successfully",
                     token: token
-                })
+                });
             });
         } else {
-            console.log('wromg password');
+            console.log('wrong password');
             return res.json({
                 httpStatusCode: 401,
                 message: "Wrong password"
-            })
+            });
         }
 
     } else {
@@ -126,7 +156,7 @@ async function login(req, res) {
         return res.json({
             httpStatusCode: 404,
             message: "User not found"
-        })
+        });
     }
 }
 
