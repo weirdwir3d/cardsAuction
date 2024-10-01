@@ -10,12 +10,35 @@
   import Logout from "./pages/Logout.svelte";
   import Login from "./pages/Login.svelte";
   import Register from "./pages/Register.svelte";
-  
+  import Forbidden from "./pages/Forbidden.svelte";
+  import Unauthorized from "./pages/Unauthorized.svelte";
+
+  // Import middleware functions
+  import { checkIsAdmin, checkLoggedIn } from "./middleware";
 
   let page;
   let params;
   let currentRoute;
 
+  // Middleware function for admin-only routes
+  function admin_only(ctx, next) {
+    if (checkIsAdmin()) {
+      next(); // Proceed to the route
+    } else {
+      router.redirect("/forbidden"); // Redirect to home if not admin
+    }
+  }
+
+  // Middleware function for login-only routes
+  function login_only(ctx, next) {
+    if (checkLoggedIn()) {
+      next(); // Proceed to the route
+    } else {
+      router.redirect("/unauthorized"); // Redirect to login if not authenticated
+    }
+  }
+
+  // Define routes
   router("/", (ctx) => {
     page = Auctions;
     currentRoute = ctx.pathname;
@@ -26,22 +49,17 @@
     currentRoute = ctx.pathname;
   });
 
-  router("/cards", (ctx) => {
+  router("/cards", admin_only, (ctx) => {
     page = Cards;
     currentRoute = ctx.pathname;
   });
 
-  router("/bids", (ctx) => {
+  router("/bids", login_only, (ctx) => {
     page = Bids;
     currentRoute = ctx.pathname;
   });
 
-  router("/profile", (ctx) => {
-    page = Profile;
-    currentRoute = ctx.pathname;
-  });
-
-  router("/logout", (ctx) => {
+  router("/logout", login_only, (ctx) => {
     page = Logout;
     currentRoute = ctx.pathname;
   });
@@ -56,15 +74,25 @@
     currentRoute = ctx.pathname;
   });
 
+  router("/forbidden", (ctx) => {
+    page = Forbidden;
+    currentRoute = ctx.pathname;
+  });
+
+  router("/unauthorized", (ctx) => {
+    page = Unauthorized;
+    currentRoute = ctx.pathname;
+  });
+
+  // Start the router
   router.start();
 </script>
 
 <main>
-  <!-- <Navbar active={currentRoute} /> -->
+  <Navbar active={currentRoute} />
 </main>
 
 <body class="bg-background">
-  <Navbar active={currentRoute} />
   <svelte:component this={page} {params} />
 </body>
 
@@ -78,7 +106,7 @@
     :root {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
         Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-        color: purple;
+      color: purple;
     }
   }
 </style>
