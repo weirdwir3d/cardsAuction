@@ -1,45 +1,69 @@
-<h1>Cards</h1>
+<h1 class="text-3xl font-bold">Cards</h1>
+<!-- TODO: make button work -->
+    <div class="text-center md:text-left mt-6">
+      <button 
+        on:click={() => router.redirect('/cards')} 
+        class="px-6 py-3 bg-tertiary text-white rounded hover:bg-blue-600 transition-colors"
+      >
+        Add card
+      </button>
+    </div>
 
 <script>
-    async function retrieveCards() {
-        console.log('retrieving cards...')
+  import router from 'page';
+  import { onMount } from "svelte";
+  import CardContainer from "../lib/CardContainer.svelte";
+  import { tokenStore } from '../TokenStore'; // Import the tokenStore
+            tokenStore.subscribe(value => {
+            console.log('CARDS PG Token stored in tokenStore:', value.token); // Log the token from TokenStore
+        })();
+
+  let cards = [];
+  let alertMessage = "";
+  let alertType = "";
+  let isAlertVisible = false;
+
+  async function retrieveCards() {
+    console.log("Retrieving cards...");
 
     try {
       const response = await fetch("http://localhost:3000/cards", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-        }
+        },
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
       const data = await response.json();
       console.log("Received response from server:", data);
 
-    //   if (data.httpStatusCode === 200) {
-    //     console.log("Login successful, updating token store");
-    //     tokenStore.set({ token: data.token });
-
-    //     tokenStore.subscribe((value) => {
-    //       console.log("Token stored in tokenStore:", value.token);
-    //       isLoggedIn = checkLoggedIn(value.token);
-    //       isAdmin = isLoggedIn && checkIsAdmin(value.token);
-
-    //       const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
-    //       username = decodedToken.username || "User";
-    //     })();
-
-    //     // Set success message
-    //     alertMessage = "Login successful!";
-    //     alertType = "success";
-    //     isAlertVisible = true;
-    //   } else {
-    //     handleLoginError(data);
-    //   }
+      cards = data.cardsData; // Assuming the API returns an array of cards
     } catch (error) {
-      console.error("Error logging in:", error);
-      alertMessage = "An unexpected error occurred. Please try again later.";
+      console.error("Error retrieving cards:", error);
+      alertMessage = "An error occurred while retrieving cards. Please try again later.";
       alertType = "error";
       isAlertVisible = true;
     }
-    }
+  }
+
+  // Run the function on component mount
+  onMount(() => {
+    retrieveCards();
+  });
 </script>
+
+{#if isAlertVisible}
+  <div class={`alert ${alertType === 'error' ? 'bg-red-500 text-white' : ''} p-4 rounded`}>
+    {alertMessage}
+  </div>
+{/if}
+
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6">
+  {#each cards as card}
+  <CardContainer {card} />
+  {/each}
+</div>

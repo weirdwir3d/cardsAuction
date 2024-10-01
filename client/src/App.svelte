@@ -1,11 +1,12 @@
 <script>
-  import logo from "./assets/Yugioh-logo.svg";
+  import { tokenStore } from './TokenStore';
   import router from "page";
 
   import Navbar from "./components/Navbar.svelte";
 
   import Auctions from "./pages/Auctions.svelte";
   import Cards from "./pages/Cards.svelte";
+  import CardDetails from "./pages/CardDetails.svelte";
   import Bids from "./pages/Bids.svelte";
   import Logout from "./pages/Logout.svelte";
   import Login from "./pages/Login.svelte";
@@ -20,12 +21,22 @@
   let params;
   let currentRoute;
 
+    // Subscribe to tokenStore for global access
+  let token;
+  tokenStore.subscribe(value => {
+    token = value.token;
+    if (token) {
+      console.log('Token is available');
+    }
+  });
+
   // Middleware function for admin-only routes
   function admin_only(ctx, next) {
     if (checkIsAdmin()) {
       next(); // Proceed to the route
     } else {
-      router.redirect("/forbidden"); // Redirect to home if not admin
+          page = Forbidden;
+    currentRoute = ctx.pathname;
     }
   }
 
@@ -34,7 +45,8 @@
     if (checkLoggedIn()) {
       next(); // Proceed to the route
     } else {
-      router.redirect("/unauthorized"); // Redirect to login if not authenticated
+          page = Unauthorized;
+    currentRoute = ctx.pathname;
     }
   }
 
@@ -52,6 +64,12 @@
   router("/cards", admin_only, (ctx) => {
     page = Cards;
     currentRoute = ctx.pathname;
+  });
+
+  router("/cards/:id", (ctx) => {
+    page = CardDetails;
+    currentRoute = ctx.pathname;
+    params = ctx.params;
   });
 
   router("/bids", login_only, (ctx) => {
