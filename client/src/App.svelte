@@ -5,6 +5,7 @@
   import Navbar from "./components/Navbar.svelte";
 
   import Auctions from "./pages/Auctions.svelte";
+  import AuctionDetails from "./pages/AuctionDetails.svelte";
   import Cards from "./pages/Cards.svelte";
   import CardDetails from "./pages/CardDetails.svelte";
   import Bids from "./pages/Bids.svelte";
@@ -68,6 +69,12 @@
 
   router("/cards/:id", (ctx) => {
     page = CardDetails;
+    currentRoute = ctx.pathname;
+    params = ctx.params;
+  });
+
+  router("/auctions/:id", (ctx) => {
+    page = AuctionDetails;
     currentRoute = ctx.pathname;
     params = ctx.params;
   });

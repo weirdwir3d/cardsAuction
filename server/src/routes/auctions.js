@@ -58,12 +58,28 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     });
 });
 
-// GET one auction
+// GET one auction by ID
 router.get("/:id", async (req, res) => {
-    let wantedId = parseInt(req.params.id);
-    let foundCard = auctionsData.find(card => card.id === wantedId);
-    console.log('found id:', wantedId, 'found card:', foundCard);
-    res.json({ foundCard });
+    try {
+        const auctionId = parseInt(req.params.id);
+
+        if (isNaN(auctionId)) {
+            return res.status(400).json({ error: "Invalid auction ID format" });
+        }
+
+        const auction = auctionsData.find(auction => auction.id === auctionId);
+
+        if (!auction) {
+            return res.status(404).json({ error: "Auction not found" });
+        }
+
+        console.log('Requested auction ID:', auctionId, 'Auction details:', auction);
+
+        res.status(200).json(auction); // Respond with auction details
+    } catch (error) {
+        console.error('Error retrieving auction:', error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 // Create a new auction
