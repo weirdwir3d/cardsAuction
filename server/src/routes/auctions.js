@@ -7,7 +7,9 @@ const router = express.Router();
 // Edit an auction
 router.put('/:id', middleware.isAdmin, (req, res) => {
     const auctionId = parseInt(req.params.id);
-    const updatedAuction = req.body;
+    const auctionToUpdate = req.body;
+
+    console.log('backend new auction details:', auctionToUpdate)
 
     let foundAuction = auctionsData.find(auction => auction.id === auctionId);
 
@@ -15,46 +17,50 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
         return res.status(404).json({ error: "Auction not found" });
     }
 
-    const basePrice = updatedAuction.basePrice || foundAuction.basePrice;
-    const publishedDateTime = updatedAuction.publishedDateTime || foundAuction.publishedDateTime;
-    const endDateTime = updatedAuction.endDateTime || foundAuction.endDateTime;
-
     // Validation for base price
-    if (basePrice <= 0) {
-        return res.status(403).json({ error: "Base price cannot be zero or less" });
+    if (auctionToUpdate.basePrice != foundAuction.basePrice) {
+        if (auctionToUpdate.basePrice <= 0) {
+            return res.status(403).json({ error: "Base price cannot be zero or less" });
+        }
+        foundAuction.basePrice = auctionToUpdate.basePrice;
     }
 
-    // Validation for dates
-    if (!isValidDateTime(publishedDateTime)) {
+    if (!isValidDateTime(auctionToUpdate.publishedDateTime)) {
+        console.log('wrong startdate')
         return res.status(400).json({ error: "Invalid published date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
     }
 
-    if (!isValidDateTime(endDateTime)) {
+    if (auctionToUpdate.endDateTime && !isValidDateTime(auctionToUpdate.endDateTime)) {
+        console.log('wrong enddate')
         return res.status(400).json({ error: "Invalid end date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
     }
 
-    const parsedPublishedDateTime = parseDate(publishedDateTime);
-    const parsedEndDateTime = parseDate(endDateTime);
+    const parsedPublishedDateTime = parseDate(auctionToUpdate.publishedDateTime);
+    const parsedEndDateTime = parseDate(auctionToUpdate.endDateTime);
     const currentDateTime = new Date();
     currentDateTime.setMilliseconds(0); // Set currentDate to the start of the second
 
-    if (parsedPublishedDateTime < currentDateTime) {
-        return res.status(400).json({ error: "Published date cannot be in the past." });
+    if (auctionToUpdate.publishedDateTime != foundAuction.publishedDateTime) {
+        if (parsedPublishedDateTime < currentDateTime) {
+            console.log('Published date cannot be in the past.')
+            return res.status(400).json({ error: "Published date cannot be in the past." });
+        }
+        foundAuction.publishedDateTime = auctionToUpdate.publishedDateTime;
     }
 
-    if (parsedEndDateTime <= parsedPublishedDateTime) {
-        return res.status(400).json({ error: "End date must be after the published date." });
+    if (auctionToUpdate.endDateTime != foundAuction.endDateTime) {
+        if (parsedEndDateTime <= parsedPublishedDateTime) {
+            console.log('End date must be after the published date.')
+            return res.status(400).json({ error: "End date must be after the published date." });
+        }
+        foundAuction.endDateTime = auctionToUpdate.endDateTime;
     }
 
-    // Update the auction with the new details
-    foundAuction.basePrice = basePrice;
-    foundAuction.publishedDateTime = publishedDateTime;
-    foundAuction.endDateTime = endDateTime;
 
     // Respond with a success message
     res.status(200).json({
         message: "Auction updated successfully!",
-        updatedAuction: foundAuction
+        auctionToUpdate: foundAuction
     });
 });
 

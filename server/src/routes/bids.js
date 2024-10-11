@@ -68,15 +68,27 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
 
 // Create a new bid
 router.post('/', middleware.isLoggedIn, (req, res) => {
+    console.log('in fucking method')
     const { userId, auctionId, bidAmount, publishedDateTime } = req.body;
+    console.log('userId:', userId);
+    console.log('auctionId:', auctionId);
+    console.log('bidAmount:', bidAmount);
+    console.log('publishedDateTime:', publishedDateTime);
+    if (userId == null || auctionId == null || bidAmount == null || !publishedDateTime) {
+        return res.status(400).json({ error: "Missing required fields." });
+    }
 
-    let foundUser = usersData.find(user => user.id === userId);
+    console.log("Received bid request:", req.body);
+
+    let foundUser = usersData.find(user => user.id == userId);
+    console.log("Found user:", foundUser);
 
     if (!foundUser) {
         return res.status(404).json({ error: "User not found" });
     }
     
-    let foundAuction = auctionsData.find(auction => auction.id === auctionId);
+    let foundAuction = auctionsData.find(auction => auction.id == auctionId);
+    console.log("Found auction:", foundAuction);
 
     if (!foundAuction) {
         return res.status(404).json({ error: "Auction not found" });
@@ -119,21 +131,22 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
         return res.status(400).json({ error: "Bid amount cannot be lower than the previous bid, or the base price of the card." });
     }
 
-    bidsData.push(
-        {
-            id: highestId + 1,
-            userId: userId,
-            auctionId: auctionId,
-            bidAmount: bidAmount,
-            hasWon: null,
-            publishedDateTime: publishedDateTime
-        }
-    )
+    const newBid = {
+        id: bidsData.length > 0 ? bidsData[bidsData.length - 1].id + 1 : 1,
+        userId: userId,
+        auctionId: auctionId,
+        bidAmount: bidAmount,
+        hasWon: null,
+        publishedDateTime: publishedDateTime
+    };
+
+    bidsData.push(newBid);
+    // console.log("New bid added:", newBid);
 
     res.status(200).json({
-        message: "Bid added successfully!"
+        message: "Bid added successfully!",
+        bid: newBid
     });
-
 });
 
 // Helper function to convert "dd-mm-yyyy hh:mm:ss" format to a Date object
@@ -170,8 +183,15 @@ router.get("/:id", async (req, res) => {
 })
 
 // Get all bids, with optional filters for auctionId or userId
+// Get all bids, with optional filters for auctionId or userId
+// Get all bids, with optional filters for auctionId or userId
 router.get("/", async (req, res) => {
     const { auctionId, userId } = req.query;
+
+    // If no auctionId or userId is provided, return a 400 Bad Request
+    if (!auctionId && !userId) {
+        return res.status(400).json({ error: "Missing required auctionId or userId parameter." });
+    }
 
     let filteredBids = bidsData;
 
@@ -185,12 +205,16 @@ router.get("/", async (req, res) => {
         filteredBids = filteredBids.filter(bid => bid.userId === parseInt(userId));
     }
 
+    // If no bids are found, return 404 Not Found
     if (filteredBids.length === 0) {
-        return res.status(404).json({ error: "No bids found" });
+        return res.status(404).json({ error: "No bids found for the given filters." });
     }
 
-    res.json({ filteredBids });
+    // Otherwise, return the filtered bids with 200 OK
+    return res.status(200).json({ bids: filteredBids });
 });
+
+
 
 // Delete a bid
 router.delete('/:id', middleware.isAdmin, (req, res) => {

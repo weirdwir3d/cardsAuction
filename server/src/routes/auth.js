@@ -94,7 +94,7 @@ router.post("/login", async (req, res) => {
 
 router.post("/logout", middleware.isLoggedIn, async (req, res) => {
     res.cookie('authToken', '', {
-        httpOnly: true,
+        httpOnly: false,
         maxAge: 0
     });
 
@@ -132,7 +132,8 @@ async function login(req, res) {
 
                 // Set cookie in HTTP response
                 res.cookie('authToken', token, {
-                    httpOnly: true,
+                    httpOnly: false,
+                    SameSite: 'None',
                     maxAge: 60 * 60 * 1000, // 1h
                 });
 

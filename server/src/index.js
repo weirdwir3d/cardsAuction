@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser()); // parsing cookies
 // Enable CORS for all origins
 app.use(cors({
-  origin: '*', // Allow any origin
+  origin: 'http://localhost:5173', // Allow any origin
   methods: 'GET,POST,PUT,DELETE', // Specify allowed HTTP methods
   credentials: true, // Allow credentials (cookies, etc.)
 }));

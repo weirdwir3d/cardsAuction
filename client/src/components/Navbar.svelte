@@ -37,7 +37,7 @@
     <li><a class:active={active === "/auctions"} href="/auctions" class="px-4 py-2 md:py-0 text-center hover:text-tertiary">Auctions</a></li>
     
     {#if isLoggedIn}
-      <li><a class:active={active === "/bids"} href="/bids" class="px-4 py-2 md:py-0 text-center hover:text-tertiary">My Bids</a></li>
+      <li><a class:active={active === "/profile"} href="/profile" class="px-4 py-2 md:py-0 text-center hover:text-tertiary">Profile</a></li>
       {#if isAdmin}
         <li><a class:active={active === "/cards"} href="/cards" class="px-4 py-2 md:py-0 text-center hover:text-tertiary">Cards</a></li>
       {/if}

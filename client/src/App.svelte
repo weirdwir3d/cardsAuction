@@ -8,7 +8,7 @@
   import AuctionDetails from "./pages/AuctionDetails.svelte";
   import Cards from "./pages/Cards.svelte";
   import CardDetails from "./pages/CardDetails.svelte";
-  import Bids from "./pages/Bids.svelte";
+  import Profile from "./pages/Profile.svelte";
   import Logout from "./pages/Logout.svelte";
   import Login from "./pages/Login.svelte";
   import Register from "./pages/Register.svelte";
@@ -79,8 +79,8 @@
     params = ctx.params;
   });
 
-  router("/bids", login_only, (ctx) => {
-    page = Bids;
+  router("/profile", login_only, (ctx) => {
+    page = Profile;
     currentRoute = ctx.pathname;
   });
 

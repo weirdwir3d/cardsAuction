@@ -13,8 +13,9 @@
      role="button"
      tabindex="0"
      on:keypress={(e) => e.key === 'Enter' && handleClick()}>
-  <h2 class="text-lg font-bold mb-2 text-center">{auction.id}</h2>
+  
   {#if card}
+  <h2 class="text-lg font-bold mb-2 text-center">{card.name}</h2>
     <img src={card.imageUrl} alt={card.name} class="w-full h-auto object-contain rounded-lg" />
   {:else}
     <p>No card available</p>
