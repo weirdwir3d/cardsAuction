@@ -3,6 +3,7 @@
 
   export let selectedType = "All";
   export let selectedRarity = "All";
+  let maxPrice = "";
 
   const dispatch = createEventDispatcher();
 
@@ -10,7 +11,8 @@
   function handleFilterChange() {
     dispatch('applyFilters', {
       selectedType,
-      selectedRarity
+      selectedRarity,
+      maxPrice
     });
   }
 </script>
@@ -31,5 +33,8 @@
         <option value={rarity}>{rarity}</option>
       {/each}
     </select>
+
+    <label class="block mb-2">Max Price</label>
+    <input type="number" bind:value={maxPrice} placeholder="Max Price" class="border p-2 mb-4 w-full" on:input={handleFilterChange} />
   </div>
 </div>

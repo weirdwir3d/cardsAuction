@@ -11,8 +11,8 @@
   let searchQuery = "";
   let selectedType = "All";
   let selectedRarity = "All";
+  let maxPrice = ""; // New variable for maximum price
 
-  // Update the query parameters dynamically
   function updateQueryParams() {
     let queryParams = [];
     if (selectedRarity !== "All") {
@@ -21,12 +21,23 @@
     if (selectedType !== "All") {
       queryParams.push(`type=${selectedType.toLowerCase()}`);
     }
+    if (maxPrice) {
+      queryParams.push(`price=lte:${maxPrice}`); // Filter for maximum price
+    }
     return queryParams.length > 0 ? '?' + queryParams.join('&') : '';
   }
 
   async function retrieveAuctions() {
     const queryString = updateQueryParams();
     let url = `http://localhost:3000/auctions${queryString}`;
+
+    if (searchQuery) {
+      let symbol = '?'
+      if (url.includes('type') || url.includes('rarity') || url.includes('price')) {
+        symbol = '&'
+      }
+      url += symbol + `search=${searchQuery}`
+    }
 
     console.log('Fetching auctions with URL:', url);
 
@@ -38,7 +49,7 @@
 
         const data = await response.json();
         auctions = data.auctions || [];
-        console.log("Received auctions:", auctions);
+        // console.log("Received auctions:", auctions);
     } catch (error) {
         alertMessage = "An error occurred while retrieving auctions.";
         alertType = "error";
@@ -62,7 +73,7 @@
 
       const data = await response.json();
       cards = data.cardsData || [];
-      console.log("Received cards:", cards);
+      // console.log("Received cards:", cards);
     } catch (error) {
       console.error("Error retrieving cards:", error);
       alertMessage = "An error occurred while retrieving cards.";
@@ -71,20 +82,18 @@
     }
   }
 
-function getCardById(auctionId) {
-    console.log("Looking for card with auctionId:", auctionId); // Log the auctionId
+  function getCardById(auctionId) {
+    // console.log("Looking for card with auctionId:", auctionId);
     const matchedCard = cards.find(card => card.auctionId === auctionId);
     
-    // Log the found card or if no card was found
     if (matchedCard) {
-        console.log("Matched card:", matchedCard);
+      // console.log("Matched card:", matchedCard);
     } else {
-        console.log("No card found for auctionId:", auctionId);
+      // console.log("No card found for auctionId:", auctionId);
     }
     
     return matchedCard ?? { imageUrl: "placeholder-image-url", name: "No card available" };
-}
-
+  }
 
   async function handleSearch() {
     await retrieveAuctions();
@@ -97,19 +106,35 @@ function getCardById(auctionId) {
     }
   }
 
-  // Handle filter updates from child component
   async function handleApplyFilters(event) {
     selectedRarity = event.detail.selectedRarity;
     selectedType = event.detail.selectedType;
-    await retrieveAuctions(); // Fetch auctions first
+    maxPrice = event.detail.maxPrice; // Add this line to capture max price
+    await retrieveAuctions();
     await retrieveCards(); 
   }
 
   onMount(async () => {
     await retrieveCards();
     await retrieveAuctions();
-     // Ensure cards are retrieved on mount
   });
+
+function handleSearchChange() {
+    console.log('search query:', searchQuery);
+    
+    // Filter cards based on the search query
+    let filteredCards = cards.filter(card => card.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    console.log('Found cards with name:', filteredCards);
+    
+    // Filter auctions based on the filtered cards
+    auctions = auctions.filter(auction => 
+        filteredCards.some(card => card.auctionId === auction.id)
+    );
+
+    // Log the filtered auctions
+    console.log('Filtered auctions:', auctions);
+}
+
 </script>
 
 <!-- Page Layout -->
@@ -118,22 +143,33 @@ function getCardById(auctionId) {
     <Filter 
       bind:selectedType={selectedType} 
       bind:selectedRarity={selectedRarity} 
+      bind:maxPrice={maxPrice} 
       on:applyFilters={handleApplyFilters} 
     />
   </div>
 
-<div class="lg:w-3/4 w-full">
-  <!-- Auctions List -->
-  {#if auctions.length > 0}
-    <p class="px-4">Found {auctions.length} auction{auctions.length !== 1 ? 's' : ''}.</p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 px-4">
-      {#each auctions as auction}
-        <AuctionContainer {auction} card={getCardById(auction.id)} />
-      {/each}
+  <div class="lg:w-3/4 w-full">
+    <!-- Search Bar -->
+    <div class="px-4">
+      <input 
+        type="text" 
+        placeholder="Search by card name..." 
+        bind:value={searchQuery} 
+        on:input={handleSearchChange} 
+        class="border rounded p-2 mb-4 w-full" 
+      />
     </div>
-  {:else}
-    <p class="px-4">No auctions found.</p>
-  {/if}
-</div>
 
+    <!-- Auctions List -->
+    {#if auctions.length > 0}
+      <p class="px-4">Found {auctions.length} auction{auctions.length !== 1 ? 's' : ''}.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 px-4">
+        {#each auctions as auction}
+          <AuctionContainer {auction} card={getCardById(auction.id)} />
+        {/each}
+      </div>
+    {:else}
+      <p class="px-4">No auctions found.</p>
+    {/if}
+  </div>
 </div>
