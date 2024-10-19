@@ -179,6 +179,7 @@ router.get("/", async (req, res) => {
 
     // Filter active auctions
     if (active === "true") {
+        console.log('retrieving active auctions...')
         auctions = auctions.filter(auction => {
             const publishedDate = parseDate(auction.publishedDateTime);
             const endDate = parseDate(auction.endDateTime);
@@ -188,6 +189,7 @@ router.get("/", async (req, res) => {
 
     // Search auctions by card name
     if (search) {
+        console.log('filtering auctions by card name...')
         const searchLower = search.toLowerCase();
         const filteredCards = cardsData.filter(card => card.name.toLowerCase().includes(searchLower));
         const filteredCardIds = filteredCards.map(card => card.id);
@@ -196,13 +198,20 @@ router.get("/", async (req, res) => {
 
     // Filter auctions by card type
     if (type) {
+        console.log('filtering auctions by type')
+        console.log('type:', type)
+        // console.log('cardsData:', cardsData)
+        console.log('cards types:', cardsData.map(card => card.type))
         const filteredCards = cardsData.filter(card => card.type === type);
+        // console.log('filtered cards:', filteredCards)
         const filteredCardIds = filteredCards.map(card => card.id);
         auctions = auctions.filter(auction => filteredCardIds.includes(auction.cardId));
     }
 
     // Filter auctions by card rarity
     if (rarity) {
+        console.log('filtering auctions by rarity')
+        console.log('cards raritis:', cardsData.map(card => card.rarity))
         const filteredCards = cardsData.filter(card => card.rarity === rarity);
         const filteredCardIds = filteredCards.map(card => card.id);
         auctions = auctions.filter(auction => filteredCardIds.includes(auction.cardId));
@@ -210,6 +219,7 @@ router.get("/", async (req, res) => {
 
     // Filter by price range (gte and lte)
     if (price) {
+        console.log('filtering auctions by price')
         const [operator, value] = price.split(':');
         const priceValue = parseInt(value);
 

@@ -32,3 +32,7 @@ export function getUserId() {
 export function getUsername() {
     return decodedToken ? decodedToken.username : null; // Assuming 'id' is the key in the token
 }
+
+export function getEmail() {
+    return decodedToken ? decodedToken.email : null; // Assuming 'id' is the key in the token
+}

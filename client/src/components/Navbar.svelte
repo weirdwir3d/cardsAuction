@@ -1,22 +1,31 @@
 <script>
   import logo from "../assets/Yugioh-logo.svg";
-  import { tokenStore } from '../TokenStore'; // Import the tokenStore
-  import { checkLoggedIn, checkIsAdmin } from "../middleware"; // Import necessary middleware functions
+  import { tokenStore } from '../TokenStore';
+  import { checkLoggedIn, checkIsAdmin } from "../middleware";
+  import Alert from '../lib/Alert.svelte'; // Import the Alert component
 
   export let active;
-  let isMenuOpen = false; // State to track if the menu is open
-
-  // Local reactive variables
+  let isMenuOpen = false;
+  
   let isLoggedIn = false;
   let isAdmin = false;
+  let alertVisible = false; // State for alert visibility
+  let alertMessage = ""; // Message to display in the alert
+  let alertType = "success"; // Type of alert
 
-  // Subscribe to tokenStore to react to token changes
   tokenStore.subscribe(token => {
-    console.log('Token from navbar:', token); // Log the token for debugging
-
-    isLoggedIn = checkLoggedIn(token); // Update isLoggedIn based on the token
-    isAdmin = isLoggedIn && checkIsAdmin(token); // Update isAdmin based on the token
+    console.log('Token from navbar:', token);
+    isLoggedIn = checkLoggedIn(token);
+    isAdmin = isLoggedIn && checkIsAdmin(token);
   });
+
+  const handleLogout = () => {
+    tokenStore.set({ token: null });
+    // Set alert message and visibility
+    alertMessage = "Logged out successfully!";
+    alertType = "success";
+    alertVisible = true;
+  };
 </script>
 
 <nav class="flex flex-col md:flex-row items-center justify-between max-w-5xl w-full px-4 py-2 bg-secondary">
@@ -41,9 +50,16 @@
       {#if isAdmin}
         <li><a class:active={active === "/cards"} href="/cards" class="px-4 py-2 md:py-0 text-center hover:text-tertiary">Cards</a></li>
       {/if}
-      <li><a class:active={active === "/logout"} href="/logout" class="px-4 py-2 md:py-0 text-center hover:text-tertiary">Log Out</a></li>
+      <li>
+        <a class:active={active === "/logout"} href="/logout" class="px-4 py-2 md:py-0 text-center hover:text-tertiary" on:click={handleLogout}>
+          Log Out
+        </a>
+      </li>
     {:else}
       <li><a class:active={active === "/login"} href="/login" class="px-4 py-2 md:py-0 text-center hover:text-tertiary">Log In</a></li>
     {/if}
   </ul>
+
+  <!-- Include the Alert component -->
+  <Alert message={alertMessage} type={alertType} isVisible={alertVisible} />
 </nav>

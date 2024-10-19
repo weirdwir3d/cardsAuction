@@ -183,8 +183,6 @@ router.get("/:id", async (req, res) => {
 })
 
 // Get all bids, with optional filters for auctionId or userId
-// Get all bids, with optional filters for auctionId or userId
-// Get all bids, with optional filters for auctionId or userId
 router.get("/", async (req, res) => {
     const { auctionId, userId } = req.query;
 
