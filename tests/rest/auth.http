@@ -1,24 +1,20 @@
-###
-### Retrieve a token that can be used for calls requiring authentication
-###
-POST {{protocol}}{{host}}:{{port}}/auth
+### Log in user
+POST http://localhost:3000/auth/login
 Content-Type: application/json
-Accept: application/json
 
 {
-  "username": "user",
-  "password": "pass"
+  "email": "admin@gmail.com",
+  "password": "adminPassword"
 }
 
-> {%
-client.global.set("token", "m1jnH3l3L4ng3en5uperV31l!geT0ken");
-%}
-
-
-###
-### Invalidate the token
-###
-DELETE {{protocol}}{{host}}:{{port}}/auth
+### register user
+POST http://localhost:3000/auth/register
 Content-Type: application/json
-Accept: application/json
-Authorization: Bearer {{token}}
+
+{
+  "email": "admin@gmail.com",
+  "username": "admin",
+  "password": "adminPassword",
+  "confirmPassword": "adminPassword",
+  "isAdmin": true
+}

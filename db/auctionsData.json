@@ -1,0 +1,44 @@
+[
+    {
+        "id": 0,
+        "cardId": 4,
+        "basePrice": 500,
+        "publishedDateTime": "05-10-2024 10:15:20",
+        "endDateTime": "25-11-2024 15:30:00"
+    },
+    {
+        "id": 1,
+        "cardId": 0,
+        "basePrice": 270,
+        "publishedDateTime": "15-10-2024 09:42:15",
+        "endDateTime": "22-10-2025 14:00:00"
+    },
+    {
+        "id": 2,
+        "cardId": 9,
+        "basePrice": 270,
+        "publishedDateTime": "19-10-2024 11:27:30",
+        "endDateTime": "25-12-2024 18:45:00"
+    },
+    {
+        "id": 7,
+        "cardId": 6,
+        "basePrice": 300,
+        "publishedDateTime": "20-10-2024 12:48:30",
+        "endDateTime": "03-12-2024 11:15:00"
+    },
+    {
+        "id": 9,
+        "cardId": 8,
+        "basePrice": 450,
+        "publishedDateTime": "23-10-2024 18:23:50",
+        "endDateTime": "30-12-2024 16:30:00"
+    },
+    {
+        "id": 11,
+        "cardId": 11,
+        "basePrice": 350,
+        "publishedDateTime": "25-10-2024 14:45:22",
+        "endDateTime": "01-12-2024 18:30:00"
+    }
+]

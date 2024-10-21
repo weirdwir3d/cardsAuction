@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "username": "judai",
+        "email": "hero@gmail.com",
+        "password": "$2b$10$9c6G9JrblQrBQETXpUf.S.14d063AOg1VZTlSRdAFZq.nkS6OtgMS",
+        "isAdmin": false
+    },
+    {
+        "id": 0,
+        "username": "admin",
+        "email": "admin@gmail.com",
+        "password": "$2b$10$ClWG3X9UHo6puIji/icjf.iquiazGlUODfw7aSutEhssGUaS6BT2q",
+        "isAdmin": true
+    },
+    {
+        "id": 2,
+        "username": "yugi",
+        "email": "heartofcards@gmail.com",
+        "password": "$2b$10$csp5tvGp/yM3atmfutyobeqr9aOoAx/09O0LBqF6YCrDEhw8y8J4C",
+        "isAdmin": false
+    },
+    {
+        "id": 3,
+        "username": "Dwight Schrute",
+        "email": "schrutefarms@gmail.com",
+        "password": "$2b$10$0FyPhi.zd/SJ.mPXAhmu3OLQaghaDOgM/4lRYyg1dImsR3ULTwoWC",
+        "isAdmin": false
+    },
+    {
+        "id": 4,
+        "username": "mr robot",
+        "email": "elliot@gmail.com",
+        "password": "$2b$10$8Q6Pb2uq6UJ/jQQOKvi9V.jzECpys5z/9Zja1dyY1hlSwz1mGC4V.",
+        "isAdmin": false
+    }
+]

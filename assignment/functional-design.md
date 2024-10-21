@@ -30,20 +30,20 @@ The requirements for this project have been split into functional and non-functi
 
 ### Functional
 
-- [ ] Display a list of auctionable products or services
-- [ ] Of each of these products or services show at least the following:
-  - [ ] Product or service name
-  - [ ] The price (these should be integer values)
-  - [ ] Who placed bids
-  - [ ] When will the auction end
-- [ ] It should be possible to search the list of auctions
-- [ ] It should not be possible to remove or edit bids once they are made
+- [x] Display a list of auctionable products or services
+- [x] Of each of these products or services show at least the following:
+  - [x] Product or service name
+  - [x] The price (these should be integer values)
+  - [x] Who placed bids
+  - [x] When will the auction end
+- [x] It should be possible to search the list of auctions
+- [x] It should not be possible to remove or edit bids once they are made
 - [ ] Input is validated client side before sending it to the server
 - [ ] The server must perform server side validation
-- [ ] The list of auctions should be filterable on at least three attributes that are logical for the chosen service or product. I.e.:
-  - [ ] all trips in Twente 
-  - [ ] all yellow sneakers
-  - [ ] all paintings that are worth over 3 million euros
+- [x] The list of auctions should be filterable on at least three attributes that are logical for the chosen service or product. I.e.:
+  - [x] all trips in Twente 
+  - [x] all yellow sneakers
+  - [x] all paintings that are worth over 3 million euros
 
 ### Non functional
 
@@ -54,24 +54,24 @@ The requirements for this project have been split into functional and non-functi
   - [ ] Query parameters are meant for querying, so it should limit the results from a GET request. I.e. they can be used to filter certain values, sort or limit result sets by requesting only the first 10 results.
 - [ ] All response bodies (including errors) must return valid JSON
 - [ ] Correct HTTP status codes have to be returned for every request.
-- [ ] Both the front-end and backend provide descriptive error messages: 'You already placed a bid', 'Bid already exists', 'User X not allowed to do ...'
-- [ ] Both front-end and backend code is logically separated. Specifically for the Express routes (use multiple files)
+- [x] Both the front-end and backend provide descriptive error messages: 'You already placed a bid', 'Bid already exists', 'User X not allowed to do ...'
+- [x] Both front-end and backend code is logically separated. Specifically for the Express routes (use multiple files)
 - [ ] Endpoints have meaningful good and bad-weather tests
-- [ ] After registration the user should be logged in. They should not have to log in again before being able to place a bid
-- [ ] The front-end is build using Svelte
-- [ ] The backend is built using Node js with Express
+- [x] After registration the user should be logged in. They should not have to log in again before being able to place a bid
+- [x] The front-end is build using Svelte
+- [x] The backend is built using Node js with Express
 
 
 ## Userstories
 
 - [ ] As an administrator I want to be able to add, remove and modify auctions, so I can maintain the website
-- [ ] As a user I want to be able to register (wth email-address and password), so I can use the website
-- [ ] As an administrator I want to be able to log in, so I can maintain the auction site.
-- [ ] As a user I want to be able to log in, so I can place bids
-- [ ] As a user I want to be able to place a bid on an auction, so I have a chance of winning the item
-- [ ] As a user I want to be able to remove my bid, so I can correct any mistakes 
+- [x] As a user I want to be able to register (wth email-address and password), so I can use the website
+- [x] As an administrator I want to be able to log in, so I can maintain the auction site.
+- [x] As a user I want to be able to log in, so I can place bids
+- [x] As a user I want to be able to place a bid on an auction, so I have a chance of winning the item
+- [x] As a user I want to be able to remove my bid, so I can correct any mistakes 
 - [ ] As I want to see a list of all auctions I won, so I can see how much I have to pay
-- [ ] As a user I want to see a countdown of the number of days, hours, minutes and seconds I have left to bid
+- [x] As a user I want to see a countdown of the number of days, hours, minutes and seconds I have left to bid
 
 ## Wireframes
 
