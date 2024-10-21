@@ -7,8 +7,10 @@
   import { formatDate, getCookie } from "../utils";
   import Countdown from '../lib/Countdown.svelte';
   import NewBidModal from '../lib/NewBidModal.svelte';
+  import AuctionBidsSection from '../lib/AuctionBidsSection.svelte'
 
-  let auctionId;
+let auctionId;
+let endDateTimeForCountdown;
   let auction = null;
   let card = null;
   let bids = [];
@@ -22,8 +24,10 @@
   let isAdmin = false;
   let showAlert = false;
   let alertMessage = '';
-  let alertType = 'success'
-  let showBidModal = false;
+  let alertType = 'success';
+  let showBidModal = false
+
+  $: lastBidHasWon = bids.length > 0 && bids[bids.length - 1].hasWon;
 
   tokenStore.subscribe(value => {
     token = value.token;
@@ -51,8 +55,10 @@
       auction = await response.json(); 
       const parts = auction.endDateTime.split(' ');
       const [day, month, year] = parts[0].split('-');
-      // auction.endDateTime = `${year}-${month}-${day}T${parts[1]}`;
+      endDateTimeForCountdown = `${year}-${month}-${day}T${parts[1]}`;
+      // displayAuctionDate = `${day}-${month}-${year} ${parts[1]}`;
       updatedAuction = { ...auction };
+      console.log('updatedAuction:', updatedAuction)
     } catch (error) {
       console.error("Error retrieving auction details:", error);
     }
@@ -91,6 +97,35 @@
       }
     } catch (error) {
       console.error('Error fetching bids:', error);
+    }
+  }
+
+    async function deleteBid(bidId) {
+    try {
+      const response = await fetch(`http://localhost:3000/bids/${bidId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        bids = bids.filter(bid => bid.id !== bidId);
+        alertMessage = 'Bid deleted successfully';
+        alertType = 'success';
+        showAlert = true;
+
+        setTimeout(() => {
+          showAlert = false;
+        }, 3000);
+      } else {
+        throw new Error('Failed to delete bid');
+      }
+    } catch (error) {
+      alertMessage = 'Error deleting bid';
+      alertType = 'error';
+      showAlert = true;
+      console.error('Error deleting bid:', error);
     }
   }
 
@@ -225,13 +260,42 @@ async function handleConfirmBid(bidAmount) {
     closeBidModal();
   }
 }  
+
+  async function deleteAuction() {
+    try {
+      const response = await fetch(`http://localhost:3000/auctions/${auctionId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      if (response.ok) {
+        alertMessage = 'Auction deleted successfully!';
+        alertType = 'success';
+        showAlert = true;
+
+        setTimeout(() => {
+          router.redirect('/auctions');
+        }, 3000);
+      } else {
+        throw new Error('Failed to delete auction');
+      }
+    } catch (error) {
+      alertMessage = 'Error deleting auction';
+      alertType = 'error';
+      showAlert = true;
+      console.error('Error deleting auction:', error);
+    }
+  }
 </script>
 
 <Alert message={alertMessage} type={alertType} isVisible={showAlert} />
 <NewBidModal isVisible={showBidModal} onClose={closeBidModal} onConfirm={handleConfirmBid} />
 
 {#if auction && card}
-  <div class="p-4 max-w-7xl mx-auto">
+  <div class="flex flex-col min-h-screen">
+  <div class="flex-grow p-4 max-w-7xl mx-auto">
     <h1 class="text-4xl font-bold mb-4 text-center md:text-left">{card.name}</h1>
 
     <!-- Auction details section -->
@@ -268,62 +332,38 @@ async function handleConfirmBid(bidAmount) {
         <p><strong>Published Date/Time: </strong>{auction.publishedDateTime}</p>
         <p><strong>End Date/Time: </strong>{auction.endDateTime}</p>
       {/if}
-      
+
       {#if auction.endDateTime}
-        <Countdown endDateTime={auction.endDateTime} />
+        <Countdown auctionId={auctionId} endDateTime={endDateTimeForCountdown} />
       {/if}
     </div>
 
     <!-- Current bid card with bid history -->
-    <div class="mt-8">
-      <!-- Current bid section -->
-<div class="p-6 border rounded-lg bg-gray-100">
-  {#if bids && bids.length > 0}
-    <div class="flex items-center">
-      <div class="flex-grow">
-        <p class="text-lg"><strong>Current Bid: </strong>${bids[bids.length - 1].bidAmount}</p>
-        <p class="text-lg hidden md:block"><strong>Published Date/Time: </strong>{bids[0].publishedDateTime}</p>
-      </div>
-<button 
-  on:click={openBidModal} 
-  class={`px-4 py-2 rounded hover:bg-green-600 hidden md:block ml-4 ${isLoggedIn ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`} 
-  disabled={!isLoggedIn}
->
-  {isLoggedIn ? 'Place Bid' : 'Log in to place a bid'}
-</button>
+    <!-- Current bid card with bid history -->
+<div class="mt-8">
+  <div class="p-6 border rounded-lg bg-gray-100">
+    {#if bids && bids.length > 0}
+      <AuctionBidsSection 
+        {bids} 
+        {users} 
+        {isAdmin} 
+        onDeleteBid={deleteBid} 
+      />
+    {/if}
 
-    </div>
-  {:else}
-    <p class="text-lg">No bids have been placed for this auction yet.</p>
-  {/if}
-        <!-- Bid History Table -->
-<!-- Bid History Table -->
-{#if bids && bids.length > 1}
-  <div class="mt-6">
-    <h3 class="text-lg font-bold mb-2">Bid History</h3>
-    <table class="table-auto w-full text-left border-collapse">
-      <thead>
-        <tr class="bg-gray-200">
-          <th class="border px-4 py-2">Bid Amount</th>
-          <th class="border px-4 py-2">Published Date/Time</th>
-          <th class="border px-4 py-2">Username</th> <!-- New Username Column -->
-        </tr>
-      </thead>
-      <tbody>
-        {#each bids.slice(1) as bid, index}
-          <tr class={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-            <td class="border px-4 py-2">${bid.bidAmount}</td>
-            <td class="border px-4 py-2">{bid.publishedDateTime}</td>
-            <td class="border px-4 py-2">{users.find(user => user.id === bid.userId)?.username || 'Unknown'}</td> <!-- Display username -->
-          </tr>
-        {/each}
-      </tbody>
-    </table>
+    {#if !lastBidHasWon}
+          <button 
+        on:click={openBidModal} 
+        class={`px-4 py-2 rounded hover:bg-green-600 md:block ml-4 ${isLoggedIn ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`} 
+        disabled={!isLoggedIn}
+      >
+        {isLoggedIn ? 'Place Bid' : 'Log in to place a bid'}
+      </button>
+      {/if}
+
   </div>
-{/if}
+</div>
 
-      </div>
-    </div>
 
     <!-- Display card details -->
     <div class="flex flex-col md:flex-row items-center md:items-start gap-6 mt-6">
@@ -338,9 +378,9 @@ async function handleConfirmBid(bidAmount) {
         <p><strong>Type:</strong> {card.type}</p>
         <p><strong>Rarity:</strong> {card.rarity}</p>
         
-        {#if card.auctionId !== -1}
+        <!-- {#if card.auctionId !== -1}
           <p><strong>Auction ID:</strong> {card.auctionId}</p>
-        {/if}
+        {/if} -->
       </div>
     </div>
 
@@ -369,12 +409,18 @@ async function handleConfirmBid(bidAmount) {
           </button>
         {/if}
         
-        <!-- View Card Button, only for admins -->
         <button 
           on:click={viewCardDetails} 
           class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
         >
           View Card
+        </button>
+
+        <button 
+          on:click={deleteAuction} 
+          class="px-6 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+        >
+          Delete Auction
         </button>
       </div>
     {/if}
@@ -386,21 +432,29 @@ async function handleConfirmBid(bidAmount) {
       Back to Auctions
     </button>
 
-    <!-- Fixed Bottom Bar for mobile -->
-    {#if bids && bids.length > 0}
-      <div class="fixed bottom-0 left-0 right-0 bg-white shadow-md p-4 md:hidden flex justify-between items-center">
-        <p class="text-lg"><strong>Current Bid: </strong>${bids[bids.length - 1].bidAmount}</p>
-<button 
-  on:click={openBidModal} 
-  class={`px-4 py-2 rounded hover:bg-green-600 md:block ml-4 ${isLoggedIn ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`} 
-  disabled={!isLoggedIn}
->
-  {isLoggedIn ? 'Place Bid' : 'Log in to place a bid'}
-</button>
-
-      </div>
-    {/if}
+    <!-- Add padding to avoid overlap with fixed bottom bar -->
+    <div class="pb-16"></div>
   </div>
+
+  <!-- Fixed Bottom Bar for mobile -->
+  {#if bids && !lastBidHasWon}
+    <div class="fixed bottom-0 left-0 right-0 bg-white shadow-md p-4 md:hidden flex justify-between items-center">
+      {#if bids.length > 0}
+        <p class="text-lg"><strong>Current Bid: </strong>${bids[bids.length - 1].bidAmount}</p>
+      {:else}
+        <p class="text-lg"><strong>No bids yet. </strong>Be the first to bid!</p>
+      {/if}
+      <button 
+        on:click={openBidModal} 
+        class={`px-4 py-2 rounded hover:bg-green-600 md:block ml-4 ${isLoggedIn ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`} 
+        disabled={!isLoggedIn}
+      >
+        {isLoggedIn ? 'Place Bid' : 'Log in to place a bid'}
+      </button>
+    </div>
+  {/if}
+</div>
+
 {:else}
   <p>Loading auction and card details...</p>
 {/if}

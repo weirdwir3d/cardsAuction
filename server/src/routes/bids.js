@@ -7,7 +7,7 @@ const router = express.Router();
 
 // Edit a bid
 router.put('/:id', middleware.isAdmin, (req, res) => {
-    const { bidAmount, publishedDateTime } = req.body;
+    const { bidAmount, publishedDateTime, hasWon } = req.body;
     const bidId = parseInt(req.params.id);
 
     // Find the bid to update
@@ -57,6 +57,10 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     // Update bid amount if provided
     if (bidAmount !== undefined) {
         foundBid.bidAmount = bidAmount;
+    }
+
+    if (!["true", "false"].includes(hasWon) && !hasWon) {
+        return res.status(400).json({ error: "hasWon value can either be true, false or null." });
     }
 
     // Save the updated bid

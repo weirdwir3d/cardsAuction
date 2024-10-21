@@ -1,4 +1,5 @@
 <script>
+    //TODO: edit bids to make hasWon a boolean
     import { onMount } from 'svelte';
     import { getUserId, getUsername, getEmail } from '../middleware';
     import BidCard from '../lib/BidCard.svelte'; // Import the BidCard component
@@ -17,7 +18,7 @@
             username = await getUsername();
             email = await getEmail();
 
-            if (userId) {
+            if (userId || userId === 0) {
                 await fetchBids();
             } else {
                 throw new Error("User ID is not available");

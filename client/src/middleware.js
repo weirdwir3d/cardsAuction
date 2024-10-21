@@ -26,7 +26,10 @@ export function checkLoggedIn() {
 
 // New function to get user ID
 export function getUserId() {
-    return decodedToken ? decodedToken.id : null; // Assuming 'id' is the key in the token
+    if (decodedToken) {
+        return decodedToken.id
+    }
+    return null;
 }
 
 export function getUsername() {

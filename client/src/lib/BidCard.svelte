@@ -1,8 +1,9 @@
 <script>
-    export let bid;
+        export let bid;
+    console.log("Rendering Bid:", bid);
 
     // Determine the status symbol based on the bid's outcome
-    let statusSymbol = '';
+    let statusSymbol = 'Auction still running';
     if (bid.hasWon === "true") {
         statusSymbol = '✔️'; // Checkmark for won bids
     } else if (bid.hasWon === "false") {

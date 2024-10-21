@@ -15,7 +15,7 @@
         "type": "monster",
         "rarity": "super rare",
         "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Legendary_Magician_Of_Dark_1.jpg",
-        "auctionId": 3
+        "auctionId": -1
     },
     {
         "id": 2,
@@ -24,7 +24,7 @@
         "type": "trap",
         "rarity": "ultra rare",
         "imageUrl": "https://m.media-amazon.com/images/I/71G+cR1JNAL._AC_UF1000,1000_QL80_.jpg",
-        "auctionId": 4
+        "auctionId": -1
     },
     {
         "id": 3,
@@ -33,7 +33,7 @@
         "type": "trap",
         "rarity": "ultra rare",
         "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Crush_Card_Virus_1.jpg",
-        "auctionId": 5
+        "auctionId": -1
     },
     {
         "id": 4,
@@ -51,7 +51,7 @@
         "type": "monster",
         "rarity": "ultra rare",
         "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Des_Volstgalph_1.jpg",
-        "auctionId": 6
+        "auctionId": -1
     },
     {
         "id": 6,
@@ -69,7 +69,7 @@
         "type": "monster",
         "rarity": "ultra rare",
         "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Cyber_Dragon_1_1.jpg",
-        "auctionId": 8
+        "auctionId": -1
     },
     {
         "id": 8,
@@ -96,7 +96,7 @@
         "type": "monster",
         "rarity": "ultra rare",
         "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Dark_Magician_1.jpg",
-        "auctionId": 10
+        "auctionId": -1
     },
     {
         "id": 11,

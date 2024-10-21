@@ -92,10 +92,18 @@ router.get("/:id", async (req, res) => {
 router.post('/', middleware.isAdmin, (req, res) => {
     const auction = req.body;
 
-    let cardId = parseInt(auction.cardId);
-    let foundAuction = auctionsData.find(auction => auction.cardId === cardId);
+    console.log('Received auction data:', auction);
 
+    if (!auction.cardId) {
+        return res.status(400).json({ error: "No card selected" });
+    }
+
+    let cardId = parseInt(auction.cardId);
+    console.log('Parsed cardId:', cardId);
+
+    let foundAuction = auctionsData.find(existingAuction => existingAuction.cardId === cardId);
     if (foundAuction) {
+        console.log('Found existing auction for cardId:', cardId);
         return res.status(400).json({ error: "There is already an auction active for that card" });
     }
 
@@ -103,15 +111,22 @@ router.post('/', middleware.isAdmin, (req, res) => {
     const publishedDateTime = auction.publishedDateTime;
     const endDateTime = auction.endDateTime;
 
+    console.log('Base Price:', basePrice);
+    console.log('Published DateTime:', publishedDateTime);
+    console.log('End DateTime:', endDateTime);
+
     if (basePrice <= 0) {
+        console.error('Base price validation failed:', basePrice);
         return res.status(403).json({ error: "Base price cannot be zero or less" });
     }
 
     if (!isValidDateTime(publishedDateTime)) {
+        console.error('Invalid published date format:', publishedDateTime);
         return res.status(400).json({ error: "Invalid published date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
     }
 
     if (!isValidDateTime(endDateTime)) {
+        console.error('Invalid end date format:', endDateTime);
         return res.status(400).json({ error: "Invalid end date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
     }
 
@@ -120,12 +135,18 @@ router.post('/', middleware.isAdmin, (req, res) => {
     const currentDateTime = new Date();
     currentDateTime.setMilliseconds(0); // Set currentDate to the start of the second
 
+    console.log('Parsed Published DateTime:', parsedPublishedDateTime);
+    console.log('Parsed End DateTime:', parsedEndDateTime);
+    console.log('Current DateTime:', currentDateTime);
+
     if (parsedPublishedDateTime < currentDateTime) {
+        console.error('Published date is in the past:', parsedPublishedDateTime);
         return res.status(400).json({ error: "Published date cannot be in the past." });
     }
 
     if (parsedEndDateTime <= parsedPublishedDateTime) {
-        return res.status(400).json({ error: "End date must be after the published date." });
+        console.error('End date is not after the published date:', parsedEndDateTime, parsedPublishedDateTime);
+        return res.status(400).json({ error: "You cannot post an auction in the past" });
     }
 
     let sortedAuctions = auctionsData.sort(function (a, b) {
@@ -133,18 +154,35 @@ router.post('/', middleware.isAdmin, (req, res) => {
     });
     let highestId = (sortedAuctions.length > 0) ? sortedAuctions[sortedAuctions.length - 1].id : -1;
 
-    auctionsData.push({
+    console.log('Highest Auction ID:', highestId);
+
+    const newAuction = {
         id: highestId + 1,
         cardId: auction.cardId,
         publishedDateTime: auction.publishedDateTime,
         endDateTime: auction.endDateTime,
         basePrice: auction.basePrice
-    });
+    };
+
+    auctionsData.push(newAuction);
+
+    console.log('Auction added successfully:', newAuction);
+
+    // Now update the card with the auctionId
+    let foundCard = cardsData.find(card => card.id === cardId);
+    if (foundCard) {
+        foundCard.auctionId = newAuction.id;
+        console.log('Card updated with auctionId:', foundCard);
+    } else {
+        console.error('Card not found for cardId:', cardId);
+        return res.status(404).json({ error: "Card not found" });
+    }
 
     res.status(200).json({
         message: "Auction added successfully!"
     });
 });
+
 
 // Helper function to convert "dd-mm-yyyy hh:mm:ss" format to a Date object
 function parseDate(dateString) {
@@ -260,24 +298,34 @@ router.get("/", async (req, res) => {
 
 // Delete an auction
 router.delete('/:id', middleware.isAdmin, (req, res) => {
-    let wantedId = parseInt(req.params.id);
-    let foundAuction = auctionsData.find(auction => auction.id === wantedId);
+    const auctionId = parseInt(req.params.id);
+    let foundAuction = auctionsData.find(auction => auction.id === auctionId);
 
     if (!foundAuction) {
         return res.status(404).json({ error: "Auction not found" });
     }
 
-    let removedAuction;
+    // Remove the auction from the auctionsData
     const index = auctionsData.indexOf(foundAuction);
     if (index > -1) {
-        removedAuction = auctionsData.splice(index, 1);
+        auctionsData.splice(index, 1);
     }
 
-    if (!removedAuction) {
-        return res.status(404).json({ error: "Auction not found" });
+    // Find the card linked to this auction and set its auctionId to -1
+    const foundCard = cardsData.find(card => card.auctionId === auctionId);
+    if (foundCard) {
+        foundCard.auctionId = -1;
+        console.log(`Card ID ${foundCard.id} auctionId set to -1`);
+    } else {
+        console.log(`No card found linked to auction ID ${auctionId}`);
     }
 
-    return res.status(202).json({ error: "Auction deleted: " + JSON.stringify(removedAuction) });
+    // Respond with a success message
+    return res.status(202).json({
+        message: `Auction with ID ${auctionId} deleted successfully`,
+        removedAuction: foundAuction,
+        updatedCard: foundCard || null
+    });
 });
 
 export default router;

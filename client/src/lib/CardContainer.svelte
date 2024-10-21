@@ -14,4 +14,8 @@
      on:keypress={(e) => e.key === 'Enter' && handleClick()}>
   <h2 class="text-lg font-bold mb-2 text-center">{card.name}</h2>
   <img src={card.imageUrl} alt={card.name} class="w-full h-auto object-contain rounded-lg" />
+
+  {#if card.auctionId !== -1}
+    <p class="text-center font-semibold mt-2">In auction</p>
+  {/if}
 </div>
