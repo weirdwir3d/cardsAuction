@@ -6,15 +6,17 @@
   import Alert from "../lib/Alert.svelte";
   import ModalConfirmation from "../lib/ModalConfirmation.svelte";
   import { checkLoggedIn, checkIsAdmin } from "../middleware";
+  import { fetchCardAPI, deleteCardAPI, saveCardChangesAPI } from "../api";
 
   let cardId;
-  let card; 
+  let card;
   let auction;
   let auctionId = -1;
   let isEditing = false;
   let updatedCard = {};
   let token;
   let showAlert = false;
+  let alertType = "success";
   let alertMessage = "";
   let isLoggedIn = false;
   let isAdmin = false;
@@ -22,10 +24,10 @@
   let auctionWarningMessage = ""; // Warning message for the modal
   let showAuctionModal = false;
 
-function openAuctionModal() {
-    console.log('Opening auction modal with cardId:', cardId); // Set the selectedCardId to the current cardId
+  function openAuctionModal() {
+    console.log("Opening auction modal with cardId:", cardId); // Set the selectedCardId to the current cardId
     showAuctionModal = true; // Then show the modal
-}
+  }
 
   function closeAuctionModal() {
     showAuctionModal = false;
@@ -35,15 +37,15 @@ function openAuctionModal() {
     token = value.token;
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
-    console.log('isAdmin:', isAdmin)
+    console.log("isAdmin:", isAdmin);
   });
 
-    // Unsubscribe when the component is destroyed
+  // Unsubscribe when the component is destroyed
   onDestroy(() => {
     unsubscribe();
   });
 
-    // Show confirmation modal if the card is associated with an auction
+  // Show confirmation modal if the card is associated with an auction
   function handleDelete() {
     if (card.auctionId !== -1) {
       auctionWarningMessage = `This card is associated with an auction. Deleting the card will also delete the auction. Do you want to proceed?`;
@@ -58,44 +60,30 @@ function openAuctionModal() {
     deleteCard(); // Delete confirmed by user
   }
 
-    function cancelDelete() {
+  function cancelDelete() {
     showModal = false; // Cancel the delete operation
   }
 
   async function fetchCardDetails() {
     try {
-      const response = await fetch(`http://localhost:3000/cards/${cardId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      card = data.foundCard;
-      // console.log('CARD:', card)
+      card = await fetchCardAPI(cardId);
       updatedCard = { ...card };
-      auctionId = card.auctionId;
     } catch (error) {
       console.error("Error retrieving card details:", error);
     }
   }
 
-      // Listen for the auctionAdded event
-    async function handleAuctionAdded(event) {
-        const { cardId } = event.detail;
-        console.log('cardId and card.id:', cardId + " " + card.id)
+  // Listen for the auctionAdded event
+  async function handleAuctionAdded(event) {
+    const { cardId } = event.detail;
+    console.log("cardId and card.id:", cardId + " " + card.id);
 
-        if (cardId == card.id) {
-          console.log('updating card page...')
-            // If the auction is linked to this card, update the card details
-            await fetchCardDetails();
-        }
+    if (cardId == card.id) {
+      console.log("updating card page...");
+      // If the auction is linked to this card, update the card details
+      await fetchCardDetails();
     }
+  }
 
   onMount(() => {
     cardId = window.location.pathname.split("/").pop();
@@ -104,26 +92,17 @@ function openAuctionModal() {
 
   async function deleteCard() {
     try {
-      const response = await fetch(`http://localhost:3000/cards/${cardId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
+      await deleteCardAPI(cardId, token);
       alertMessage = "Card deleted successfully!";
+      alertType = "success";
       showAlert = true;
-
       setTimeout(() => {
-        showAlert = false;
         router.redirect("/cards");
-      }, 2000);
+      }, 3000);
     } catch (error) {
+      alertMessage = "Error deleting card";
+      alertType = "error";
+      showAlert = true;
       console.error("Error deleting card:", error);
     }
   }
@@ -134,36 +113,29 @@ function openAuctionModal() {
 
   async function saveChanges() {
     try {
-      const response = await fetch(`http://localhost:3000/cards/${cardId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedCard),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      card = data.card;
+      card = await saveCardChangesAPI(cardId, updatedCard, token);
       isEditing = false;
-
       alertMessage = "Card edited successfully!";
+      alertType = "success"; // Set alert type to success
       showAlert = true;
-
+      await fetchCardDetails();
       setTimeout(() => {
         showAlert = false;
       }, 4000);
     } catch (error) {
+      // Set the alert message and type to display the error
+      alertMessage = `Error updating card: ${error.message}`;
+      alertType = "error"; // Set alert type to error
+      showAlert = true;
+      setTimeout(() => {
+        showAlert = false;
+      }, 4000);
       console.error("Error updating card details:", error);
     }
   }
 </script>
 
-<Alert message={alertMessage} type="success" isVisible={showAlert} />
+<Alert message={alertMessage} type={alertType} isVisible={showAlert} />
 
 {#if card}
   <div class="p-4 max-w-7xl mx-auto">
@@ -189,19 +161,26 @@ function openAuctionModal() {
           </div>
           <div>
             <label><strong>Type:</strong></label>
-            <input
-              type="text"
+            <select
               bind:value={updatedCard.type}
               class="border rounded p-1 w-full"
-            />
+            >
+              <option value="monster">Monster</option>
+              <option value="trap">Trap</option>
+              <option value="spell">Spell</option>
+            </select>
           </div>
           <div>
             <label><strong>Rarity:</strong></label>
-            <input
-              type="text"
+            <select
               bind:value={updatedCard.rarity}
               class="border rounded p-1 w-full"
-            />
+            >
+              <option value="rare">Rare</option>
+              <option value="super rare">Super Rare</option>
+              <option value="ultra rare">Ultra Rare</option>
+              <option value="unique">Unique</option>
+            </select>
           </div>
         {:else}
           <p><strong>Description: </strong>{card.description}</p>
@@ -209,51 +188,48 @@ function openAuctionModal() {
           <p><strong>Rarity:</strong> {card.rarity}</p>
         {/if}
 
-{#if card.auctionId !== -1}
-  <!-- <p><strong>Auction ID:</strong> {card.auctionId}</p> -->
-  <button
-    on:click={() => router.redirect(`/auctions/${card.auctionId}`)}
-    class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-  >
-    View Auction
-  </button>
-{:else}
-  {#if isAdmin && auctionId === -1}
-    <button
-      on:click={openAuctionModal}
-      class="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-    >
-      Put Up for Auction
-    </button>
-  {/if}
-{/if}
-
+        {#if card.auctionId !== -1}
+          <!-- <p><strong>Auction ID:</strong> {card.auctionId}</p> -->
+          <button
+            on:click={() => router.redirect(`/auctions/${card.auctionId}`)}
+            class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            View Auction
+          </button>
+        {:else if isAdmin && auctionId === -1}
+          <button
+            on:click={openAuctionModal}
+            class="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          >
+            Put Up for Auction
+          </button>
+        {/if}
       </div>
     </div>
 
     {#if isAdmin}
-    <div class="text-center md:text-left mt-6 space-x-4">
-      {#if isEditing}
-        <button
-          on:click={saveChanges}
-          class="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-        >
-          Save Changes
-        </button>
-        <button
-          on:click={toggleEdit}
-          class="px-6 py-3 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-        >
-          Cancel
-        </button>
-      {:else}
-        <button
-          on:click={toggleEdit}
-          class="px-6 py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-        >
-          Edit
-        </button>
-      {/if}
+      <div class="text-center md:text-left mt-6 space-x-4">
+        {#if isEditing}
+          <button
+            on:click={saveChanges}
+            class="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          >
+            Save Changes
+          </button>
+          <button
+            on:click={toggleEdit}
+            class="px-6 py-3 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
+        {:else}
+          <button
+            on:click={toggleEdit}
+            class="px-6 py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+          >
+            Edit
+          </button>
+        {/if}
 
         <button
           on:click={handleDelete}
@@ -261,30 +237,29 @@ function openAuctionModal() {
         >
           Delete Card
         </button>
-    </div>
+      </div>
     {/if}
 
     <button
-        on:click={() => router.redirect("/cards")}
-        class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-      >
-        Back to Cards
-      </button>
+      on:click={() => router.redirect("/cards")}
+      class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+    >
+      Back to Cards
+    </button>
   </div>
 {/if}
 
 {#if showModal}
-  <ModalConfirmation 
+  <ModalConfirmation
     message={auctionWarningMessage}
     confirmAction={confirmDelete}
     cancelAction={cancelDelete}
   />
 {/if}
 
-<AddAuctionModal 
+<AddAuctionModal
   bind:isVisible={showAuctionModal}
   on:close={closeAuctionModal}
   on:auctionAdded={handleAuctionAdded}
-  cardId={cardId}
+  {cardId}
 />
-

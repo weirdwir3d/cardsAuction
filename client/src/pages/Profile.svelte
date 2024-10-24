@@ -1,8 +1,8 @@
 <script>
-    //TODO: edit bids to make hasWon a boolean
     import { onMount } from 'svelte';
     import { getUserId, getUsername, getEmail } from '../middleware';
-    import BidCard from '../lib/BidCard.svelte'; // Import the BidCard component
+    import BidCard from '../lib/BidCard.svelte';
+    import { fetchBidsAPI, fetchCardAPI } from '../api'; // Import the new API functions
 
     let userId;
     let username;
@@ -19,7 +19,7 @@
             email = await getEmail();
 
             if (userId || userId === 0) {
-                await fetchBids();
+                await loadBids(); // Updated function name for clarity
             } else {
                 throw new Error("User ID is not available");
             }
@@ -31,75 +31,44 @@
         }
     });
 
-    async function fetchBids() {
-        try {
-            const response = await fetch(`http://localhost:3000/bids?userId=${userId}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+async function loadBids() {
+    try {
+        const data = await fetchBidsAPI({ userId });
+        console.log("API Response:", data); // Log the entire response
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const latestBids = {};
-
-            // Group bids by auctionId and keep only the highest bid
-            data.bids.forEach(bid => {
-                if (!latestBids[bid.auctionId] || bid.bidAmount > latestBids[bid.auctionId].bidAmount) {
-                    latestBids[bid.auctionId] = bid;
-                }
-            });
-
-            // Convert the object back to an array
-            const uniqueBids = Object.values(latestBids);
-
-            // Fetch card data for the latest bids
-            const bidsWithCardData = await Promise.all(uniqueBids.map(async (bid) => {
-                const card = await fetchCard(bid.auctionId);
-                return {
-                    ...bid,
-                    cardName: card.name,
-                    cardImageUrl: card.imageUrl,
-                };
-            }));
-
-            bids = bidsWithCardData;
-            console.log("Bids:", bids);
-        } catch (error) {
-            console.error("Error retrieving bids:", error);
-            alertMessage = "An error occurred while retrieving bids.";
-            alertType = "error";
-            isAlertVisible = true;
+        if (!data) {
+            throw new Error("No bids found in response");
         }
-    }
 
-    async function fetchCard(auctionId) {
-        try {
-            const response = await fetch(`http://localhost:3000/cards/${auctionId}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+        const latestBids = {};
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+        data.forEach(bid => {
+            if (!latestBids[bid.auctionId] || bid.bidAmount > latestBids[bid.auctionId].bidAmount) {
+                latestBids[bid.auctionId] = bid;
             }
+        });
 
-            const data = await response.json();
-            return data.foundCard; // Adjust this based on your actual API response
-        } catch (error) {
-            console.error("Error retrieving card:", error);
-            alertMessage = "An error occurred while retrieving card information.";
-            alertType = "error";
-            isAlertVisible = true;
-            return { name: 'Unknown', imageUrl: '' }; // Fallback if card not found
-        }
+        const uniqueBids = Object.values(latestBids);
+
+        const bidsWithCardData = await Promise.all(uniqueBids.map(async (bid) => {
+            const card = await fetchCardAPI(bid.auctionId);
+            return {
+                ...bid,
+                cardName: card.name,
+                cardImageUrl: card.imageUrl,
+            };
+        }));
+
+        bids = bidsWithCardData;
+        console.log("Bids:", bids);
+    } catch (error) {
+        console.error("Error retrieving bids:", error);
+        alertMessage = "An error occurred while retrieving bids.";
+        alertType = "error";
+        isAlertVisible = true;
     }
+}
+
 </script>
 
 <h1>Profile</h1>

@@ -1,9 +1,9 @@
-<!-- BidHistory.svelte -->
 <script>
   export let bids = [];
   export let users = [];
   export let isAdmin = false;
   export let onDeleteBid; // Callback function to delete a bid
+  $: console.log('bids porcoddio:', bids);
 </script>
 
 <div class="mt-6">
@@ -21,7 +21,7 @@
     </thead>
     <tbody>
       {#each bids as bid, index}
-        <tr class={bid.hasWon === "true" ? 'bg-green-100' : (index % 2 === 0 ? 'bg-white' : 'bg-gray-50')}>
+        <tr class={bid.hasWon === true ? 'bg-green-100' : (index % 2 === 0 ? 'bg-white' : 'bg-gray-50')}>
           <td class="border px-4 py-2">${bid.bidAmount}</td>
           <td class="border px-4 py-2">{bid.publishedDateTime}</td>
           <td class="border px-4 py-2">{users.find(user => user.id === bid.userId)?.username || 'Unknown'}</td>

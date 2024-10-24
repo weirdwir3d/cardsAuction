@@ -15,7 +15,7 @@ function isValidEmail(email) {
 }
 
 router.post("/register", async (req, res) => {
-    let { password, confirmPassword, email, isAdmin, username } = req.body;
+    let { password, confirmPassword, email, username } = req.body;
 
     // Validate if password is not empty
     if (!password) {
@@ -68,7 +68,7 @@ router.post("/register", async (req, res) => {
                 username: req.body.username,
                 email: email,
                 password: hashedPassword,
-                isAdmin: (isAdmin)
+                isAdmin: false
             });
 
             await login(req, res);

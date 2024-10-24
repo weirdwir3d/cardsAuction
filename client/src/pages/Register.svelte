@@ -6,6 +6,7 @@
     import Alert from "../lib/Alert.svelte"; 
     import WelcomeSection from "../lib/WelcomeSection.svelte";
     import { tokenStore } from '../TokenStore'; // Import the tokenStore
+    import { registerUserAPI } from '../api'; // Import the registerUser function
 
     let username = "";
     let email = "";
@@ -18,14 +19,12 @@
     let isLoggedIn = false;
     let isAdmin = false;
 
-    // Reset alert and login state
     function resetAlert() {
         alertMessage = "";
         alertType = "error";
         isAlertVisible = false;
     }
 
-    // Helper function to validate email format
     function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
@@ -33,10 +32,7 @@
 
     async function handleRegister(event) {
         event.preventDefault();
-
-        // Frontend validation with console logs
         console.log('Starting registration process');
-
         resetAlert();
 
         if (username.length < 4) {
@@ -71,40 +67,31 @@
             return;
         }
 
-        // Proceed with registration if validations pass
         console.log('All validations passed, sending registration request');
-        const response = await fetch("http://localhost:3000/auth/register", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, email, password, confirmPassword }),
-        });
+        try {
+            const data = await registerUserAPI({ username, email, password, confirmPassword });
+            console.log('Received response from server:', data);
+            
+            tokenStore.set({ token: data.token });
 
-        const data = await response.json();
-        console.log('Received response from server:', data);
-
-        if (response.ok) {
-            console.log('Registration successful, updating token store');
-            tokenStore.set({ token: data.token }); // Update the tokenStore
-
-            // Immediately check the stored token
             tokenStore.subscribe(value => {
-                console.log('Token stored in tokenStore:', value.token); // Log the token
+                console.log('Token stored in tokenStore:', value.token); 
                 
                 if (value.token) {
-                    // Decode the token to get the username and admin status
                     const decodedToken = JSON.parse(atob(value.token.split('.')[1]));
                     username = decodedToken.username || "User";
                     isAdmin = decodedToken.isAdmin || false;
-
-                    // Set isLoggedIn to true after successful registration
                     isLoggedIn = true;
                 }
             })();
 
             alertMessage = "Registration successful!";
             alertType = "success";
+            isAlertVisible = true;
+        } catch (error) {
+            console.error("Registration error:", error);
+            alertMessage = "An error occurred during registration.";
+            alertType = "error";
             isAlertVisible = true;
         }
     }
@@ -117,7 +104,7 @@
 {/if}
 
 {#if isLoggedIn}
-  <WelcomeSection {username} {isAdmin} /> <!-- Show welcome section when logged in -->
+  <WelcomeSection {username} {isAdmin} />
 {:else}
   <form on:submit={handleRegister} class="p-4">
     <TextInput placeholder="Username" bind:value={username} />

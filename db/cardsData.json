@@ -58,7 +58,7 @@
         "name": "Shrink (SJC-EN003)",
         "description": "Target 1 face-up monster on the field; its original ATK becomes halved until the end of this turn.",
         "type": "spell",
-        "rarity": "ultra rare",
+        "rarity": "rare",
         "imageUrl": "https://aura-print.com/media/wysiwyg/AP_Blog_Yu_Gi_Oh_Shrink_1.jpg",
         "auctionId": 7
     },

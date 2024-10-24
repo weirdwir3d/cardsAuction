@@ -2,14 +2,14 @@
   import PasswordInput from "../lib/PasswordInput.svelte";
   import EmailInput from "../lib/EmailInput.svelte";
   import Button from "../lib/Button.svelte";
-  import Alert from "../lib/Alert.svelte"; // Include the alert
+  import Alert from "../lib/Alert.svelte"; 
   import WelcomeSection from "../lib/WelcomeSection.svelte";
   import { tokenStore } from "../TokenStore";
   import { checkLoggedIn, checkIsAdmin } from "../middleware";
+  import { loginAPI } from '../api'; // Import the new API function
 
   let email = "";
   let password = "";
-
   let alertMessage = "";
   let alertType = "error";
   let isAlertVisible = false;
@@ -17,7 +17,6 @@
   let isLoggedIn = false;
   let isAdmin = false;
 
-  // Reset alert and login state
   function resetAlert() {
     alertMessage = "";
     alertType = "error";
@@ -27,23 +26,14 @@
   async function handleLogin(event) {
     event.preventDefault();
     console.log("Logging in with", email, password);
-
-    // Reset any previous alert and state before attempting login
     resetAlert();
 
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const { response, data } = await loginAPI(email, password); // Call the API function
 
-      const data = await response.json();
       console.log("Received response from server:", data);
 
-      if (data.httpStatusCode === 200) {
+      if (response.ok) {
         console.log("Login successful, updating token store");
         tokenStore.set({ token: data.token });
 
@@ -56,7 +46,6 @@
           username = decodedToken.username || "User";
         })();
 
-        // Set success message
         alertMessage = "Login successful!";
         alertType = "success";
         isAlertVisible = true;
@@ -65,7 +54,7 @@
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      alertMessage = "An unexpected error occurred. Please try again later.";
+      alertMessage = error.message; // Use error message from catch block
       alertType = "error";
       isAlertVisible = true;
     }
@@ -82,13 +71,12 @@
       alertMessage = data.message || "Login failed. Please try again.";
     }
     alertType = "error";
-    isAlertVisible = true; // Ensure the alert is visible
+    isAlertVisible = true;
   }
 </script>
 
 <h1 class="text-3xl font-bold">Log in</h1>
 
-<!-- Display the alert when an error or success message exists -->
 {#if isAlertVisible}
   <Alert message={alertMessage} type={alertType} isVisible={isAlertVisible} />
 {/if}
@@ -96,20 +84,15 @@
 {#if isLoggedIn}
   <WelcomeSection {username} {isAdmin} />
 {:else}
-  <!-- Show the form when the user is not logged in -->
   <form on:submit={handleLogin} class="p-4">
     <EmailInput placeholder="Email" bind:value={email} />
-    <PasswordInput
-      placeholder="Type your password here"
-      bind:value={password}
-    />
+    <PasswordInput placeholder="Type your password here" bind:value={password} />
     <div class="flex items-center justify-between mt-4">
       <Button label="Log in" type="submit" />
       <a
         href="/register"
         class="text-tertiary underline hover:text-secondary transition duration-150 ease-in-out"
-        >Register</a
-      >
+      >Register</a>
     </div>
   </form>
 {/if}

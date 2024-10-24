@@ -1,8 +1,9 @@
 <script>
-    import { checkLoggedIn, checkIsAdmin, getUserId } from "../middleware";
+    import { checkLoggedIn, checkIsAdmin } from "../middleware";
     import { tokenStore } from '../TokenStore';
     import { createEventDispatcher, tick } from "svelte";
     import Alert from "../lib/Alert.svelte";
+    import { addCardAPI } from '../api'; // Importing the API function
 
     let isLoggedIn = false;
     let isAdmin = false;
@@ -28,48 +29,25 @@
     const dispatch = createEventDispatcher();
 
     async function addCard() {
-        isAlertVisible = false; 
+        isAlertVisible = false;
 
         try {
-            const response = await fetch("http://localhost:3000/cards", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name,
-                    description,
-                    type,
-                    rarity,
-                    imageUrl,
-                    auctionId
-                })
-            });
+            const data = await addCardAPI({ name, description, type, rarity, imageUrl, auctionId, token });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                alertMessage = "Card added successfully!";
-                alertType = "success";
-                isAlertVisible = true;
-                await tick(); 
-                dispatch('cardAdded', { name: name}); 
-                setTimeout(() => {
-                    dispatch('close');
-                }, 1500);
-            } else {
-                alertMessage = data.error || "Failed to add card.";
-                alertType = "error";
-                isAlertVisible = true;
-                await tick(); 
-            }
-
+            // Since response status is already checked in addCardAPI, no need for data.success check
+            alertMessage = "Card added successfully!";
+            alertType = "success";
+            isAlertVisible = true;
+            await tick();
+            dispatch('cardAdded', { name: name });
+            setTimeout(() => {
+                dispatch('close');
+            }, 1500);
         } catch (error) {
-            alertMessage = "An error occurred while adding the card.";
+            alertMessage = error.message || "An error occurred while adding the card.";
             alertType = "error";
-            isAlertVisible = true; 
-            await tick(); 
+            isAlertVisible = true;
+            await tick();
             console.error("Error adding card:", error);
         }
     }

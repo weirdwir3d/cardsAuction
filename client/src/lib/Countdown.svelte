@@ -1,10 +1,13 @@
 <script>
   import { onMount } from 'svelte';
+  import { tokenStore } from '../TokenStore';
+  import { checkLoggedIn, checkIsAdmin } from "../middleware";
+  import { fetchBidsAPI, updateBidAPI } from '../api.js';
+
   export let auctionId;
   export let endDateTime;
-    import { tokenStore } from '../TokenStore';
-  import { checkLoggedIn, checkIsAdmin, getUserId } from "../middleware";
-    let token;
+
+  let token;
   let isLoggedIn = false;
   let isAdmin = false;
   let days = 0;
@@ -14,13 +17,11 @@
   let interval;
   let auctionEnded = false;
 
-    tokenStore.subscribe(value => {
+  tokenStore.subscribe(value => {
     token = value.token;
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
-    // console.log('AUCTIONDETAILS PG Token stored in tokenStore:', token);
-    // console.log('is the user logged in?:', isLoggedIn)
-    console.log('token:', token)
+    console.log('token dio cane:', token)
   })();
 
   function calculateTimeLeft() {
@@ -46,7 +47,7 @@
       hours = 0;
       minutes = 0;
       seconds = 0;
-      auctionEnded = true; 
+      auctionEnded = true;
       setWinningBid();
       clearInterval(interval);
     }
@@ -54,37 +55,13 @@
 
   async function setWinningBid() {
     try {
-      const response = await fetch(`http://localhost:3000/bids?auctionId=${auctionId}`);
-      const data = await response.json();
-
-      if (data.error) {
-        console.error("Error fetching bids:", data.error);
-        return;
-      }
-
-      const bids = data.bids;
+      const bids = await fetchBidsAPI(auctionId);
       if (bids.length === 0) return;
 
-      // Get the highest bid
       const highestBid = bids.reduce((prev, current) => (prev.bidAmount > current.bidAmount) ? prev : current);
 
-      // Update hasWon status
-      const updateResponse = await fetch(`http://localhost:3000/bids/${highestBid.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        credentials: 'include',
-        body: JSON.stringify({ hasWon: "true" })
-      });
-
-      const updateData = await updateResponse.json();
-      if (updateData.error) {
-        console.error("Error updating winning bid:", updateData.error);
-      } else {
-        console.log("Winning bid updated successfully:", updateData.bid);
-      }
+      const updateData = await updateBidAPI(highestBid.id, { hasWon: true });
+      console.log("Winning bid updated successfully:", updateData.bid);
     } catch (error) {
       console.error("Error in setWinningBid:", error);
     }

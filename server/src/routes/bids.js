@@ -10,21 +10,30 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     const { bidAmount, publishedDateTime, hasWon } = req.body;
     const bidId = parseInt(req.params.id);
 
+    console.log(`Received request to edit bid with ID: ${bidId}`);
+
     // Find the bid to update
     let foundBid = bidsData.find(bid => bid.id === bidId);
 
     if (!foundBid) {
+        console.error(`Bid with ID ${bidId} not found.`);
         return res.status(404).json({ error: "Bid not found" });
     }
+
+    console.log(`Found bid:`, foundBid);
 
     let foundAuction = auctionsData.find(auction => auction.id === foundBid.auctionId);
 
     if (!foundAuction) {
+        console.error(`Auction not found for bid with ID ${bidId}`);
         return res.status(404).json({ error: "Auction not found for this bid" });
     }
 
+    console.log(`Found auction for bid:`, foundAuction);
+
     // Validate the new date format, if provided
     if (publishedDateTime && !isValidDateTime(publishedDateTime)) {
+        console.error(`Invalid date format: ${publishedDateTime}`);
         return res.status(400).json({ error: "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'." });
     }
 
@@ -34,41 +43,64 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
         const currentDateTime = new Date();
         currentDateTime.setMilliseconds(0); // Remove milliseconds for comparison
 
+        console.log(`Parsed published date: ${parsedPublishedDateTime}, Current date: ${currentDateTime}`);
+
         if (parsedPublishedDateTime < currentDateTime) {
+            console.error(`Published date ${publishedDateTime} is in the past.`);
             return res.status(400).json({ error: "Published date cannot be in the past." });
         }
 
         foundBid.publishedDateTime = publishedDateTime; // Update date
+        console.log(`Updated publishedDateTime to: ${foundBid.publishedDateTime}`);
     }
 
     // Validate the new bid amount
     let allAuctionBids = bidsData.filter(bid => bid.auctionId === foundBid.auctionId && bid.id !== bidId);
 
+    console.log(`Filtered auction bids:`, allAuctionBids);
+
     // Sort existing bids by publishedDateTime
     let sortedAuctionBids = allAuctionBids.sort((a, b) => parseDate(a.publishedDateTime) - parseDate(b.publishedDateTime));
     let latestAuctionBid = sortedAuctionBids[sortedAuctionBids.length - 1];
 
+    console.log(`Sorted auction bids:`, sortedAuctionBids);
+    console.log(`Latest auction bid:`, latestAuctionBid);
+
     let minBidAmount = latestAuctionBid ? latestAuctionBid.bidAmount : foundAuction.basePrice;
 
+    console.log(`Minimum allowed bid amount: ${minBidAmount}`);
+
     if (bidAmount !== undefined && bidAmount <= minBidAmount) {
+        console.error(`Bid amount ${bidAmount} is less than or equal to the minimum bid amount.`);
         return res.status(400).json({ error: "Bid amount must be higher than the previous highest bid or base price." });
     }
 
     // Update bid amount if provided
     if (bidAmount !== undefined) {
         foundBid.bidAmount = bidAmount;
+        console.log(`Updated bid amount to: ${foundBid.bidAmount}`);
     }
 
-    if (!["true", "false"].includes(hasWon) && !hasWon) {
-        return res.status(400).json({ error: "hasWon value can either be true, false or null." });
+    // Update hasWon if provided
+    if (typeof hasWon === 'boolean') {
+        foundBid.hasWon = hasWon;
+        console.log(`Updated hasWon to: ${foundBid.hasWon}`);
+    } else {
+        console.error(`Invalid hasWon value: ${hasWon}`);
+        return res.status(400).json({ error: "hasWon must be true or false." });
     }
+
+    console.log(`hasWon value is: ${hasWon}`);
 
     // Save the updated bid
     res.status(200).json({
         message: "Bid updated successfully!",
         bid: foundBid
     });
+
+    console.log(`Bid updated successfully:`, foundBid);
 });
+
 
 // Create a new bid
 router.post('/', middleware.isLoggedIn, (req, res) => {

@@ -12,10 +12,9 @@
 
 <script>
   import { onMount } from "svelte";
-  import router from 'page';
   import CardContainer from "../lib/CardContainer.svelte";
-  import { tokenStore } from '../TokenStore';
-  import ModalAddCard from "../lib/ModalAddCard.svelte"; // New Modal for adding cards
+  import ModalAddCard from "../lib/ModalAddCard.svelte";
+  import { fetchCardsAPI } from "../api";
 
   let cards = [];
   let showModal = false; // Modal visibility
@@ -23,16 +22,10 @@
   let alertType = "";
   let isAlertVisible = false;
 
-  async function retrieveCards() {
+  async function fetchCards() {
     try {
-      const response = await fetch("http://localhost:3000/cards", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-      cards = data.cardsData;
+      cards = await fetchCardsAPI();
+      console.log("Received cards:", cards);
     } catch (error) {
       alertMessage = "An error occurred while retrieving cards.";
       alertType = "error";
@@ -41,7 +34,7 @@
   }
 
   onMount(() => {
-    retrieveCards();
+    fetchCards();
   });
 </script>
 
@@ -61,5 +54,5 @@
 
 <!-- Modal for adding a card -->
 {#if showModal}
-  <ModalAddCard on:close={() => showModal = false} on:cardAdded={retrieveCards} />
+  <ModalAddCard on:close={() => showModal = false} on:cardAdded={fetchCards} /> <!-- Use fetchCards here -->
 {/if}

@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import AuctionContainer from "../lib/AuctionContainer.svelte";
   import Filter from "../lib/Filter.svelte";
+  import { fetchAuctionsAPI, fetchCardsAPI } from '../api.js';
 
     let token;
   let isLoggedIn = false;
@@ -27,73 +28,28 @@
     isAdmin = isLoggedIn && checkIsAdmin(token);
   });
 
-  function updateQueryParams() {
-    let queryParams = [];
-    if (selectedRarity !== "All") {
-      queryParams.push(`rarity=${selectedRarity.toLowerCase()}`);
-    }
-    if (selectedType !== "All") {
-      queryParams.push(`type=${selectedType.toLowerCase()}`);
-    }
-    if (maxPrice) {
-      queryParams.push(`price=lte:${maxPrice}`); // Filter for maximum price
-    }
-    return queryParams.length > 0 ? "?" + queryParams.join("&") : "";
-  }
-
-  async function retrieveAuctions() {
-    const queryString = updateQueryParams();
-    let url = `http://localhost:3000/auctions${queryString}`;
-
-    if (searchQuery) {
-      let symbol = "?";
-      if (
-        url.includes("type") ||
-        url.includes("rarity") ||
-        url.includes("price")
-      ) {
-        symbol = "&";
-      }
-      url += symbol + `search=${searchQuery}`;
-    }
-
-    // console.log('Fetching auctions with URL:', url);
-
+  async function fetchAuctions() {
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      auctions = data.auctions || [];
+      auctions = await fetchAuctionsAPI(selectedRarity, selectedType, maxPrice, searchQuery);
       console.log("Received auctions:", auctions);
     } catch (error) {
       alertMessage = "An error occurred while retrieving auctions.";
       alertType = "error";
       isAlertVisible = true;
-      console.error("Error retrieving auctions:", error);
+      auctions = [];
     }
   }
 
-  async function retrieveCards() {
+  onMount(async () => {
+    await fetchCards();
+    await fetchAuctions();
+  });
+
+  async function fetchCards() {
     try {
-      const response = await fetch("http://localhost:3000/cards", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      cards = data.cardsData || [];
+      cards = await fetchCardsAPI();
       console.log("Received cards:", cards);
     } catch (error) {
-      console.error("Error retrieving cards:", error);
       alertMessage = "An error occurred while retrieving cards.";
       alertType = "error";
       isAlertVisible = true;
@@ -118,8 +74,8 @@
   }
 
   async function handleSearch() {
-    await retrieveAuctions();
-    await retrieveCards();
+    await fetchAuctions();
+    await fetchCards();
   }
 
   function handleKeydown(event) {
@@ -132,13 +88,13 @@
     selectedRarity = event.detail.selectedRarity;
     selectedType = event.detail.selectedType;
     maxPrice = event.detail.maxPrice; // Add this line to capture max price
-    await retrieveAuctions();
-    await retrieveCards();
+    await fetchAuctions();
+    await fetchCards();
   }
 
   onMount(async () => {
-    await retrieveCards();
-    await retrieveAuctions();
+    await fetchCards();
+    await fetchAuctions();
   });
 
   function closeAuctionModal() {
@@ -146,12 +102,14 @@
   }
 
   async function handleAuctionAdded() {
-    await retrieveCards();
-    await retrieveAuctions();
+    await fetchCards();
+    await fetchAuctions();
   }
 
   function handleSearchChange() {
     console.log("search query:", searchQuery);
+
+    fetchAuctions();
 
     // Filter cards based on the search query
     let filteredCards = cards.filter((card) =>

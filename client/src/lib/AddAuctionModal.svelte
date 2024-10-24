@@ -5,6 +5,7 @@
   import Alert from "../lib/Alert.svelte";
   import { formatDate } from "../utils";
   import ModalAddCard from "./ModalAddCard.svelte";
+  import { fetchCardsAPI } from "../api.js"; // Import the API function
 
   export let isVisible = false;
   export let isFromAuctionsPage = false;
@@ -32,12 +33,8 @@
 
   async function fetchCards() {
     try {
-      const response = await fetch("http://localhost:3000/cards");
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const data = await response.json();
-      cardsWithoutAuctions = data.cardsData.filter(
+      cardsWithoutAuctions = await fetchCardsAPI(); // Use the API function
+      cardsWithoutAuctions = cardsWithoutAuctions.filter(
         (card) => card.auctionId == -1
       );
     } catch (error) {
@@ -79,7 +76,7 @@
       body: JSON.stringify(auctionData),
     })
       .then(async (response) => {
-        if (!response.ok) {
+        if (response.status !== 201) {
           const err = await response.json();
           throw new Error(err.error || "Failed to add auction.");
         }
