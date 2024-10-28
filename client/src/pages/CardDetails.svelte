@@ -1,12 +1,12 @@
 <script>
-  import AddAuctionModal from "../lib/AddAuctionModal.svelte";
+  import AddAuctionModal from "../components/ModalAddAuction.svelte";
   import { onMount, onDestroy } from "svelte";
   import router from "page";
-  import { tokenStore } from "../TokenStore";
-  import Alert from "../lib/Alert.svelte";
-  import ModalConfirmation from "../lib/ModalConfirmation.svelte";
-  import { checkLoggedIn, checkIsAdmin } from "../middleware";
-  import { fetchCardAPI, deleteCardAPI, saveCardChangesAPI } from "../api";
+  import { tokenStore } from "../lib/TokenStore";
+  import Alert from "../components/Alert.svelte";
+  import ModalConfirmation from "../components/ModalConfirmation.svelte";
+  import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
+  import { fetchCardAPI, deleteCardAPI, saveCardChangesAPI } from "../lib/api";
 
   let cardId;
   let card;

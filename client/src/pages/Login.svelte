@@ -1,12 +1,12 @@
 <script>
-  import PasswordInput from "../lib/PasswordInput.svelte";
-  import EmailInput from "../lib/EmailInput.svelte";
-  import Button from "../lib/Button.svelte";
-  import Alert from "../lib/Alert.svelte"; 
-  import WelcomeSection from "../lib/WelcomeSection.svelte";
-  import { tokenStore } from "../TokenStore";
-  import { checkLoggedIn, checkIsAdmin } from "../middleware";
-  import { loginAPI } from '../api'; // Import the new API function
+  import PasswordInput from "../components/PasswordInput.svelte";
+  import EmailInput from "../components/EmailInput.svelte";
+  import Button from "../components/Button.svelte";
+  import Alert from "../components/Alert.svelte";
+  import WelcomeSection from "../components/WelcomeSection.svelte";
+  import { tokenStore } from "../lib/TokenStore";
+  import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
+  import { loginAPI } from "../lib/api"; // Import the new API function
 
   let email = "";
   let password = "";
@@ -86,13 +86,17 @@
 {:else}
   <form on:submit={handleLogin} class="p-4">
     <EmailInput placeholder="Email" bind:value={email} />
-    <PasswordInput placeholder="Type your password here" bind:value={password} />
+    <PasswordInput
+      placeholder="Type your password here"
+      bind:value={password}
+    />
     <div class="flex items-center justify-between mt-4">
       <Button label="Log in" type="submit" />
       <a
         href="/register"
-        class="text-tertiary underline hover:text-secondary transition duration-150 ease-in-out"
-      >Register</a>
+        class="text-accent underline hover:text-secondary transition duration-150 ease-in-out"
+        >Register</a
+      >
     </div>
   </form>
 {/if}

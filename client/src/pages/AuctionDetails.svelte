@@ -1,13 +1,13 @@
 <script>
   import { onMount } from "svelte";
   import router from "page";
-  import { tokenStore } from "../TokenStore";
-  import Alert from "../lib/Alert.svelte";
-  import { checkLoggedIn, checkIsAdmin, getUserId } from "../middleware";
-  import { formatDate, getCookie } from "../utils";
-  import Countdown from "../lib/Countdown.svelte";
-  import NewBidModal from "../lib/NewBidModal.svelte";
-  import AuctionBidsSection from "../lib/AuctionBidsSection.svelte";
+  import { tokenStore } from "../lib/TokenStore";
+  import Alert from "../components/Alert.svelte";
+  import { checkLoggedIn, checkIsAdmin, getUserId } from "../lib/middleware";
+  import { formatDate, getCookie } from "../lib/utils";
+  import Countdown from "../components/Countdown.svelte";
+  import NewBidModal from "../components/ModalNewBid.svelte";
+  import AuctionBidsSection from "../components/AuctionBidsSection.svelte";
   import {
     fetchAuctionDetailsAPI,
     fetchCardAPI,
@@ -17,7 +17,7 @@
     saveAuctionChangesAPI,
     deleteAuctionAPI,
     addBidAPI
-  } from "../api";
+  } from "../lib/api";
 
   let auctionId;
   let endDateTimeForCountdown;

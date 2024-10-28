@@ -1,9 +1,9 @@
 <script>
-    import { checkLoggedIn, checkIsAdmin } from "../middleware";
-    import { tokenStore } from '../TokenStore';
+    import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
+    import { tokenStore } from '../lib/TokenStore';
     import { createEventDispatcher, tick } from "svelte";
-    import Alert from "../lib/Alert.svelte";
-    import { addCardAPI } from '../api'; // Importing the API function
+    import Alert from "./Alert.svelte";
+    import { addCardAPI } from '../lib/api'; // Importing the API function
 
     let isLoggedIn = false;
     let isAdmin = false;

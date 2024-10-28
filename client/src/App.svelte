@@ -1,5 +1,5 @@
 <script>
-  import { tokenStore } from './TokenStore';
+  import { tokenStore } from './lib/TokenStore';
   import router from "page";
 
   import Navbar from "./components/Navbar.svelte";
@@ -16,7 +16,7 @@
   import Unauthorized from "./pages/Unauthorized.svelte";
 
   // Import middleware functions
-  import { checkIsAdmin, checkLoggedIn } from "./middleware";
+  import { checkIsAdmin, checkLoggedIn } from "./lib/middleware";
 
   let page;
   let params;
@@ -131,7 +131,6 @@
     :root {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
         Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      color: purple;
     }
   }
 </style>

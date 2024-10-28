@@ -1,11 +1,11 @@
 <script>
-  import { tokenStore } from "../TokenStore";
-  import { checkLoggedIn, checkIsAdmin } from "../middleware";
+  import { tokenStore } from "../lib/TokenStore";
+  import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
   import { createEventDispatcher, onMount } from "svelte";
-  import Alert from "../lib/Alert.svelte";
-  import { formatDate } from "../utils";
+  import Alert from "./Alert.svelte";
+  import { formatDate } from "../lib/utils";
   import ModalAddCard from "./ModalAddCard.svelte";
-  import { fetchCardsAPI } from "../api.js"; // Import the API function
+  import { fetchCardsAPI } from "../lib/api.js";
 
   export let isVisible = false;
   export let isFromAuctionsPage = false;
@@ -33,7 +33,7 @@
 
   async function fetchCards() {
     try {
-      cardsWithoutAuctions = await fetchCardsAPI(); // Use the API function
+      cardsWithoutAuctions = await fetchCardsAPI();
       cardsWithoutAuctions = cardsWithoutAuctions.filter(
         (card) => card.auctionId == -1
       );
@@ -48,7 +48,6 @@
 
   async function handleCardAdded(event) {
     const { name } = event.detail;
-    console.log("cardName:", name);
     fetchCards();
   }
 
@@ -111,16 +110,14 @@
 </script>
 
 {#if isVisible}
-  <div
-    class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50"
-  >
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4 sm:p-6 md:p-8">
     <Alert message={alertMessage} type={alertType} isVisible={showAlert} />
-    <div class="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg">
-      <h2 class="text-2xl font-bold mb-4">Add Auction</h2>
+    <div class="bg-white rounded-lg p-6 md:p-8 max-w-full w-full sm:w-[400px] md:w-[500px] lg:w-[600px] shadow-lg">
+      <h2 class="text-2xl font-bold mb-4 text-center">Add Auction</h2>
       <div class="space-y-4">
         <div>
           <label class="block"><strong>Select Card:</strong></label>
-          <select bind:value={selectedCardId} class="border rounded p-1 w-full">
+          <select bind:value={selectedCardId} class="border rounded p-2 w-full">
             {#each cardsWithoutAuctions as card (card.id)}
               <option value={card.id}>{card.name}</option>
             {/each}
@@ -129,7 +126,8 @@
             <a
               href="#"
               on:click|preventDefault={() => (showAddCardModal = true)}
-              class="text-blue-500 underline">Add a new card</a
+              class="text-blue-500 underline block mt-2 text-sm"
+              >Add a new card</a
             >
           {/if}
         </div>
@@ -140,7 +138,7 @@
               type="number"
               bind:value={basePrice}
               min="1"
-              class="border rounded p-1 w-full"
+              class="border rounded p-2 w-full"
               placeholder="Enter base price"
             />
             <span class="ml-2">$</span>
@@ -151,7 +149,7 @@
           <input
             type="date"
             bind:value={endDate}
-            class="border rounded p-1 w-full"
+            class="border rounded p-2 w-full"
           />
         </div>
         <div>
@@ -159,19 +157,19 @@
           <input
             type="time"
             bind:value={endTime}
-            class="border rounded p-1 w-full"
+            class="border rounded p-2 w-full"
           />
         </div>
       </div>
-      <div class="mt-4 flex justify-between">
+      <div class="mt-6 flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 sm:space-x-2">
         <button
           on:click={handleSubmit}
-          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full sm:w-auto"
           >Post Auction</button
         >
         <button
           on:click={close}
-          class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button
+          class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 w-full sm:w-auto">Cancel</button
         >
       </div>
     </div>
@@ -184,12 +182,3 @@
     />
   {/if}
 {/if}
-
-<style>
-  @media (max-width: 640px) {
-    div {
-      max-width: 90%;
-      padding: 2rem;
-    }
-  }
-</style>

@@ -1,28 +1,27 @@
 <script>
-  import { tokenStore } from "../TokenStore";
-  import { checkLoggedIn, checkIsAdmin } from "../middleware";
-  import AddAuctionModal from "../lib/AddAuctionModal.svelte";
+  import { tokenStore } from "../lib/TokenStore";
+  import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
+  import ModalAddAuction from "../components/ModalAddAuction.svelte";
   import { onMount } from "svelte";
-  import AuctionContainer from "../lib/AuctionContainer.svelte";
-  import Filter from "../lib/Filter.svelte";
-  import { fetchAuctionsAPI, fetchCardsAPI } from '../api.js';
+  import AuctionContainer from "../components/AuctionContainer.svelte";
+  import Filter from "../components/Filter.svelte";
+  import SearchBar from "../components/SearchBar.svelte";
+  import { fetchAuctionsAPI, fetchCardsAPI } from "../lib/api.js";
+  import PageTitle from "../components/PageTitle.svelte";
 
-    let token;
+  let token;
   let isLoggedIn = false;
   let isAdmin = false;
 
-  let showAuctionModal = false; // Modal visibility
+  let showAuctionModal = false;
   let auctions = [];
   let cards = [];
-  let alertMessage = "";
-  let alertType = "";
-  let isAlertVisible = false;
   let searchQuery = "";
   let selectedType = "All";
   let selectedRarity = "All";
-  let maxPrice = ""; // New variable for maximum price
+  let maxPrice = "";
 
-    tokenStore.subscribe((value) => {
+  tokenStore.subscribe((value) => {
     token = value.token;
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
@@ -30,7 +29,12 @@
 
   async function fetchAuctions() {
     try {
-      auctions = await fetchAuctionsAPI(selectedRarity, selectedType, maxPrice, searchQuery);
+      auctions = await fetchAuctionsAPI(
+        selectedRarity,
+        selectedType,
+        maxPrice,
+        searchQuery
+      );
       console.log("Received auctions:", auctions);
     } catch (error) {
       alertMessage = "An error occurred while retrieving auctions.";
@@ -39,11 +43,6 @@
       auctions = [];
     }
   }
-
-  onMount(async () => {
-    await fetchCards();
-    await fetchAuctions();
-  });
 
   async function fetchCards() {
     try {
@@ -54,6 +53,37 @@
       alertType = "error";
       isAlertVisible = true;
     }
+  }
+
+  function handleSearchChange(query) {
+    searchQuery = query;
+    fetchAuctions();
+
+    let filteredCards = cards.filter((card) =>
+      card.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    auctions = auctions.filter((auction) =>
+      filteredCards.some((card) => card.auctionId === auction.id)
+    );
+
+    console.log("Filtered auctions:", auctions);
+  }
+
+  async function handleApplyFilters(event) {
+    selectedRarity = event.detail.selectedRarity;
+    selectedType = event.detail.selectedType;
+    maxPrice = event.detail.maxPrice;
+    await fetchAuctions();
+    await fetchCards();
+  }
+
+  onMount(async () => {
+    await fetchCards();
+    await fetchAuctions();
+  });
+
+  function closeAuctionModal() {
+    showAuctionModal = false;
   }
 
   function getCardById(cardId) {
@@ -73,80 +103,45 @@
     );
   }
 
-  async function handleSearch() {
-    await fetchAuctions();
-    await fetchCards();
-  }
-
-  function handleKeydown(event) {
-    if (event.key === "Enter") {
-      handleSearch();
-    }
-  }
-
-  async function handleApplyFilters(event) {
-    selectedRarity = event.detail.selectedRarity;
-    selectedType = event.detail.selectedType;
-    maxPrice = event.detail.maxPrice; // Add this line to capture max price
-    await fetchAuctions();
-    await fetchCards();
-  }
-
-  onMount(async () => {
-    await fetchCards();
-    await fetchAuctions();
-  });
-
-  function closeAuctionModal() {
-    showAuctionModal = false;
-  }
-
   async function handleAuctionAdded() {
     await fetchCards();
     await fetchAuctions();
   }
-
-  function handleSearchChange() {
-    console.log("search query:", searchQuery);
-
-    fetchAuctions();
-
-    // Filter cards based on the search query
-    let filteredCards = cards.filter((card) =>
-      card.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    console.log("Found cards with name:", filteredCards);
-
-    // Filter auctions based on the filtered cards
-    auctions = auctions.filter((auction) =>
-      filteredCards.some((card) => card.auctionId === auction.id)
-    );
-
-    // Log the filtered auctions
-    console.log("Filtered auctions:", auctions);
-  }
 </script>
 
 <!-- Page Layout -->
-<div class="flex flex-col lg:flex-row justify-between">
-  <div class="lg:w-1/4 w-full lg:relative">
+<div class="flex flex-col lg:flex-row justify-between space-y-4 lg:space-y-0 lg:space-x-4 px-4">
+  <h1 class="text-2xl lg:hidden p-4 md:text-3xl lg:text-4xl font-bold text-center">
+  Auctions
+</h1>
+  <div class="lg:w-1/4 w-full lg:relative mb-4 lg:mb-0">
     <Filter
       bind:selectedType
       bind:selectedRarity
       bind:maxPrice
       on:applyFilters={handleApplyFilters}
     />
+          <div class="text-center mt-6">
+        {#if isAdmin}
+          <button
+            on:click={() => (showAuctionModal = true)}
+            class="px-6 py-3 hidden lg:flex bg-accent text-white rounded hover:bg-primary transition-colors"
+          >
+            Add auction
+          </button>
+        {/if}
+      </div>
   </div>
 
   <div class="lg:w-3/4 w-full">
-    <!-- Search Bar -->
-    <div class="px-4">
-      <input
-        type="text"
-        placeholder="Search by card name..."
-        bind:value={searchQuery}
-        on:input={handleSearchChange}
-        class="border rounded p-2 mb-4 w-full"
+      <h1 class="text-2xl hidden lg:block p-4 md:text-3xl lg:text-4xl font-bold text-center">
+  Auctions
+</h1>
+    <!-- Add margin below search bar for spacing on mobile -->
+    <div class="mb-4">
+      <SearchBar
+        bind:searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
       />
     </div>
 
@@ -155,19 +150,18 @@
       <p class="px-4">
         Found {auctions.length} auction{auctions.length !== 1 ? "s" : ""}.
       </p>
-      <!-- Button to trigger modal -->
-      <div class="text-center md:text-left mt-6">
+      <div class="text-center mt-6">
         {#if isAdmin}
-        <button
-          on:click={() => (showAuctionModal = true)}
-          class="px-6 py-3 bg-tertiary text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          Add auction
-        </button>
+          <button
+            on:click={() => (showAuctionModal = true)}
+            class="px-6 py-3 lg:hidden bg-accent text-white rounded hover:bg-primary transition-colors"
+          >
+            Add auction
+          </button>
         {/if}
       </div>
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6 px-4"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6"
       >
         {#each auctions as auction}
           <AuctionContainer {auction} card={getCardById(auction.cardId)} />
@@ -179,7 +173,7 @@
   </div>
 </div>
 
-<AddAuctionModal
+<ModalAddAuction
   bind:isVisible={showAuctionModal}
   on:close={closeAuctionModal}
   on:auctionAdded={handleAuctionAdded}

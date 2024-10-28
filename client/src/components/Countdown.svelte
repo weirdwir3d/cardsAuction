@@ -1,8 +1,8 @@
 <script>
   import { onMount } from 'svelte';
-  import { tokenStore } from '../TokenStore';
-  import { checkLoggedIn, checkIsAdmin } from "../middleware";
-  import { fetchBidsAPI, updateBidAPI } from '../api.js';
+  import { tokenStore } from '../lib/TokenStore';
+  import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
+  import { fetchBidsAPI, updateBidAPI } from '../lib/api.js';
 
   export let auctionId;
   export let endDateTime;
