@@ -5,34 +5,28 @@ import * as middleware from '../middleware/middleware.js';
 import { parseDateTime, isValidDateTime } from '../utils.js'
 const router = express.Router();
 
-// edit an auction
 router.put('/:id', middleware.isAdmin, (req, res) => {
     const auctionId = parseInt(req.params.id);
     const auctionToUpdate = req.body;
 
-    // console.log('backend new auction details:', auctionToUpdate)
-
     let foundAuction = auctionsData.find(auction => auction.id === auctionId);
-
     if (!foundAuction) {
-        return res.status(404).json({ error: "Auction not found" });
+        return res.status(404).json({ error: "Auction not found", message: "The specified auction does not exist." });
     }
 
     if (auctionToUpdate.basePrice != foundAuction.basePrice) {
         if (auctionToUpdate.basePrice <= 0) {
-            return res.status(403).json({ error: "Base price cannot be zero or less" });
+            return res.status(403).json({ error: "Base price cannot be zero or less", message: "Base price must be greater than zero." });
         }
         foundAuction.basePrice = auctionToUpdate.basePrice;
     }
 
     if (!isValidDateTime(auctionToUpdate.publishedDateTime)) {
-        // console.log('wrong startdate')
-        return res.status(400).json({ error: "Invalid published date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
+        return res.status(400).json({ error: "Invalid published date format", message: "Published date must be in the format 'dd-mm-yyyy hh:mm:ss'." });
     }
 
     if (auctionToUpdate.endDateTime && !isValidDateTime(auctionToUpdate.endDateTime)) {
-        // console.log('wrong enddate')
-        return res.status(400).json({ error: "Invalid end date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
+        return res.status(400).json({ error: "Invalid end date format", message: "End date must be in the format 'dd-mm-yyyy hh:mm:ss'." });
     }
 
     const parsedPublishedDateTime = parseDateTime(auctionToUpdate.publishedDateTime);
@@ -42,25 +36,24 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
 
     if (auctionToUpdate.publishedDateTime != foundAuction.publishedDateTime) {
         if (parsedPublishedDateTime < currentDateTime) {
-            console.log('Published date cannot be in the past.')
-            return res.status(400).json({ error: "Published date cannot be in the past." });
+            return res.status(400).json({ error: "Published date in the past", message: "Published date cannot be earlier than the current date and time." });
         }
         foundAuction.publishedDateTime = auctionToUpdate.publishedDateTime;
     }
 
     if (auctionToUpdate.endDateTime != foundAuction.endDateTime) {
         if (parsedEndDateTime <= parsedPublishedDateTime) {
-            console.log('End date must be after the published date.')
-            return res.status(400).json({ error: "End date must be after the published date." });
+            return res.status(400).json({ error: "End date before published date", message: "End date must be later than the published date." });
         }
         foundAuction.endDateTime = auctionToUpdate.endDateTime;
     }
 
     res.status(200).json({
         message: "Auction updated successfully!",
-        auctionToUpdate: foundAuction
+        auction: foundAuction
     });
 });
+
 
 // GET one auction by ID
 router.get("/:id", async (req, res) => {

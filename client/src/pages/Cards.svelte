@@ -26,13 +26,19 @@
   });
 </script>
 
-<h1 class="text-3xl font-bold">Cards</h1>
+<div
+  class="flex flex-col justify-between space-y-4 px-4"
+>
+
+<h1 class="text-2xl p-4 md:text-3xl lg:text-4xl font-bold text-center">
+  Cards
+</h1>
 
 <!-- Button to trigger modal -->
-<div class="text-center md:text-left mt-6">
+<div class="text-center mt-6">
   <button
     on:click={() => (showModal = true)}
-    class="px-6 py-3 bg-accent text-white rounded hover:bg-blue-600 transition-colors"
+    class="px-6 py-3 bg-accent text-white rounded hover:bg-primary transition-colors"
   >
     Add card
   </button>
@@ -64,3 +70,4 @@
   />
   <!-- Use fetchCards here -->
 {/if}
+</div>

@@ -7,7 +7,6 @@
   import Filter from "../components/Filter.svelte";
   import SearchBar from "../components/SearchBar.svelte";
   import { fetchAuctionsAPI, fetchCardsAPI } from "../lib/api.js";
-  import PageTitle from "../components/PageTitle.svelte";
 
   let token;
   let isLoggedIn = false;
@@ -110,10 +109,14 @@
 </script>
 
 <!-- Page Layout -->
-<div class="flex flex-col lg:flex-row justify-between space-y-4 lg:space-y-0 lg:space-x-4 px-4">
-  <h1 class="text-2xl lg:hidden p-4 md:text-3xl lg:text-4xl font-bold text-center">
-  Auctions
-</h1>
+<div
+  class="flex flex-col lg:flex-row justify-between space-y-4 lg:space-y-0 lg:space-x-4 px-4"
+>
+  <h1
+    class="text-2xl lg:hidden p-4 md:text-3xl lg:text-4xl font-bold text-center"
+  >
+    Auctions
+  </h1>
   <div class="lg:w-1/4 w-full lg:relative mb-4 lg:mb-0">
     <Filter
       bind:selectedType
@@ -121,28 +124,27 @@
       bind:maxPrice
       on:applyFilters={handleApplyFilters}
     />
-          <div class="text-center mt-6">
-        {#if isAdmin}
-          <button
-            on:click={() => (showAuctionModal = true)}
-            class="px-6 py-3 hidden lg:flex bg-accent text-white rounded hover:bg-primary transition-colors"
-          >
-            Add auction
-          </button>
-        {/if}
-      </div>
+    <div class="text-center mt-6">
+      {#if isAdmin}
+        <button
+          on:click={() => (showAuctionModal = true)}
+          class="px-6 py-3 hidden lg:flex bg-accent text-white rounded hover:bg-primary transition-colors"
+        >
+          Add auction
+        </button>
+      {/if}
+    </div>
   </div>
 
   <div class="lg:w-3/4 w-full">
-      <h1 class="text-2xl hidden lg:block p-4 md:text-3xl lg:text-4xl font-bold text-center">
-  Auctions
-</h1>
+    <h1
+      class="text-2xl hidden lg:block p-4 md:text-3xl lg:text-4xl font-bold text-center"
+    >
+      Auctions
+    </h1>
     <!-- Add margin below search bar for spacing on mobile -->
     <div class="mb-4">
-      <SearchBar
-        bind:searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-      />
+      <SearchBar bind:searchQuery onSearchChange={handleSearchChange} />
     </div>
 
     <!-- Auctions List -->

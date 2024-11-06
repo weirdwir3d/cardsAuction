@@ -6,7 +6,9 @@
   import { checkLoggedIn, checkIsAdmin, getUserId } from "../lib/middleware";
   import { formatDate, getCookie } from "../lib/utils";
   import Countdown from "../components/Countdown.svelte";
+  import CardDetails from "../components/CardDetails.svelte";
   import NewBidModal from "../components/ModalNewBid.svelte";
+  import ModalEditAuction from "../components/ModalEditAuction.svelte";
   import AuctionBidsSection from "../components/AuctionBidsSection.svelte";
   import {
     fetchAuctionDetailsAPI,
@@ -16,7 +18,7 @@
     fetchUsersAPI,
     saveAuctionChangesAPI,
     deleteAuctionAPI,
-    addBidAPI
+    addBidAPI,
   } from "../lib/api";
 
   let auctionId;
@@ -36,6 +38,7 @@
   let alertMessage = "";
   let alertType = "success";
   let showBidModal = false;
+    let showEditModal = false;
 
   $: lastBidHasWon = bids.length > 0 && bids[bids.length - 1].hasWon;
 
@@ -67,14 +70,14 @@
     }
   }
 
-async function fetchBids() {
+  async function fetchBids() {
     try {
-        bids = await fetchBidsAPI({ auctionId });
-        console.log('Fetched bids:', bids); // Add this line
+      bids = await fetchBidsAPI({ auctionId });
+      console.log("Fetched bids:", bids); // Add this line
     } catch (error) {
-        console.error("Error fetching bids:", error);
+      console.error("Error fetching bids:", error);
     }
-}
+  }
 
   async function deleteBid(bidId) {
     try {
@@ -113,23 +116,28 @@ async function fetchBids() {
   });
 
   function toggleEdit() {
-    isEditing = !isEditing;
+    updatedAuction = { ...auction };
+    showEditModal = !showEditModal;
   }
 
-  async function saveChanges() {
+async function saveChanges() {
     try {
-      auction = await saveAuctionChangesAPI(auctionId, updatedAuction, token);
-      isEditing = false;
-      alertMessage = "Auction edited successfully!";
-      showAlert = true;
-      await fetchAuctionDetails();
-      setTimeout(() => {
-        showAlert = false;
-      }, 4000);
+        auction = await saveAuctionChangesAPI(auctionId, updatedAuction, token);
+        showEditModal = false;
+        alertMessage = "Auction edited successfully!";
+        alertType = "success";
+        showAlert = true;
+        await fetchAuctionDetails();
     } catch (error) {
-      console.error("Error updating auction details:", error);
+        alertMessage = error.message;
+        alertType = "error";
+        showAlert = true;
+    } finally {
+        setTimeout(() => {
+            showAlert = false;
+        }, 4000);
     }
-  }
+}
 
   function viewCardDetails() {
     router.redirect(`/cards/${card.id}`);
@@ -194,72 +202,90 @@ async function fetchBids() {
   onClose={closeBidModal}
   onConfirm={handleConfirmBid}
 />
+{#if showEditModal}
+  <ModalEditAuction
+    {auction}
+    bind:updatedAuction
+    on:save={saveChanges}
+    on:cancel={toggleEdit}
+  />
+{/if}
 
 {#if auction && card}
   <div class="flex flex-col min-h-screen">
-    <div class="flex-grow p-4 max-w-7xl mx-auto">
-      <h1 class="text-4xl font-bold mb-4 text-center md:text-left">
+    <!-- <div class="flex-col md:flex-row"></div> -->
+    <div
+  class="flex flex-col justify-between space-y-4 px-4"
+>
+      <h1 class="text-2xl md:text-4xl font-bold mt-4 text-center">
         {card.name}
       </h1>
 
-      <!-- Auction details section -->
-      <div class="text-lg space-y-4">
-        {#if isAdmin && isEditing}
-          <div>
-            <label><strong>Base Price: </strong></label>
-            <input
-              type="number"
-              bind:value={updatedAuction.basePrice}
-              class="border rounded p-1 w-full"
-            />
-          </div>
-          <div>
-            <label><strong>Published Date/Time: </strong></label>
-            <input
-              type="text"
-              bind:value={updatedAuction.publishedDateTime}
-              class="border rounded p-1 w-full"
-              placeholder="dd-mm-yyyy hh:mm:ss"
-            />
-          </div>
-          <div>
-            <label><strong>End Date/Time: </strong></label>
-            <input
-              type="text"
-              bind:value={updatedAuction.endDateTime}
-              class="border rounded p-1 w-full"
-              placeholder="dd-mm-yyyy hh:mm:ss"
-            />
-          </div>
-        {:else}
-          <p><strong>Base Price: </strong>{auction.basePrice}</p>
-          <p>
-            <strong>Published Date/Time: </strong>{auction.publishedDateTime}
-          </p>
-          <p><strong>End Date/Time: </strong>{auction.endDateTime}</p>
-        {/if}
+      <div class="flex flex-col md:flex-row justify-evenly">
+        <div class="text-base md:text-lg space-y-4 md:w-2/4 mb-2">
+          <!-- Auction details section -->
+          {#if isAdmin && isEditing}
+            <div>
+              <label><strong>Base Price: </strong></label>
+              <input
+                type="number"
+                bind:value={updatedAuction.basePrice}
+                class="border rounded p-1 w-full"
+              />
+            </div>
+            <div>
+              <label><strong>Published: </strong></label>
+              <input
+                type="text"
+                bind:value={updatedAuction.publishedDateTime}
+                class="border rounded p-1 w-full"
+                placeholder="dd-mm-yyyy hh:mm:ss"
+              />
+            </div>
+            <div>
+              <label><strong>Ends: </strong></label>
+              <input
+                type="text"
+                bind:value={updatedAuction.endDateTime}
+                class="border rounded p-1 w-full"
+                placeholder="dd-mm-yyyy hh:mm:ss"
+              />
+            </div>
+          {:else}
+            <p><strong>Base Price: </strong>{auction.basePrice} $</p>
+            <p><strong>Published: </strong>{auction.publishedDateTime}</p>
+            <p><strong>Ends: </strong>{auction.endDateTime}</p>
+          {/if}
 
-        {#if auction.endDateTime}
-          <Countdown {auctionId} endDateTime={endDateTimeForCountdown} />
-        {/if}
-      </div>
+          {#if auction.endDateTime}
+            <Countdown {auctionId} endDateTime={endDateTimeForCountdown} />
+          {/if}
+            {#if isAdmin}
+ 
+      <button
+        on:click={toggleEdit}
+        class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+      >Edit Auction</button>
+    {/if}
+    
+        </div>
 
-      <!-- Current bid card with bid history -->
-      <!-- Current bid card with bid history -->
-      <div class="mt-8">
-        <div class="p-6 border rounded-lg bg-gray-100">
-        {#if bids && bids.length > 0}
-            <AuctionBidsSection {bids} {users} {isAdmin} onDeleteBid={deleteBid} />
-        {:else}
-            <p>No bids found.</p> <!-- Add a fallback message -->
-        {/if}
-
+        <div class="w-full p-2 border rounded-lg bg-gray-200">
+          {#if bids && bids.length > 0}
+            <AuctionBidsSection
+              {bids}
+              {users}
+              {isAdmin}
+              onDeleteBid={deleteBid}
+            />
+          {:else}
+            <p>No bids found.</p>
+          {/if}
 
           {#if !lastBidHasWon}
             <button
               on:click={openBidModal}
-              class={`px-4 py-2 rounded hover:bg-green-600 md:block ml-4 ${isLoggedIn ? "bg-green-500 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
-              disabled={!isLoggedIn}
+              class={`px-4 py-2 rounded hover:bg-green-600 ${isLoggedIn ? "bg-green-500 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"} mt-4`}
             >
               {isLoggedIn ? "Place Bid" : "Log in to place a bid"}
             </button>
@@ -267,83 +293,39 @@ async function fetchBids() {
         </div>
       </div>
 
-      <!-- Display card details -->
-      <div
-        class="flex flex-col md:flex-row items-center md:items-start gap-6 mt-6"
-      >
-        <img
-          src={card.imageUrl}
-          alt={card.name}
-          class="w-full max-w-xs md:max-w-md lg:max-w-lg h-auto object-contain rounded-lg mx-auto"
-        />
+      <CardDetails {card} />
 
-        <div class="text-lg space-y-4">
-          <p><strong>Description: </strong>{card.description}</p>
-          <p><strong>Type:</strong> {card.type}</p>
-          <p><strong>Rarity:</strong> {card.rarity}</p>
+<div class="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
+  {#if isAdmin}
+    <button
+      on:click={viewCardDetails}
+      class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
+    >View Card</button>
+    <button
+      on:click={deleteAuction}
+      class="px-6 py-3 bg-red-500 text-white rounded hover:bg-red-600"
+    >Delete Auction</button>
+  {/if}
+</div>
 
-          <!-- {#if card.auctionId !== -1}
-          <p><strong>Auction ID:</strong> {card.auctionId}</p>
-        {/if} -->
-        </div>
-      </div>
-
-      <!-- Auction editing controls -->
-      {#if isAdmin}
-        <div class="text-center md:text-left mt-6 space-x-4">
-          {#if isEditing}
-            <button
-              on:click={saveChanges}
-              class="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-            >
-              Save Changes
-            </button>
-            <button
-              on:click={toggleEdit}
-              class="px-6 py-3 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-            >
-              Cancel
-            </button>
-          {:else}
-            <button
-              on:click={toggleEdit}
-              class="px-6 py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-            >
-              Edit Auction
-            </button>
-          {/if}
-
+        <div class="flex flex-wrap justify-center md:justify-start gap-4">
           <button
-            on:click={viewCardDetails}
-            class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
-            View Card
-          </button>
-
-          <button
-            on:click={deleteAuction}
-            class="px-6 py-3 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-          >
-            Delete Auction
-          </button>
-        </div>
-      {/if}
-
-      <button
         on:click={() => router.redirect("/auctions")}
-        class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors mt-6"
+        class="px-6 py-3 bg-primary text-white rounded hover:bg-blue-600"
       >
         Back to Auctions
       </button>
-
-      <!-- Add padding to avoid overlap with fixed bottom bar -->
+      
+      </div>
       <div class="pb-16"></div>
+
+
     </div>
 
-    <!-- Fixed Bottom Bar for mobile -->
+
     {#if bids && !lastBidHasWon}
       <div
-        class="fixed bottom-0 left-0 right-0 bg-white shadow-md p-4 md:hidden flex justify-between items-center"
+        class="fixed bottom-0 left-0 right-0 bg-primary shadow-md p-4 md:hidden flex justify-between items-center"
       >
         {#if bids.length > 0}
           <p class="text-lg">
@@ -356,7 +338,7 @@ async function fetchBids() {
         {/if}
         <button
           on:click={openBidModal}
-          class={`px-4 py-2 rounded hover:bg-green-600 md:block ml-4 ${isLoggedIn ? "bg-green-500 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+          class={`px-4 py-2 rounded hover:bg-green-600 ${isLoggedIn ? "bg-green-500 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
           disabled={!isLoggedIn}
         >
           {isLoggedIn ? "Place Bid" : "Log in to place a bid"}

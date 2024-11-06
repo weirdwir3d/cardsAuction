@@ -71,7 +71,13 @@ async function loadBids() {
 
 </script>
 
-<h1>Profile</h1>
+<div
+  class="flex flex-col lg:flex-row justify-between space-y-4 lg:space-y-0 lg:space-x-4 px-4"
+>
+
+<h1 class="text-2xl p-4 md:text-3xl lg:text-4xl font-bold text-center">
+  Profile
+</h1>
 
 {#if isAlertVisible}
     <div class={`alert ${alertType === 'error' ? 'bg-red-500 text-white' : ''} p-4 rounded mt-4`}>
@@ -89,4 +95,5 @@ async function loadBids() {
     {#each bids as bid}
         <BidCard {bid} />
     {/each}
+</div>
 </div>

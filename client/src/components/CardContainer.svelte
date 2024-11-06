@@ -8,13 +8,13 @@
 </script>
 
 <div
-  class="bg-accent p-2 shadow-md rounded-lg max-w-xs mx-auto cursor-pointer"
+  class="bg-secondary p-2 shadow-md rounded-lg max-w-xs mx-auto cursor-pointer"
   on:click={handleClick}
   role="button"
   tabindex="0"
   on:keypress={(e) => e.key === "Enter" && handleClick()}
 >
-  <h2 class="text-lg font-bold mb-2 text-center">{card.name}</h2>
+  <h2 class="text-lg font-bold mb-2 text-center text-white hover:text-accent">{card.name}</h2>
   <img
     src={card.imageUrl}
     alt={card.name}

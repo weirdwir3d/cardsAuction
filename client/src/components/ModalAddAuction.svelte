@@ -165,7 +165,7 @@
         <button
           on:click={handleSubmit}
           class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full sm:w-auto"
-          >Post Auction</button
+          >Add Auction</button
         >
         <button
           on:click={close}

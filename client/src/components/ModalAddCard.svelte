@@ -58,7 +58,7 @@
 </script>
 
 <!-- Modal layout -->
-<div class="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
+<div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4 sm:p-6 md:p-8">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
         <h2 class="text-2xl font-bold mb-4">Add New Card</h2>
         
@@ -98,10 +98,17 @@
             <input bind:value={imageUrl} class="w-full p-2 border rounded" type="text" placeholder="Enter image URL" />
         </div>
 
-        <div class="flex justify-end space-x-4">
-            <button on:click={closeModal} class="px-4 py-2 bg-gray-500 text-white rounded">Cancel</button>
-            <button on:click={addCard} class="px-4 py-2 bg-blue-500 text-white rounded">Add Card</button>
-        </div>
+      <div class="mt-6 flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 sm:space-x-2">
+        <button
+          on:click={addCard}
+          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full sm:w-auto"
+          >Add Card</button
+        >
+        <button
+          on:click={closeModal}
+          class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 w-full sm:w-auto">Cancel</button
+        >
+      </div>
     </div>
 </div>
 

@@ -199,23 +199,22 @@ export async function saveAuctionChangesAPI(auctionId, updatedAuction, token) {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${token}`
             },
-            credentials: 'include',
-            body: JSON.stringify(updatedAuction),
+            body: JSON.stringify(updatedAuction)
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update auction');
         }
 
-        const auctionData = await response.json();
-        return auctionData.auction;
+        return await response.json();
     } catch (error) {
-        console.error("Error updating auction details:", error);
-        throw error;
+        throw new Error(error.message || 'An error occurred while updating the auction');
     }
 }
+
 
 export async function saveCardChangesAPI(cardId, updatedCard, token) {
     try {
