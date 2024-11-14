@@ -1,12 +1,9 @@
 <script>
-  import TextInput from "../components/TextInput.svelte";
-  import EmailInput from "../components/EmailInput.svelte";
-  import PasswordInput from "../components/PasswordInput.svelte";
   import Button from "../components/Button.svelte";
   import Alert from "../components/Alert.svelte";
   import WelcomeSection from "../components/WelcomeSection.svelte";
-  import { tokenStore } from "../lib/TokenStore"; // Import the tokenStore
-  import { registerUserAPI } from "../lib/api"; // Import the registerUser function
+  import { tokenStore } from "../lib/TokenStore";
+  import { registerUserAPI } from "../lib/api";
 
   let username = "";
   let email = "";
@@ -36,73 +33,71 @@
     resetAlert();
 
     if (username.length < 4) {
-      console.log("Username validation failed");
-      alertMessage = "Username must be at least 4 characters long.";
-      alertType = "error";
-      isAlertVisible = true;
-      return;
+        alertMessage = "Username must be at least 4 characters long.";
+        alertType = "error";
+        isAlertVisible = true;
+        return;
     }
 
     if (!isValidEmail(email)) {
-      console.log("Email validation failed");
-      alertMessage = "Please enter a valid email address.";
-      alertType = "error";
-      isAlertVisible = true;
-      return;
+        alertMessage = "Please enter a valid email address.";
+        alertType = "error";
+        isAlertVisible = true;
+        return;
     }
 
     if (!password) {
-      console.log("Password is empty");
-      alertMessage = "Password cannot be empty.";
-      alertType = "error";
-      isAlertVisible = true;
-      return;
+        alertMessage = "Password cannot be empty.";
+        alertType = "error";
+        isAlertVisible = true;
+        return;
     }
 
     if (password !== confirmPassword) {
-      console.log("Passwords do not match");
-      alertMessage = "Passwords don't match!";
-      alertType = "error";
-      isAlertVisible = true;
-      return;
+        alertMessage = "Passwords don't match!";
+        alertType = "error";
+        isAlertVisible = true;
+        return;
     }
 
-    console.log("All validations passed, sending registration request");
     try {
-      const data = await registerUserAPI({
-        username,
-        email,
-        password,
-        confirmPassword,
-      });
-      console.log("Received response from server:", data);
+        const response = await registerUserAPI({ username, email, password, confirmPassword });
 
-      tokenStore.set({ token: data.token });
+        if (response.httpStatusCode === 409) {
+            alertMessage = "Email address already in use.";
+            alertType = "error";
+            isAlertVisible = true;
+        } else if (response.httpStatusCode === 200) {
+            const data = response;
+            tokenStore.set({ token: data.token });
+            const unsubscribe = tokenStore.subscribe((value) => {
+                if (value.token) {
+                    const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
+                    username = decodedToken.username || "User";
+                    isAdmin = decodedToken.isAdmin || false;
+                    isLoggedIn = true;
+                }
+            });
+            unsubscribe();
 
-      tokenStore.subscribe((value) => {
-        console.log("Token stored in tokenStore:", value.token);
-
-        if (value.token) {
-          const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
-          username = decodedToken.username || "User";
-          isAdmin = decodedToken.isAdmin || false;
-          isLoggedIn = true;
+            alertMessage = "Registration successful!";
+            alertType = "success";
+            isAlertVisible = true;
+        } else {
+            alertMessage = "An unknown error occurred.";
+            alertType = "error";
+            isAlertVisible = true;
         }
-      })();
-
-      alertMessage = "Registration successful!";
-      alertType = "success";
-      isAlertVisible = true;
     } catch (error) {
-      console.error("Registration error:", error);
-      alertMessage = "An error occurred during registration.";
-      alertType = "error";
-      isAlertVisible = true;
+        alertMessage = "An error occurred during registration.";
+        alertType = "error";
+        isAlertVisible = true;
     }
   }
 </script>
 
-<h1 class="text-3xl font-bold">Register</h1>
+<div class="flex flex-col pb-6">
+  <h1 class="text-2xl p-4 md:text-3xl lg:text-4xl font-bold text-center">Register</h1>
 
 {#if isAlertVisible}
   <Alert message={alertMessage} type={alertType} isVisible={isAlertVisible} />
@@ -111,26 +106,48 @@
 {#if isLoggedIn}
   <WelcomeSection {username} {isAdmin} />
 {:else}
-  <form on:submit={handleRegister} class="p-4">
-    <TextInput placeholder="Username" bind:value={username} />
-    <EmailInput placeholder="Email" bind:value={email} />
-    <PasswordInput
+<div class="flex justify-center py-4">
+  <form on:submit={handleRegister} class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-4/6 lg:1/6">
+    <div class="flex flex-col mb-4">
+    <input
+      type="text"
+      placeholder="Username"
+      bind:value={username}
+      class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary transition duration-150 ease-in-out w-full"
+    />
+    </div>
+    <div class="flex flex-col mb-4">
+    <input
+      type="email"
+      placeholder="Email"
+      bind:value={email}
+      class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary transition duration-150 ease-in-out w-full"
+    />
+    </div>
+    <div class="flex flex-col mb-4">
+    <input
+      type="password"
       placeholder="Type your password here"
       bind:value={password}
+      class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary transition duration-150 ease-in-out w-full"
     />
-    <PasswordInput
+    </div>
+    <div class="flex flex-col mb-4">
+    <input
+      type="password"
       placeholder="Confirm your password"
       bind:value={confirmPassword}
+      class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary transition duration-150 ease-in-out w-full"
     />
+    </div>
 
-    <div class="flex items-center justify-between mt-4">
-      <Button label="Register" type="submit" />
-      <a
-        href="/login"
-        class="text-accent underline hover:text-secondary transition duration-150 ease-in-out"
-      >
+    <div class="flex items-center justify-start mt-4">
+      <Button label="Register" color="danger" onClick={handleRegister} />
+      <a href="/login" class="text-accent underline hover:text-secondary transition duration-150 ease-in-out px-2">
         Log in
       </a>
     </div>
   </form>
+  </div>
 {/if}
+</div>

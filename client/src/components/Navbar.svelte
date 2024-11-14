@@ -27,7 +27,7 @@
   };
 </script>
 
-<nav class="flex flex-col md:flex-row items-center justify-between w-full px-4 py-2 bg-primary">
+<nav class="flex flex-col md:flex-row items-center justify-between w-full px-4 py-2 bg-primary fixed top-0 left-0 z-10">
   <div class="flex items-center justify-between w-full">
     <img src={logo} alt="Yugioh Logo" class="h-16 w-40 md:h-16 md:w-40 mb-4 md:mb-0" />
 

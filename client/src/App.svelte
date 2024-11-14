@@ -1,9 +1,8 @@
 <script>
-  import { tokenStore } from './lib/TokenStore';
+  import { tokenStore } from "./lib/TokenStore";
   import router from "page";
-
   import Navbar from "./components/Navbar.svelte";
-
+  import { checkIsAdmin, checkLoggedIn } from "./lib/middleware";
   import Auctions from "./pages/Auctions.svelte";
   import AuctionDetails from "./pages/AuctionDetails.svelte";
   import Cards from "./pages/Cards.svelte";
@@ -15,43 +14,38 @@
   import Forbidden from "./pages/Forbidden.svelte";
   import Unauthorized from "./pages/Unauthorized.svelte";
 
-  // Import middleware functions
-  import { checkIsAdmin, checkLoggedIn } from "./lib/middleware";
-
   let page;
   let params;
   let currentRoute;
-
-    // Subscribe to tokenStore for global access
   let token;
-  tokenStore.subscribe(value => {
+
+  tokenStore.subscribe((value) => {
     token = value.token;
     if (token) {
-      console.log('Token is available');
+      // console.log('Token is available');
     }
   });
 
-  // Middleware function for admin-only routes
+  //for content only admins can access (inspo: slides)
   function admin_only(ctx, next) {
     if (checkIsAdmin()) {
-      next(); // Proceed to the route
+      next();
     } else {
-          page = Forbidden;
-    currentRoute = ctx.pathname;
+      page = Forbidden;
+      currentRoute = ctx.pathname;
     }
   }
 
-  // Middleware function for login-only routes
+  // for content only logged in users can access
   function login_only(ctx, next) {
     if (checkLoggedIn()) {
-      next(); // Proceed to the route
+      next();
     } else {
-          page = Unauthorized;
-    currentRoute = ctx.pathname;
+      page = Unauthorized;
+      currentRoute = ctx.pathname;
     }
   }
 
-  // Define routes
   router("/", (ctx) => {
     page = Auctions;
     currentRoute = ctx.pathname;
@@ -67,7 +61,7 @@
     currentRoute = ctx.pathname;
   });
 
-  router("/cards/:id", (ctx) => {
+  router("/cards/:id", admin_only,(ctx) => {
     page = CardDetails;
     currentRoute = ctx.pathname;
     params = ctx.params;
@@ -109,7 +103,6 @@
     currentRoute = ctx.pathname;
   });
 
-  // Start the router
   router.start();
 </script>
 
@@ -117,11 +110,12 @@
   <Navbar active={currentRoute} />
 </main>
 
-<body class="bg-background">
+<!-- constant top padding to compensate for navbar -->
+<body class="bg-background pt-24">
   <svelte:component this={page} {params} />
 </body>
 
-<!-- Global styles -->
+<!-- default tailwind setup -->
 <style>
   @tailwind base;
   @tailwind components;

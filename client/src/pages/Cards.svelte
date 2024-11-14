@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import CardContainer from "../components/CardContainer.svelte";
-  import ModalAddCard from "../components/ModalAddCard.svelte";
+  import ModalAddCard from "../components/modals/AddCardModal.svelte";
   import { fetchCardsAPI } from "../lib/api";
 
   let cards = [];

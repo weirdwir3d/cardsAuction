@@ -6,9 +6,9 @@
   import { checkLoggedIn, checkIsAdmin, getUserId } from "../lib/middleware";
   import { formatDate, getCookie } from "../lib/utils";
   import Countdown from "../components/Countdown.svelte";
-  import CardDetails from "../components/CardDetails.svelte";
-  import NewBidModal from "../components/ModalNewBid.svelte";
-  import ModalEditAuction from "../components/ModalEditAuction.svelte";
+  import CardDetails from "../components/CardInfo.svelte";
+  import NewBidModal from "../components/modals/NewBidModal.svelte";
+  import ModalEditAuction from "../components/modals/EditAuctionModal.svelte";
   import AuctionBidsSection from "../components/AuctionBidsSection.svelte";
   import {
     fetchAuctionDetailsAPI,

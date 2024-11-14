@@ -1,11 +1,11 @@
 <script>
-  import { tokenStore } from "../lib/TokenStore";
-  import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
+  import { tokenStore } from "../../lib/TokenStore";
+  import { checkLoggedIn, checkIsAdmin } from "../../lib/middleware";
   import { createEventDispatcher, onMount } from "svelte";
-  import Alert from "./Alert.svelte";
-  import { formatDate } from "../lib/utils";
+  import Alert from "../Alert.svelte";
+  import { formatDate } from "../../lib/utils";
   import ModalAddCard from "./ModalAddCard.svelte";
-  import { fetchCardsAPI } from "../lib/api.js";
+  import { fetchCardsAPI } from "../../lib/api.js";
 
   export let isVisible = false;
   export let isFromAuctionsPage = false;

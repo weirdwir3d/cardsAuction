@@ -3,7 +3,7 @@
   export let isAdmin = false; // Flag for admin status
 </script>
 
-<div>
+<div class="flex-col text-center pb-6">
   <h2 class="text-2xl">
     Welcome, <span class="text-accent">{username}</span>!
   </h2>

@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import { getUserId, getUsername, getEmail } from '../lib/middleware';
-    import BidCard from '../components/BidCard.svelte';
+    import BidCard from '../components/BidContainer.svelte';
     import { fetchBidsAPI, fetchCardAPI } from '../lib/api'; // Import the new API functions
 
     let userId;

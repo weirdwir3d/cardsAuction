@@ -1,11 +1,11 @@
 <script>
-  import AddAuctionModal from "../components/ModalAddAuction.svelte";
-  import ModalEditCard from "../components/ModalEditCard.svelte";
+  import AddAuctionModal from "../components/modals/AddAuctionModal.svelte";
+  import ModalEditCard from "../components/modals/EditCardModal.svelte";
   import { onMount, onDestroy } from "svelte";
   import router from "page";
   import { tokenStore } from "../lib/TokenStore";
   import Alert from "../components/Alert.svelte";
-  import ModalConfirmation from "../components/ModalConfirmation.svelte";
+  import ModalConfirmation from "../components/modals/ConfirmationModal.svelte";
   import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
   import { fetchCardAPI, deleteCardAPI, saveCardChangesAPI } from "../lib/api";
 

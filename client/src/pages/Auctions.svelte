@@ -1,14 +1,15 @@
 <script>
+  import { onMount } from "svelte";
   import { tokenStore } from "../lib/TokenStore";
   import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
-  import ModalAddAuction from "../components/ModalAddAuction.svelte";
-  import { onMount } from "svelte";
-  import AuctionContainer from "../components/AuctionContainer.svelte";
+  import { fetchAuctionsAPI, fetchCardsAPI } from "../lib/api.js";
   import Filter from "../components/Filter.svelte";
   import SearchBar from "../components/SearchBar.svelte";
-  import { fetchAuctionsAPI, fetchCardsAPI } from "../lib/api.js";
+  import AddAuctionModal from "../components/modals/AddAuctionModal.svelte";
+  import AuctionContainer from "../components/AuctionContainer.svelte";
 
   let token;
+  // TODO: is this really necessary?
   let isLoggedIn = false;
   let isAdmin = false;
 
@@ -175,7 +176,7 @@
   </div>
 </div>
 
-<ModalAddAuction
+<AddAuctionModal
   bind:isVisible={showAuctionModal}
   on:close={closeAuctionModal}
   on:auctionAdded={handleAuctionAdded}
