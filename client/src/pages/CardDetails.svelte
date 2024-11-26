@@ -7,6 +7,7 @@
   import EditCardModal from "../components/modals/EditCardModal.svelte";
   import ConfirmationModal from "../components/modals/ConfirmationModal.svelte";
   import Alert from "../components/Alert.svelte";
+  import Button from "../components/Button.svelte";
   import * as API from "../lib/api";
 
   let token;
@@ -128,19 +129,9 @@
         <p><strong>Rarity:</strong> {card.rarity}</p>
 
         {#if card.auctionId !== -1}
-          <button
-            on:click={() => router.redirect(`/auctions/${card.auctionId}`)}
-            class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            View Auction
-          </button>
+        <Button label="View Auction" color="business" onClick={() => router.redirect(`/auctions/${card.auctionId}`)} />
         {:else if isAdmin && auctionId === -1}
-          <button
-            on:click={() => (showAuctionModal = true)}
-            class="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            Put Up for Auction
-          </button>
+        <Button label="Put Up for Auction" color="confirmation" onClick={() => (showAuctionModal = true)} />
         {/if}
       </div>
     </div>
@@ -148,28 +139,13 @@
     <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-4">
       {#if isAdmin}
         <div class="text-center md:text-left mt-6 space-x-4">
-          <button
-            on:click={openEditModal}
-            class="px-6 py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-          >
-            Edit
-          </button>
-          <button
-            on:click={handleDelete}
-            class="px-6 py-3 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Delete Card
-          </button>
+          <Button label="Edit" color="warning" onClick={openEditModal} />
+          <Button label="Delete card" color="accent" onClick={handleDelete} />
         </div>
       {/if}
     </div>
 
-    <button
-      on:click={() => router.redirect("/cards")}
-      class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
-    >
-      Back to Cards
-    </button>
+    <Button label="Back to Cards" color="gray" onClick={() => router.redirect("/cards")} />
   </div>
 {/if}
 

@@ -1,4 +1,3 @@
-<!-- TODO: done -->
 <script>
   import { onMount } from "svelte";
   import * as middleware from "../lib/middleware";

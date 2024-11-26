@@ -3,6 +3,7 @@
   import { tokenStore } from "../../lib/TokenStore";
   import { createEventDispatcher } from "svelte";
   import { addCardAPI } from "../../lib/api";
+  import Button from "../Button.svelte";
   import Alert from "../Alert.svelte";
 
   let isLoggedIn = false;
@@ -134,16 +135,9 @@
       class="mt-6 flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 sm:space-x-2"
     >
     <!-- Add card btn -->
-      <button
-        on:click={addCard}
-        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full sm:w-auto"
-        >Add Card</button
-      >
-      <button
-        on:click={() => (dispatch("close"))}
-        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 w-full sm:w-auto"
-        >Cancel</button
-      >
+     <Button label="Add card" color="confirmation" onClick={addCard} />
+
+     <Button label="Cancel" color="gray" onClick={() => (dispatch("close"))} />
     </div>
   </div>
 </div>

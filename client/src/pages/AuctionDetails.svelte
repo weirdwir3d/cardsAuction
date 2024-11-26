@@ -8,6 +8,7 @@
   import CardDetails from "../components/CardInfo.svelte";
   import NewBidModal from "../components/modals/NewBidModal.svelte";
   import EditAuctionModal from "../components/modals/EditAuctionModal.svelte";
+  import Button from "../components/Button.svelte";
   import Alert from "../components/Alert.svelte";
   import * as utils from "../lib/utils";
   import * as API from "../lib/api";
@@ -263,11 +264,7 @@
 
           <!-- Edit auction btn -->
           {#if isAdmin}
-            <button
-              on:click={toggleEdit}
-              class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-              >Edit Auction</button
-            >
+          <Button label="Edit auction" color="warning" onClick={toggleEdit} />
           {/if}
 
         </div>
@@ -302,26 +299,13 @@
 
       <div class="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
         {#if isAdmin}
-          <button
-            on:click={viewCardDetails}
-            class="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >View Card</button
-          >
-          <button
-            on:click={deleteAuction}
-            class="px-6 py-3 bg-red-500 text-white rounded hover:bg-red-600"
-            >Delete Auction</button
-          >
+        <Button label="View card" color="business" onClick={viewCardDetails} />
+        <Button label="Delete auction" color="accent" onClick={deleteAuction} />
         {/if}
       </div>
 
       <div class="flex flex-wrap justify-center md:justify-start gap-4">
-        <button
-          on:click={() => router.redirect("/auctions")}
-          class="px-6 py-3 bg-primary text-white rounded hover:bg-blue-600"
-        >
-          Back to Auctions
-        </button>
+        <Button label="Back to auctions" color="gray" onClick={() => router.redirect("/auctions")} />
       </div>
       <div class="pb-16"></div>
     </div>

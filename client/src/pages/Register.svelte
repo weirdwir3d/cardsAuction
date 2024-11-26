@@ -150,7 +150,7 @@
         </div>
 
         <div class="flex items-center justify-start mt-4">
-          <Button label="Register" color="danger" onClick={handleRegister} />
+          <Button label="Register" color="accent" onClick={handleRegister} />
           <a
             href="/login"
             class="text-accent underline hover:text-secondary px-2"

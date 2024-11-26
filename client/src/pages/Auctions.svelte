@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { tokenStore } from "../lib/TokenStore";
   import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
+  import Button from "../components/Button.svelte";
   import Alert from "../components/Alert.svelte";
   import { fetchAuctionsAPI, fetchCardsAPI } from "../lib/api.js";
   import Filter from "../components/Filter.svelte";
@@ -136,12 +137,7 @@
     <!-- Add auction btn (only visible to admin) -->
     <div class="text-center mt-6">
       {#if isAdmin}
-        <button
-          on:click={() => (showNewAuctionModal = true)}
-          class="px-6 py-3 hidden lg:flex bg-accent text-white rounded hover:bg-primary"
-        >
-          Add auction
-        </button>
+      <Button label="Add auction" color="accent" onClick={() => (showNewAuctionModal = true)} />
       {/if}
     </div>
   </div>
@@ -166,12 +162,7 @@
       </p>
       <div class="text-center mt-6">
         {#if isAdmin}
-          <button
-            on:click={() => (showNewAuctionModal = true)}
-            class="px-6 py-3 lg:hidden bg-accent text-white rounded hover:bg-primary"
-          >
-            Add auction
-          </button>
+        <Button label="Add auction" color="accent" onClick={() => (showNewAuctionModal = true)} />
         {/if}
       </div>
       <div

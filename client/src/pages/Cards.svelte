@@ -4,6 +4,7 @@
   import AddCardModal from "../components/modals/AddCardModal.svelte";
   import { fetchCardsAPI } from "../lib/api";
   import Alert from "../components/Alert.svelte";
+  import Button from "../components/Button.svelte";
 
   let cards = [];
   let showNewCardModal = false;
@@ -39,12 +40,7 @@
 
   <!-- Add card btn -->
   <div class="text-center mt-6">
-    <button
-      on:click={() => (showNewCardModal = true)}
-      class="px-6 py-3 bg-accent text-white rounded hover:bg-primary"
-    >
-      Add card
-    </button>
+    <Button label="Add card" color="accent" onClick={() => (showNewCardModal = true)} />
   </div>
 
   <!-- Cards grid -->

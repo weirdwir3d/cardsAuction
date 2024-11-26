@@ -1,6 +1,7 @@
 <script>
   import { tokenStore } from "../../lib/TokenStore";
   import { createEventDispatcher, onMount } from "svelte";
+  import Button from "../Button.svelte";
   import Alert from "../Alert.svelte";
   import { formatDate } from "../../lib/utils";
   import AddCardModal from "./AddCardModal.svelte";
@@ -149,16 +150,9 @@
         class="mt-6 flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 sm:space-x-2"
       >
       <!-- add auction btn -->
-        <button
-          on:click={addAuction}
-          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full sm:w-auto"
-          >Add Auction</button
-        >
-        <button
-          on:click={close}
-          class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 w-full sm:w-auto"
-          >Cancel</button
-        >
+       <Button label="Add auction" color="confirmation" onClick={addAuction} />
+
+       <Button label="Cancel" color="gray" onClick={close} />
       </div>
     </div>
   </div>

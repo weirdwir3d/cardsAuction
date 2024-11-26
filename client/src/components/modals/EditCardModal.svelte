@@ -1,4 +1,5 @@
 <script>
+  import Button from "../Button.svelte";
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
 
@@ -6,7 +7,9 @@
   export let updatedCard;
 </script>
 
-<div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+<div
+  class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center"
+>
   <div class="bg-white p-6 rounded shadow-lg w-full max-w-md">
     <h2 class="text-xl font-bold mb-4">Edit Card</h2>
 
@@ -38,12 +41,12 @@
     </div>
 
     <div class="flex justify-end space-x-4">
-      <button on:click={() => (dispatch("cancel"))} class="px-4 py-2 bg-gray-500 text-white rounded">
-        Cancel
-      </button>
-      <button on:click={() => (dispatch("save", updatedCard))} class="px-4 py-2 bg-green-500 text-white rounded">
-        Save Changes
-      </button>
+      <Button label="Cancel" color="gray" onClick={() => dispatch("cancel")} />
+      <Button
+        label="Save changes"
+        color="confirmation"
+        onClick={() => dispatch("save", updatedCard)}
+      />
     </div>
   </div>
 </div>

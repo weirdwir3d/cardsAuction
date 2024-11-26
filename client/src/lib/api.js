@@ -365,7 +365,7 @@ export async function loginAPI(email, password) {
 
         const data = await response.json();
         console.log('data:', data)
-        return { response, data };
+        return data;
     } catch (error) {
         throw new Error("Unexpected error occurred, please try again later");
     }

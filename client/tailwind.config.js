@@ -10,7 +10,10 @@ export default {
         primary: '#587a9c',
         secondary: '#8f8f8f',
         accent: '#d3322e',
-        background: 'whitesmoke'
+        background: 'whitesmoke',
+        confirmation: '#28a745',
+        warning: '#ffc107',
+        business: '#007bff'
       },
     },
   },

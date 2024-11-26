@@ -24,9 +24,9 @@
     showAlert = false;
 
     try {
-      const { response, data } = await loginAPI(email, password);
+      const data = await loginAPI(email, password);
 
-      if (response.httpStatusCode === 200) {
+      if (data.httpStatusCode === 200) {
         tokenStore.set({ token: data.token });
 
         tokenStore.subscribe((value) => {
@@ -100,7 +100,7 @@
           />
         </div>
         <div class="flex items-center justify-start mt-4">
-          <Button label="Log in" color="danger" onClick={handleLogin} />
+          <Button label="Log in" color="accent" onClick={handleLogin} />
           <a
             href="/register"
             class="text-accent underline hover:text-secondary transition duration-150 px-2"
