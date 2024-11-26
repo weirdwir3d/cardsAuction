@@ -1,20 +1,21 @@
 <script>
-  import logo from "../assets/Yugioh-logo.svg";
   import { tokenStore } from '../lib/TokenStore';
   import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
+  import logo from "../assets/Yugioh-logo.svg";
   import Alert from './Alert.svelte';
 
   export let active;
-  let isMenuOpen = false;
-  
   let isLoggedIn = false;
   let isAdmin = false;
-  let alertVisible = false;
+
+  let isMenuOpen = false;
+  //alert
+  let isVisible = false;
   let alertMessage = "";
   let alertType = "success";
 
   tokenStore.subscribe(token => {
-    console.log('Token from navbar:', token);
+    // console.log('token from navbar:', token);
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
   });
@@ -23,7 +24,7 @@
     tokenStore.set({ token: null });
     alertMessage = "Logged out successfully!";
     alertType = "success";
-    alertVisible = true;
+    isVisible = true;
   };
 </script>
 
@@ -35,6 +36,7 @@
       class="block md:hidden focus:outline-none" 
       on:click={() => isMenuOpen = !isMenuOpen}
       aria-label="Toggle menu">
+      <!-- hamburger -->
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
       </svg>
@@ -75,6 +77,6 @@
     {/if}
   </ul>
 
-  <Alert message={alertMessage} type={alertType} isVisible={alertVisible} />
+  <!-- Alert -->
+  <Alert message={alertMessage} type={alertType} isVisible={isVisible} />
 </nav>
-

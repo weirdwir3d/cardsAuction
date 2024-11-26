@@ -1,8 +1,8 @@
 <script>
   import { tokenStore } from "./lib/TokenStore";
+  import { checkIsAdmin, checkLoggedIn } from "./lib/middleware";
   import router from "page";
   import Navbar from "./components/Navbar.svelte";
-  import { checkIsAdmin, checkLoggedIn } from "./lib/middleware";
   import Auctions from "./pages/Auctions.svelte";
   import AuctionDetails from "./pages/AuctionDetails.svelte";
   import Cards from "./pages/Cards.svelte";
@@ -21,12 +21,12 @@
 
   tokenStore.subscribe((value) => {
     token = value.token;
-    if (token) {
-      // console.log('Token is available');
-    }
+    // if (token) {
+    //   console.log('token is available');
+    // }
   });
 
-  //for content only admins can access (inspo: slides)
+  //for content only admins can access (code from slides)
   function admin_only(ctx, next) {
     if (checkIsAdmin()) {
       next();

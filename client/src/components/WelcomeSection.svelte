@@ -1,6 +1,6 @@
 <script>
-  export let username = "User"; // Default username
-  export let isAdmin = false; // Flag for admin status
+  export let username = "User";
+  export let isAdmin = false;
 </script>
 
 <div class="flex-col text-center pb-6">

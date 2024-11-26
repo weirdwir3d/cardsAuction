@@ -5,6 +5,7 @@ import * as middleware from '../middleware/middleware.js';
 import { parseDateTime, isValidDateTime } from '../utils.js'
 const router = express.Router();
 
+//edit auction
 router.put('/:id', middleware.isAdmin, (req, res) => {
     const auctionId = parseInt(req.params.id);
     const auctionToUpdate = req.body;
@@ -178,7 +179,6 @@ router.post('/', middleware.isAdmin, (req, res) => {
 
 router.get("/", async (req, res) => {
     const { search, type, rarity, price } = req.query;
-    const currentDate = new Date();
 
     let auctions = auctionsData;
 
@@ -221,10 +221,6 @@ router.get("/", async (req, res) => {
         if (operator === 'lte') {
             auctions = auctions.filter(auction => auction.basePrice <= priceValue);
         }
-    }
-
-    if (auctions.length == 0) {
-        return res.status(404).json({ error: "No auctions found" });
     }
 
     return res.status(200).json({ auctions });

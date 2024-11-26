@@ -1,15 +1,15 @@
 import { tokenStore } from './TokenStore';
-import { jwtDecode } from 'jwt-decode'; // Ensure proper import
+import { jwtDecode } from 'jwt-decode';
 
 let decodedToken = null;
 
-const unsubscribe = tokenStore.subscribe(value => {
+tokenStore.subscribe(value => {
     if (value.token) {
         try {
             decodedToken = jwtDecode(value.token);
-            console.log('Decoded Token:', decodedToken); // Log the decoded token
+            // console.log('decoded token:', decodedToken);
         } catch (error) {
-            console.error('Error decoding token:', error);
+            console.error('error decoding token:', error);
         }
     } else {
         decodedToken = null;
@@ -24,7 +24,6 @@ export function checkLoggedIn() {
     return !!decodedToken;
 }
 
-// New function to get user ID
 export function getUserId() {
     if (decodedToken) {
         return decodedToken.id
@@ -33,9 +32,9 @@ export function getUserId() {
 }
 
 export function getUsername() {
-    return decodedToken ? decodedToken.username : null; // Assuming 'id' is the key in the token
+    return decodedToken ? decodedToken.username : null;
 }
 
 export function getEmail() {
-    return decodedToken ? decodedToken.email : null; // Assuming 'id' is the key in the token
+    return decodedToken ? decodedToken.email : null;
 }

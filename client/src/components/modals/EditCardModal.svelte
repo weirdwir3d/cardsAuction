@@ -1,18 +1,9 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
 
   export let card;
   export let updatedCard;
-
-  const dispatch = createEventDispatcher();
-
-  function handleSave() {
-    dispatch("save", updatedCard);
-  }
-
-  function handleCancel() {
-    dispatch("cancel");
-  }
 </script>
 
 <div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
@@ -47,10 +38,10 @@
     </div>
 
     <div class="flex justify-end space-x-4">
-      <button on:click={handleCancel} class="px-4 py-2 bg-gray-500 text-white rounded">
+      <button on:click={() => (dispatch("cancel"))} class="px-4 py-2 bg-gray-500 text-white rounded">
         Cancel
       </button>
-      <button on:click={handleSave} class="px-4 py-2 bg-green-500 text-white rounded">
+      <button on:click={() => (dispatch("save", updatedCard))} class="px-4 py-2 bg-green-500 text-white rounded">
         Save Changes
       </button>
     </div>

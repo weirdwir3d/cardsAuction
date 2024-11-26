@@ -1,47 +1,29 @@
-export async function fetchCard() {
-    console.log('fuck u')
-}
-
 export async function fetchAuctionsAPI(selectedRarity, selectedType, maxPrice, searchQuery) {
-    function updateQueryParams() {
-        let queryParams = [];
-        if (selectedRarity !== "All") {
-            queryParams.push(`rarity=${selectedRarity.toLowerCase()}`);
-        }
-        if (selectedType !== "All") {
-            queryParams.push(`type=${selectedType.toLowerCase()}`);
-        }
-        if (maxPrice) {
-            queryParams.push(`price=lte:${maxPrice}`);
-        }
-        return queryParams.length > 0 ? "?" + queryParams.join("&") : "";
-    }
+    let queryParams = [];
+    if (selectedRarity !== "All") queryParams.push(`rarity=${selectedRarity.toLowerCase()}`);
+    if (selectedType !== "All") queryParams.push(`type=${selectedType.toLowerCase()}`);
+    if (maxPrice) queryParams.push(`price=lte:${maxPrice}`);
 
-    const queryString = updateQueryParams();
-    let url = `http://localhost:3000/auctions${queryString}`;
+    //if there are queryParams, extend URL to filter results
+    let url = `http://localhost:3000/auctions${queryParams.length > 0 ? "?" + queryParams.join("&") : ""}`;
 
+    // add searchbar input, if any
     if (searchQuery) {
-        let symbol = url.includes("type") || url.includes("rarity") || url.includes("price") ? "&" : "?";
-        url += symbol + `search=${searchQuery}`;
+        url += `${url.includes("?") ? "&" : "?"}search=${searchQuery}`;
     }
 
-    console.log('Fetching auctions with URL:', url);
+    // console.log('fetching auctions with url:', url);
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            if (response.status === 404) {
-                console.log("No auctions found for the given filters.");
-                return [];
-            }
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`Http error! Status: ${response.status}`);
         }
-
         const data = await response.json();
-        return data.auctions;
+        return data.auctions || [];
     } catch (error) {
         console.error("Error retrieving auctions:", error);
-        throw error;
+        throw new Error("Network error while trying to fetch auctions. Please try again later");
     }
 }
 
@@ -55,14 +37,14 @@ export async function fetchCardsAPI() {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`Http error! Status: ${response.status}`);
         }
 
         const data = await response.json();
         return data.cardsData || [];
     } catch (error) {
         console.error("Error retrieving cards:", error);
-        throw error; // Re-throw error so calling function can handle it
+        throw new Error("Network error while trying to fetch cards. please try again later");
     }
 }
 
@@ -76,7 +58,7 @@ export async function fetchAuctionDetailsAPI(auctionId) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`Http error! Status: ${response.status}`);
         }
 
         return await response.json();
@@ -96,7 +78,7 @@ export async function fetchCardAPI(cardId) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`Http error! status: ${response.status}`);
         }
 
         const data = await response.json();
@@ -107,6 +89,7 @@ export async function fetchCardAPI(cardId) {
     }
 }
 
+// TODO: looks sus, might have to edit
 export async function fetchBidsAPI(params = {}) {
     try {
         const queryString = new URLSearchParams(params).toString();
@@ -114,11 +97,11 @@ export async function fetchBidsAPI(params = {}) {
 
         if (response.ok) {
             const data = await response.json();
-            return data.bids; // Return the entire data object
+            return data.bids;
         } else if (response.status === 404) {
-            return { bids: [] }; // Return an empty bids array in the expected format
+            return { bids: [] };
         } else {
-            console.error('Failed to retrieve bids:', response.statusText);
+            console.error('Could not retrieve bids:', response.statusText);
             throw new Error(response.statusText);
         }
     } catch (error) {
@@ -133,7 +116,7 @@ export async function updateBidAPI(bidId, updateData) {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, // You may want to pass the token as an argument
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify(updateData),
         });
@@ -146,8 +129,8 @@ export async function updateBidAPI(bidId, updateData) {
 
         return data;
     } catch (error) {
-        console.error("Error updating bid:", error);
-        throw error; // Re-throw error so calling function can handle it
+        console.error("error updating bid:", error);
+        throw error;
     }
 }
 
@@ -183,7 +166,7 @@ export async function fetchUsersAPI() {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error('Error fetching users');
+            throw new Error('Error fetching users :c');
         }
 
         return data.usersData;
@@ -206,12 +189,12 @@ export async function saveAuctionChangesAPI(auctionId, updatedAuction, token) {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to update auction');
+            throw new Error(errorData.message);
         }
 
         return await response.json();
     } catch (error) {
-        throw new Error(error.message || 'An error occurred while updating the auction');
+        throw new Error(error.message);
     }
 }
 
@@ -227,16 +210,49 @@ export async function saveCardChangesAPI(cardId, updatedCard, token) {
             body: JSON.stringify(updatedCard),
         });
 
+        // console.log('sending:', JSON.stringify(updatedCard))
+
         const data = await response.json();
 
         if (!response.ok) {
-            console.error(`Error updating card: ${data.message}`);
+            console.error(`Error updating card : ${data.message}`);
             throw new Error(data.message);
         }
 
         return data.card;
     } catch (error) {
         console.error("Error updating card details:", error.message);
+        throw error;
+    }
+}
+
+export async function addAuctionAPI({ cardId, basePrice, publishedDateTime, endDateTime, token }) {
+    try {
+        const response = await fetch("http://localhost:3000/auctions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                cardId,
+                basePrice,
+                publishedDateTime,
+                endDateTime,
+            }),
+        });
+
+        // console.log('response status:', response.status);
+        const data = await response.json();
+        // console.log('response data:', data);
+
+        if (response.status !== 201) {
+            throw new Error(data.error);
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error adding auction:", error);
         throw error;
     }
 }
@@ -259,12 +275,12 @@ export async function addCardAPI({ name, description, type, rarity, imageUrl, au
             })
         });
 
-        console.log('Response status:', response.status);
+        // console.log('response status:', response.status);
         const data = await response.json();
-        console.log('Response data:', data);
+        // console.log('response data:', data);
 
         if (response.status !== 201) {
-            throw new Error(data.error || 'Failed to add card');
+            throw new Error(data.error);
         }
 
         return data;
@@ -273,7 +289,6 @@ export async function addCardAPI({ name, description, type, rarity, imageUrl, au
         throw error;
     }
 }
-
 
 export async function addBidAPI(newBid) {
     try {
@@ -288,12 +303,12 @@ export async function addBidAPI(newBid) {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || 'HTTP error! Status: ' + response.status);
+            throw new Error(errorData.error);
         }
 
         return await response.json();
     } catch (error) {
-        console.error("Error trying to place a bid:", error);
+        console.error("Error trying to bid:", error);
         throw error;
     }
 }
@@ -329,7 +344,7 @@ export async function deleteCardAPI(cardId, token) {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`http error! Status: ${response.status}`);
         }
         return cardId;
     } catch (error) {
@@ -338,7 +353,6 @@ export async function deleteCardAPI(cardId, token) {
     }
 }
 
-// api.js
 export async function loginAPI(email, password) {
     try {
         const response = await fetch("http://localhost:3000/auth/login", {
@@ -350,13 +364,13 @@ export async function loginAPI(email, password) {
         });
 
         const data = await response.json();
-        return { response, data }; // Return both response and data
+        console.log('data:', data)
+        return { response, data };
     } catch (error) {
-        throw new Error("An unexpected error occurred. Please try again later.");
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
-// api.js
 export async function registerUserAPI({ username, email, password, confirmPassword }) {
     try {
         const response = await fetch("http://localhost:3000/auth/register", {
@@ -370,12 +384,16 @@ export async function registerUserAPI({ username, email, password, confirmPasswo
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.message || 'Registration failed');
+            throw new Error(data.message);
         }
 
-        return data; // Return the entire response data
+        return data;
     } catch (error) {
-        console.error('Error during registration:', error);
-        throw error; // Re-throw the error for handling in the component
+        console.error('error while registering:', error);
+        throw error;
     }
+}
+
+export async function fetchCard() {
+    console.log('eheh')
 }

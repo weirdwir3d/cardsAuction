@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { tokenStore } from '../lib/TokenStore';
   import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
-  import { fetchBidsAPI, updateBidAPI } from '../lib/api.js';
+  import * as API from '../lib/api.js';
 
   export let auctionId;
   export let endDateTime;
@@ -21,7 +21,7 @@
     token = value.token;
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
-    console.log('token dio cane:', token)
+    // console.log('token dio cane:', token)
   })();
 
   function calculateTimeLeft() {
@@ -29,7 +29,7 @@
     const end = new Date(endDateTime).getTime();
 
     if (isNaN(end)) {
-      console.error("Invalid date format for endDateTime:", endDateTime);
+      // console.error("invalid date format for endDateTime:", endDateTime);
       clearInterval(interval);
       return;
     }
@@ -37,6 +37,7 @@
     const timeLeft = end - now;
 
     if (timeLeft > 0) {
+      // couintdown https://stackoverflow.com/questions/51078140/calculation-of-countdown-timer
       days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
       hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
@@ -55,21 +56,21 @@
 
   async function setWinningBid() {
     try {
-      const bids = await fetchBidsAPI(auctionId);
+      const bids = await API.fetchBidsAPI(auctionId);
       if (bids.length === 0) return;
 
       const highestBid = bids.reduce((prev, current) => (prev.bidAmount > current.bidAmount) ? prev : current);
 
-      const updateData = await updateBidAPI(highestBid.id, { hasWon: true });
-      console.log("Winning bid updated successfully:", updateData.bid);
+      const updateData = await API.updateBidAPI(highestBid.id, { hasWon: true });
+      // console.log("winning bid updated successfully:", updateData.bid);
     } catch (error) {
-      console.error("Error in setWinningBid:", error);
+      console.error("error in setWinningBid:", error);
     }
   }
 
   onMount(() => {
     if (!endDateTime) {
-      console.error("No endDateTime provided to Countdown component");
+      console.error("no endDateTime provided to Countdown component");
       return;
     }
     calculateTimeLeft();
@@ -79,18 +80,10 @@
   });
 </script>
 
-<div class="countdown">
+<div class="text-lg font-bold mt-4">
   {#if auctionEnded}
     <p><strong>Auction has ended</strong></p>
   {:else}
     <p><strong>Time Left:</strong> {days}d {hours}h {minutes}m {seconds}s</p>
   {/if}
 </div>
-
-<style>
-  .countdown {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: 1rem;
-  }
-</style>

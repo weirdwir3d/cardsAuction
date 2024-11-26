@@ -2,27 +2,37 @@
   import { onMount } from "svelte";
   import { tokenStore } from "../lib/TokenStore";
   import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
+  import Alert from "../components/Alert.svelte";
   import { fetchAuctionsAPI, fetchCardsAPI } from "../lib/api.js";
   import Filter from "../components/Filter.svelte";
   import SearchBar from "../components/SearchBar.svelte";
   import AddAuctionModal from "../components/modals/AddAuctionModal.svelte";
   import AuctionContainer from "../components/AuctionContainer.svelte";
 
-  let token;
-  // TODO: is this really necessary?
   let isLoggedIn = false;
   let isAdmin = false;
 
-  let showAuctionModal = false;
   let auctions = [];
   let cards = [];
+  let showNewAuctionModal = false;
+  //filters
   let searchQuery = "";
   let selectedType = "All";
   let selectedRarity = "All";
   let maxPrice = "";
+  //alert
+  let alertMessage = "";
+  let showAlert = false;
+  let alertType = "";
+
+  //first things first: fetch all cards and auctions
+  onMount(async () => {
+    await fetchCards();
+    await fetchAuctions();
+  });
 
   tokenStore.subscribe((value) => {
-    token = value.token;
+    let token = value.token;
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
   });
@@ -35,11 +45,11 @@
         maxPrice,
         searchQuery
       );
-      console.log("Received auctions:", auctions);
+      // console.log("Received auctions:", auctions);
     } catch (error) {
-      alertMessage = "An error occurred while retrieving auctions.";
+      alertMessage = error.message;
       alertType = "error";
-      isAlertVisible = true;
+      showAlert = true;
       auctions = [];
     }
   }
@@ -47,14 +57,15 @@
   async function fetchCards() {
     try {
       cards = await fetchCardsAPI();
-      console.log("Received cards:", cards);
+      // console.log("Received cards:", cards);
     } catch (error) {
-      alertMessage = "An error occurred while retrieving cards.";
+      alertMessage = "An error occurred while retrieving cards";
       alertType = "error";
-      isAlertVisible = true;
+      showAlert = true;
     }
   }
 
+  //auctions (cards) have to be retrieved dynamically at any searchbar change
   function handleSearchChange(query) {
     searchQuery = query;
     fetchAuctions();
@@ -66,7 +77,7 @@
       filteredCards.some((card) => card.auctionId === auction.id)
     );
 
-    console.log("Filtered auctions:", auctions);
+    // console.log("filtered auctions:", auctions);
   }
 
   async function handleApplyFilters(event) {
@@ -77,47 +88,43 @@
     await fetchCards();
   }
 
-  onMount(async () => {
-    await fetchCards();
-    await fetchAuctions();
-  });
-
-  function closeAuctionModal() {
-    showAuctionModal = false;
-  }
-
   function getCardById(cardId) {
     const matchedCard = cards.find((card) => card.id === cardId);
 
-    if (matchedCard) {
-      console.log("Matched card:", matchedCard);
-    } else {
-      console.log("No card found for cardId:", cardId);
-    }
+    // if (matchedCard) {
+    //   console.log("matched card:", matchedCard);
+    // } else {
+    //   console.log("No card found for cardId:", cardId);
+    // }
 
+    // if no card matching auction is found, return placeholder
     return (
       matchedCard ?? {
-        imageUrl: "placeholder-image-url",
+        imageUrl:
+          "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg",
         name: "No card available",
       }
     );
   }
 
-  async function handleAuctionAdded() {
+  async function reload() {
     await fetchCards();
     await fetchAuctions();
   }
 </script>
 
-<!-- Page Layout -->
 <div
   class="flex flex-col lg:flex-row justify-between space-y-4 lg:space-y-0 lg:space-x-4 px-4"
 >
-  <h1
-    class="text-2xl lg:hidden p-4 md:text-3xl lg:text-4xl font-bold text-center"
-  >
+  <!-- Alert -->
+  <Alert message={alertMessage} type={alertType} isVisible={showAlert} />
+
+  <!-- Page title (mobile) -->
+  <h1 class="text-2xl lg:hidden p-4 md:text-3xl font-bold text-center">
     Auctions
   </h1>
+
+  <!-- Filter -->
   <div class="lg:w-1/4 w-full lg:relative mb-4 lg:mb-0">
     <Filter
       bind:selectedType
@@ -125,11 +132,13 @@
       bind:maxPrice
       on:applyFilters={handleApplyFilters}
     />
+
+    <!-- Add auction btn (only visible to admin) -->
     <div class="text-center mt-6">
       {#if isAdmin}
         <button
-          on:click={() => (showAuctionModal = true)}
-          class="px-6 py-3 hidden lg:flex bg-accent text-white rounded hover:bg-primary transition-colors"
+          on:click={() => (showNewAuctionModal = true)}
+          class="px-6 py-3 hidden lg:flex bg-accent text-white rounded hover:bg-primary"
         >
           Add auction
         </button>
@@ -138,17 +147,19 @@
   </div>
 
   <div class="lg:w-3/4 w-full">
+    <!-- Page title (larger screens) -->
     <h1
       class="text-2xl hidden lg:block p-4 md:text-3xl lg:text-4xl font-bold text-center"
     >
       Auctions
     </h1>
-    <!-- Add margin below search bar for spacing on mobile -->
+
+    <!-- Searchbar -->
     <div class="mb-4">
       <SearchBar bind:searchQuery onSearchChange={handleSearchChange} />
     </div>
 
-    <!-- Auctions List -->
+    <!-- Auctions grid -->
     {#if auctions.length > 0}
       <p class="px-4">
         Found {auctions.length} auction{auctions.length !== 1 ? "s" : ""}.
@@ -156,8 +167,8 @@
       <div class="text-center mt-6">
         {#if isAdmin}
           <button
-            on:click={() => (showAuctionModal = true)}
-            class="px-6 py-3 lg:hidden bg-accent text-white rounded hover:bg-primary transition-colors"
+            on:click={() => (showNewAuctionModal = true)}
+            class="px-6 py-3 lg:hidden bg-accent text-white rounded hover:bg-primary"
           >
             Add auction
           </button>
@@ -176,9 +187,10 @@
   </div>
 </div>
 
+<!-- Modal to add new auction -->
 <AddAuctionModal
-  bind:isVisible={showAuctionModal}
-  on:close={closeAuctionModal}
-  on:auctionAdded={handleAuctionAdded}
+  bind:isVisible={showNewAuctionModal}
+  on:close={() => (showNewAuctionModal = false)}
+  on:auctionAdded={reload}
   isFromAuctionsPage={true}
 />

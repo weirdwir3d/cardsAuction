@@ -1,4 +1,3 @@
-<!-- BidModal.svelte -->
 <script>
   export let isVisible = false;
   export let onClose;
@@ -6,14 +5,15 @@
 
   let bidAmount = '';
 
+  //can be retrieved by parent AuctionDetails page
   function confirmBid() {
     onConfirm(bidAmount);
-    bidAmount = ''; // Reset the input field
+    bidAmount = '';
   }
 </script>
 
 {#if isVisible}
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="fixed z-50 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
     <div class="bg-white p-4 rounded shadow-lg max-w-sm w-full">
       <h2 class="text-lg font-bold mb-4">New Bid</h2>
       <div class="flex items-center">
@@ -32,10 +32,3 @@
     </div>
   </div>
 {/if}
-
-<style>
-  /* Optional styling for the modal */
-  .fixed {
-    z-index: 1000;
-  }
-</style>

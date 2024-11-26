@@ -4,13 +4,13 @@
   import router from "page";
 
   function handleClick() {
-    router.redirect(`/auctions/${auction.id}`); // Navigate without causing a page refresh
+    router.redirect(`/auctions/${auction.id}`); // navigate without page refresh
   }
 </script>
 
 <div
   class="bg-primary p-2 shadow-md rounded-lg max-w-xs mx-auto cursor-pointer"
-  on:click={handleClick}
+  on:click={() => (router.redirect(`/auctions/${auction.id}`))}
   role="button"
   tabindex="0"
   on:keypress={(e) => e.key === "Enter" && handleClick()}

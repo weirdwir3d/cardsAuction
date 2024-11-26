@@ -4,11 +4,11 @@
   export let selectedType = "All";
   export let selectedRarity = "All";
   let maxPrice = "";
-  let showFilters = true; // state to control visibility of filters
+  let showFilters = true;
 
   const dispatch = createEventDispatcher();
 
-  // Dispatch selected filters to parent
+  //send filters to parent (Auctions page)
   function handleFilterChange() {
     dispatch('applyFilters', {
       selectedType,
@@ -16,17 +16,12 @@
       maxPrice
     });
   }
-
-  // Toggle filter visibility
-  function toggleFilters() {
-    showFilters = !showFilters;
-  }
 </script>
 
 <div class="p-4 lg:mt-6 border rounded-lg bg-accent">
   <h2 class="text-lg text-white font-bold flex justify-between items-center">
     Filters
-    <button on:click={toggleFilters} class="px-4 py-2 text-sm bg-secondary text-white rounded-lg">
+    <button on:click={() => (showFilters = !showFilters)} class="px-4 py-2 text-sm bg-secondary text-white rounded-lg">
       {#if showFilters} Hide Filters {/if}
       {#if !showFilters} Show Filters {/if}
     </button>

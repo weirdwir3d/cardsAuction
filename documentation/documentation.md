@@ -19,3 +19,8 @@ SVG icons source: https://heroicons.com/.
 - The "Forbidden" and "Unauthorized" page might be a bit redundant, but I would rather be redundant than imprecise, because these two errors have two different causes https://stackoverflow.com/questions/3297048/403-forbidden-vs-401-unauthorized-http-responses
 
 ## Auctions
+Every time the page is visited, all cards are fetched. Of course, this is not ideal for a real-world application. Maybe it would be better to store the cards and/or auctions in a store, or in a DB, but I think this is not required for this assignment. The whole card is fetched (although we just need its image).
+
+
+## api.js
+All API fetch calls to the backend are in this file.

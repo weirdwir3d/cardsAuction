@@ -1,5 +1,6 @@
 export function formatDate(date) {
-    const pad = (n) => (n < 10 ? '0' + n : n);
+    // from Date obj to dd-mm-yyyy hh:mm:ss format
+    const pad = (n) => (n < 10 ? '0' + n : n); // add leading zeros if any nr < 10
     const day = pad(date.getDate());
     const month = pad(date.getMonth() + 1);
     const year = date.getFullYear();
@@ -10,6 +11,7 @@ export function formatDate(date) {
     return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 }
 
+//from https://www.w3schools.com/js/js_cookies.asp
 export function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);

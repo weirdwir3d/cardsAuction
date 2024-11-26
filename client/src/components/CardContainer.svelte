@@ -3,7 +3,7 @@
   import router from "page";
 
   function handleClick() {
-    router.redirect(`/cards/${card.id}`); // Navigate without causing a page refresh
+    router.redirect(`/cards/${card.id}`);
   }
 </script>
 

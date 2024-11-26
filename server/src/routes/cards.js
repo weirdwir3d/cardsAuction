@@ -17,6 +17,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     }
 
     const updatedCard = req.body;
+    console.log('new data:', updatedCard)
     console.log(`Updating card with details: ${JSON.stringify(updatedCard)}`);
 
     if (updatedCard.name && updatedCard.name.length < 3) {

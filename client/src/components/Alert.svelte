@@ -1,6 +1,6 @@
 <script>
   export let message = "";
-  export let type = "success";
+  export let type = "error";
   export let isVisible = false;
 
   const alertColors = {
@@ -8,16 +8,13 @@
     error: "bg-red-100 text-red-700 border-red-500",
   };
 
+  //run whenever isVisible changes
   $: if (isVisible) {
     const timeout = setTimeout(() => {
       isVisible = false;
       //clear timeout if alert is closed manually
       return () => clearTimeout(timeout);
     }, 4000);
-  }
-
-  function closeAlert() {
-    isVisible = false;
   }
 </script>
 
@@ -29,7 +26,7 @@
   >
     <div class="flex justify-between items-center">
       <span>{message}</span>
-      <button class="ml-4" on:click={closeAlert}>&times;</button>
+      <button class="ml-4" on:click={() => (isVisible = false)}>&times;</button>
     </div>
   </div>
 {/if}
