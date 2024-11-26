@@ -23,7 +23,7 @@ router.get("/:id", async (req, res) => {
     res.json({foundUser})
 })
 
-// Delete a user
+// DELETE one user
 router.delete('/:id', middleware.isAdmin, (req, res) => {
     let wantedId = parseInt(req.params.id);
     let foundUser = usersData.find(user => user.id === wantedId);

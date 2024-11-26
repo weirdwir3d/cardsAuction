@@ -12,7 +12,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
 
     let foundAuction = auctionsData.find(auction => auction.id === auctionId);
     if (!foundAuction) {
-        return res.status(404).json({ error: "Auction not found", message: "The specified auction does not exist." });
+        return res.status(404).json({ error: "Auction not found", message: "The specified auction does not exist" });
     }
 
     if (auctionToUpdate.basePrice != foundAuction.basePrice) {
@@ -23,7 +23,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     }
 
     if (!isValidDateTime(auctionToUpdate.publishedDateTime)) {
-        return res.status(400).json({ error: "Invalid published date format", message: "Published date must be in the format 'dd-mm-yyyy hh:mm:ss'." });
+        return res.status(400).json({ error: "Invalid published date format", message: "Published date must be in the format 'dd-mm-yyyy hh:mm:ss'" });
     }
 
     if (auctionToUpdate.endDateTime && !isValidDateTime(auctionToUpdate.endDateTime)) {
@@ -62,7 +62,7 @@ router.get("/:id", async (req, res) => {
         const auctionId = parseInt(req.params.id);
 
         if (isNaN(auctionId)) {
-            return res.status(400).json({ error: "Auction id must be a number." });
+            return res.status(400).json({ error: "Auction id must be a number!" });
         }
 
         const auction = auctionsData.find(auction => auction.id === auctionId);
@@ -76,7 +76,7 @@ router.get("/:id", async (req, res) => {
         res.status(200).json(auction);
 
     } catch (error) {
-        console.error('Error retrieving auction:', error);
+        console.error('Error retrieving auction: ', error);
         res.status(500).json({ error: "Internal server error" });
     }
 });
@@ -97,7 +97,7 @@ router.post('/', middleware.isAdmin, (req, res) => {
     let foundAuction = auctionsData.find(existingAuction => existingAuction.cardId === cardId);
     if (foundAuction) {
         console.log('Found existing auction for cardId:', cardId);
-        return res.status(409).json({ error: "There is already an auction active for that card." });
+        return res.status(409).json({ error: "There is already an auction active for that card" });
     }
 
     const basePrice = auction.basePrice;
@@ -110,17 +110,17 @@ router.post('/', middleware.isAdmin, (req, res) => {
 
     if (basePrice <= 0) {
         // console.error('Base price invalid:', basePrice);
-        return res.status(403).json({ error: "Base price cannot be zero or less." });
+        return res.status(403).json({ error: "Base price cannot be zero or less" });
     }
 
     if (!isValidDateTime(publishedDateTime)) {
         // console.error('Invalid published date format:', publishedDateTime);
-        return res.status(400).json({ error: "Invalid published date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
+        return res.status(400).json({ error: "Invalid published date format. It must be 'dd-mm-yyyy hh:mm:ss'" });
     }
 
     if (!isValidDateTime(endDateTime)) {
         // console.error('Invalid end date format:', endDateTime);
-        return res.status(400).json({ error: "Invalid end date format. It must be 'dd-mm-yyyy hh:mm:ss'." });
+        return res.status(400).json({ error: "Invalid end date format. It must be 'dd-mm-yyyy hh:mm:ss'" });
     }
 
     const parsedPublishedDateTime = parseDateTime(publishedDateTime);
@@ -134,12 +134,12 @@ router.post('/', middleware.isAdmin, (req, res) => {
 
     if (parsedPublishedDateTime < currentDateTime) {
         console.error('Published date is in the past:', parsedPublishedDateTime);
-        return res.status(400).json({ error: "Published date cannot be in the past." });
+        return res.status(400).json({ error: "Published date cannot be in the past" });
     }
 
     if (parsedEndDateTime <= parsedPublishedDateTime) {
         console.error('End date is not after the published date:', parsedEndDateTime, parsedPublishedDateTime);
-        return res.status(400).json({ error: "You cannot post an auction in the past." });
+        return res.status(400).json({ error: "You cannot post an auction in the past" });
     }
 
     let sortedAuctions = auctionsData.sort(function (a, b) {

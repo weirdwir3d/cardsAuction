@@ -4,20 +4,15 @@ import usersData from '../../../db/usersData.json' assert { type: 'json' };
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import * as middleware from '../middleware/middleware.js';
+import * as utils from '../utils.js'
 
 const router = express.Router();
 dotenv.config();
 
-// Helper function to validate email format
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
 router.post("/register", async (req, res) => {
     let { password, confirmPassword, email, username } = req.body;
 
-    // Validate if password is not empty
+    // validate password not empty
     if (!password) {
         return res.json({
             httpStatusCode: 400,
@@ -25,7 +20,7 @@ router.post("/register", async (req, res) => {
         });
     }
 
-    // Validate if passwords are the same
+    // validate passwords are the same
     if (password !== confirmPassword) {
         return res.json({
             httpStatusCode: 401,
@@ -33,15 +28,15 @@ router.post("/register", async (req, res) => {
         });
     }
 
-    // Validate email format
-    if (!isValidEmail(email)) {
+    // validate email format
+    if (!utils.isValidEmail(email)) {
         return res.json({
             httpStatusCode: 400,
             message: "Invalid email format"
         });
     }
 
-    // Validate username length (must be at least 4 characters)
+    // validate username at least 4 chars
     if (username.length < 4) {
         return res.json({
             httpStatusCode: 400,
@@ -50,7 +45,7 @@ router.post("/register", async (req, res) => {
     }
 
     let foundUser = usersData.find(user => user.email === email);
-    // Register if email is unused
+    // proceed with registering if email unused
     if (!foundUser) {
         try {
             let hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUNDS));
@@ -113,7 +108,7 @@ async function login(req, res) {
 
     console.log(`found user: ${JSON.stringify(foundUser)}`);
 
-    // Find user
+    //Find user
     if (foundUser) {
 
         let isPasswordValid = await bcrypt.compare(password, foundUser.password);
@@ -130,11 +125,11 @@ async function login(req, res) {
                     });
                 }
 
-                // Set cookie in HTTP response
+                //set cookie in response
                 res.cookie('authToken', token, {
                     httpOnly: false,
                     SameSite: 'None',
-                    maxAge: 60 * 60 * 1000, // 1h
+                    maxAge: 60 * 60 * 1000, //1h
                 });
 
                 console.log('logged in');

@@ -12,12 +12,13 @@ import bids from './routes/bids.js';
 
 app.use(express.json()) 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser()); // parsing cookies
-// Enable CORS for all origins
+app.use(cookieParser()); // parsing cookies?
+//CORS for all origins
+// https://expressjs.com/en/resources/middleware/cors.html
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow any origin
-  methods: 'GET,POST,PUT,DELETE', // Specify allowed HTTP methods
-  credentials: true, // Allow credentials (cookies, etc.)
+  origin: 'http://localhost:5173',
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: true,
 }));
 
 app.use("/auth", auth);

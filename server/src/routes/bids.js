@@ -3,16 +3,17 @@ import bidsData from '../../../db/bidsData.json' assert { type: 'json' };
 import auctionsData from '../../../db/auctionsData.json' assert { type: 'json' };
 import usersData from '../../../db/usersData.json' assert { type: 'json' };
 import * as middleware from '../middleware/middleware.js';
+import * as utils from '../utils.js'
 const router = express.Router();
 
-// Edit a bid
+//Edit a bid
 router.put('/:id', middleware.isAdmin, (req, res) => {
     const { bidAmount, publishedDateTime, hasWon } = req.body;
     const bidId = parseInt(req.params.id);
 
-    console.log(`Received request to edit bid with ID: ${bidId}`);
+    // console.log(`received request to edit bid with id: ${bidId}`);
 
-    // Find the bid to update
+    //find the bid to update
     let foundBid = bidsData.find(bid => bid.id === bidId);
 
     if (!foundBid) {
@@ -20,7 +21,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
         return res.status(404).json({ error: "Bid not found" });
     }
 
-    console.log(`Found bid:`, foundBid);
+    // console.log(`found bid:`, foundBid);
 
     let foundAuction = auctionsData.find(auction => auction.id === foundBid.auctionId);
 
@@ -29,114 +30,114 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
         return res.status(404).json({ error: "Auction not found for this bid" });
     }
 
-    console.log(`Found auction for bid:`, foundAuction);
+    // console.log(`Foud auction for bid:`, foundAuction);
 
-    // Validate the new date format, if provided
-    if (publishedDateTime && !isValidDateTime(publishedDateTime)) {
+    //validate new date format, if provided
+    if (publishedDateTime && !utils.isValidDateTime(publishedDateTime)) {
         console.error(`Invalid date format: ${publishedDateTime}`);
-        return res.status(400).json({ error: "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'." });
+        return res.status(400).json({ error: "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'" });
     }
 
-    // Parse and validate new publishedDateTime
+    //Parse and validate new publishedDateTime
     if (publishedDateTime) {
-        const parsedPublishedDateTime = parseDate(publishedDateTime);
+        const parsedPublishedDateTime = utils.parseDateTime(publishedDateTime);
         const currentDateTime = new Date();
-        currentDateTime.setMilliseconds(0); // Remove milliseconds for comparison
+        currentDateTime.setMilliseconds(0);
 
-        console.log(`Parsed published date: ${parsedPublishedDateTime}, Current date: ${currentDateTime}`);
+        // console.log(`parsed publihed date: ${parsedPublishedDateTime}, current date: ${currentDateTime}`);
 
         if (parsedPublishedDateTime < currentDateTime) {
             console.error(`Published date ${publishedDateTime} is in the past.`);
             return res.status(400).json({ error: "Published date cannot be in the past." });
         }
 
-        foundBid.publishedDateTime = publishedDateTime; // Update date
-        console.log(`Updated publishedDateTime to: ${foundBid.publishedDateTime}`);
+        foundBid.publishedDateTime = publishedDateTime;
+        // console.log(`updated publishedDateTime tooo: ${foundBid.publishedDateTime}`);
     }
 
-    // Validate the new bid amount
+    //validate the new bid amount
     let allAuctionBids = bidsData.filter(bid => bid.auctionId === foundBid.auctionId && bid.id !== bidId);
 
-    console.log(`Filtered auction bids:`, allAuctionBids);
+    // console.log(`Filtered auction bids:`, allAuctionBids);
 
-    // Sort existing bids by publishedDateTime
-    let sortedAuctionBids = allAuctionBids.sort((a, b) => parseDate(a.publishedDateTime) - parseDate(b.publishedDateTime));
+    //sort existing bids by publishedDateTime
+    let sortedAuctionBids = allAuctionBids.sort((a, b) => utils.parseDateTime(a.publishedDateTime) - utils.parseDateTime(b.publishedDateTime));
     let latestAuctionBid = sortedAuctionBids[sortedAuctionBids.length - 1];
 
-    console.log(`Sorted auction bids:`, sortedAuctionBids);
-    console.log(`Latest auction bid:`, latestAuctionBid);
+    // console.log(`sorted auction bids:`, sortedAuctionBids);
+    // console.log(`latest auction bid:`, latestAuctionBid);
 
     let minBidAmount = latestAuctionBid ? latestAuctionBid.bidAmount : foundAuction.basePrice;
 
-    console.log(`Minimum allowed bid amount: ${minBidAmount}`);
+    // console.log(`minimum allowed bid amount: ${minBidAmount}`);
 
     if (bidAmount !== undefined && bidAmount <= minBidAmount) {
         console.error(`Bid amount ${bidAmount} is less than or equal to the minimum bid amount.`);
         return res.status(400).json({ error: "Bid amount must be higher than the previous highest bid or base price." });
     }
 
-    // Update bid amount if provided
+    //  Update bid amount if provided
     if (bidAmount !== undefined) {
         foundBid.bidAmount = bidAmount;
-        console.log(`Updated bid amount to: ${foundBid.bidAmount}`);
+        // console.log(`updated bid amount to: ${foundBid.bidAmount}`);
     }
 
-    // Update hasWon if provided
+    //  Update hasWon if provided
     if (typeof hasWon === 'boolean') {
         foundBid.hasWon = hasWon;
-        console.log(`Updated hasWon to: ${foundBid.hasWon}`);
+        // console.log(`updated hasWon to: ${foundBid.hasWon}`);
     } else {
         console.error(`Invalid hasWon value: ${hasWon}`);
         return res.status(400).json({ error: "hasWon must be true or false." });
     }
 
-    console.log(`hasWon value is: ${hasWon}`);
+    // console.log(`hasWon value is: ${hasWon}`);
 
-    // Save the updated bid
+    // save updated bid
     res.status(200).json({
         message: "Bid updated successfully!",
         bid: foundBid
     });
 
-    console.log(`Bid updated successfully:`, foundBid);
+    // console.log(`bid updated successfully:`, foundBid);
 });
 
 
-// Create a new bid
+// POST new bid
 router.post('/', middleware.isLoggedIn, (req, res) => {
-    console.log('in fucking method')
+    // console.log('in fucking method')
     const { userId, auctionId, bidAmount, publishedDateTime } = req.body;
-    console.log('userId:', userId);
-    console.log('auctionId:', auctionId);
-    console.log('bidAmount:', bidAmount);
-    console.log('publishedDateTime:', publishedDateTime);
+    // console.log('userId:', userId);
+    // console.log('auctionId:', auctionId);
+    // console.log('bidAmount:', bidAmount);
+    // console.log('publishedDateTime:', publishedDateTime);
     if (userId == null || auctionId == null || bidAmount == null || !publishedDateTime) {
-        return res.status(400).json({ error: "Missing required fields." });
+        return res.status(400).json({ error: "Missing required fields" });
     }
 
-    console.log("Received bid request:", req.body);
+    // console.log("received bid request:", req.body);
 
     let foundUser = usersData.find(user => user.id == userId);
-    console.log("Found user:", foundUser);
+    // console.log("found user:", foundUser);
 
     if (!foundUser) {
         return res.status(404).json({ error: "User not found" });
     }
     
     let foundAuction = auctionsData.find(auction => auction.id == auctionId);
-    console.log("Found auction:", foundAuction);
+    // console.log("found auction:", foundAuction);
 
     if (!foundAuction) {
         return res.status(404).json({ error: "Auction not found" });
     }
 
-    if (!isValidDateTime(publishedDateTime)) {
+    if (!utils.isValidDateTime(publishedDateTime)) {
         return res.status(400).json({ error: "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'." });
     }
 
-    const parsedPublishedDateTime = parseDate(publishedDateTime);
+    const parsedPublishedDateTime = utils.parseDateTime(publishedDateTime);
     const currentDateTime = new Date();
-    currentDateTime.setMilliseconds(0); // Set currentDate to the start of the second
+    currentDateTime.setMilliseconds(0); // 0 seconds by default
 
     if (parsedPublishedDateTime < currentDateTime) {
         return res.status(400).json({ error: "Published date cannot be in the past." });
@@ -154,7 +155,7 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
     if (!allAuctionBids) {
         minBidAmount = foundAuction.basePrice;
     } else {
-        let sortedAuctionBids = allAuctionBids.sort((a, b) => parseDate(a.publishedDateTime) - parseDate(b.publishedDateTime));
+        let sortedAuctionBids = allAuctionBids.sort((a, b) => utils.parseDateTime(a.publishedDateTime) - utils.parseDateTime(b.publishedDateTime));
         let latestAuctionBid = sortedAuctionBids[sortedAuctionBids.length - 1];
 
         if (latestAuctionBid.userId === userId) {
@@ -185,72 +186,42 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
     });
 });
 
-// Helper function to convert "dd-mm-yyyy hh:mm:ss" format to a Date object
-function parseDate(dateString) {
-    const [datePart, timePart] = dateString.split(" ");
-    const [day, month, year] = datePart.split("-").map(Number);
-    const [hours, minutes, seconds] = timePart ? timePart.split(":").map(Number) : [0, 0, 0];
-
-    return new Date(year, month - 1, day, hours, minutes, seconds);
-}
-
-// Helper function to validate the date and time format "dd-mm-yyyy hh:mm:ss"
-function isValidDateTime(dateString) {
-    const regex = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}$/;
-    if (!regex.test(dateString)) {
-        return false;
-    }
-
-    const [datePart, timePart] = dateString.split(" ");
-    const [day, month, year] = datePart.split("-").map(Number);
-    const [hours, minutes, seconds] = timePart.split(":").map(Number);
-    const date = new Date(year, month - 1, day, hours, minutes, seconds);
-
-    return date && date.getDate() === day && (date.getMonth() + 1) === month && date.getFullYear() === year
-        && date.getHours() === hours && date.getMinutes() === minutes && date.getSeconds() === seconds;
-}
-
 // GET one bid
 router.get("/:id", async (req, res) => {
     let wantedId = parseInt(req.params.id);
     let foundBid = bidsData.find(bid => bid.id === wantedId)
-    console.log('found id:', wantedId, 'foud bid:', foundBid)
+    // console.log('found id:', wantedId, 'foud bid:', foundBid)
     res.json({ foundBid })
 })
 
-// Get all bids, with optional filters for auctionId or userId
+//Get all bids for an auction or user
 router.get("/", async (req, res) => {
     const { auctionId, userId } = req.query;
 
-    // If no auctionId or userId is provided, return a 400 Bad Request
     if (!auctionId && !userId) {
         return res.status(400).json({ error: "Missing required auctionId or userId parameter." });
     }
 
     let filteredBids = bidsData;
 
-    // If auctionId is provided, filter bids by auctionId
     if (auctionId) {
         filteredBids = filteredBids.filter(bid => bid.auctionId === parseInt(auctionId));
     }
 
-    // If userId is provided, filter bids by userId
     if (userId) {
         filteredBids = filteredBids.filter(bid => bid.userId === parseInt(userId));
     }
 
-    // If no bids are found, return 404 Not Found
     if (filteredBids.length === 0) {
         return res.status(404).json({ error: "No bids found for the given filters." });
     }
 
-    // Otherwise, return the filtered bids with 200 OK
     return res.status(200).json({ bids: filteredBids });
 });
 
 
 
-// Delete a bid
+//DELETE one bid
 router.delete('/:id', middleware.isAdmin, (req, res) => {
     let wantedId = parseInt(req.params.id);
     let foundBid = bidsData.find(bid => bid.id === wantedId);

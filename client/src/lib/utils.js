@@ -1,3 +1,9 @@
+export function isValidEmail(email) {
+    //https://stackoverflow.com/questions/46155/how-can-i-validate-an-email-address-in-javascript
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
 export function formatDate(date) {
     // from Date obj to dd-mm-yyyy hh:mm:ss format
     const pad = (n) => (n < 10 ? '0' + n : n); // add leading zeros if any nr < 10

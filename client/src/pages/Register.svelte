@@ -4,6 +4,7 @@
   import WelcomeSection from "../components/WelcomeSection.svelte";
   import Button from "../components/Button.svelte";
   import Alert from "../components/Alert.svelte";
+  import { isValidEmail } from "../lib/utils";
 
   let isLoggedIn = false;
   let isAdmin = false;
@@ -16,12 +17,6 @@
   let alertMessage = "";
   let alertType = "error";
   let showAlert = false;
-
-  function isValidEmail(email) {
-    //https://stackoverflow.com/questions/46155/how-can-i-validate-an-email-address-in-javascript
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
 
   async function handleRegister(event) {
     event.preventDefault();
