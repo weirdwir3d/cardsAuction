@@ -168,10 +168,9 @@ export async function saveCardChangesAPI(cardId, updatedCard, token) {
         });
 
         return response;
-        
+
     } catch (error) {
-        console.error("Error updating card details:", error.message);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -219,8 +218,7 @@ export async function addCardAPI({ name, description, type, rarity, imageUrl, au
         return response;
 
     } catch (error) {
-        console.error("Error adding card:", error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 

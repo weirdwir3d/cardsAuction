@@ -172,28 +172,38 @@
   }
 
   async function handleConfirmBid(bidAmount) {
-      //format current dateTime before sending it to backend. From Javascript Date format to 'dd-mm-yyyy hh:mm:ss'
-      const currentDateTime = utils.formatDate(new Date());
-      let newBid = {
-        userId: userId,
-        auctionId: parseInt(auctionId),
-        bidAmount: parseFloat(bidAmount),
-        publishedDateTime: currentDateTime,
-      };
-      const response = await API.addBidAPI(newBid);
-      const data = await response.json();
-      // console.log("data:", data);
+    showAlert = false;
+    // console.log("being handled");
+    // console.log("bid amount:", bidAmount);
+    if (bidAmount <= 0) {
+      // console.log("is not valid");
+      showAlert = true;
+      alertMessage = "Bid amount cannot be zero or less";
+      alertType = "error";
+      return;
+    }
+    //format current dateTime before sending it to backend. From Javascript Date format to 'dd-mm-yyyy hh:mm:ss'
+    const currentDateTime = utils.formatDate(new Date());
+    let newBid = {
+      userId: userId,
+      auctionId: parseInt(auctionId),
+      bidAmount: parseFloat(bidAmount),
+      publishedDateTime: currentDateTime,
+    };
+    const response = await API.addBidAPI(newBid);
+    const data = await response.json();
+    // console.log("data:", data);
 
-      if (response.ok) {
-        await fetchBids();
-        alertMessage = "Bid placed successfully ;)";
-        alertType = "success";
-        showAlert = true;
-        showBidModal = false;
-        setTimeout(() => {
-          showAlert = false;
-        }, 4000);
-      } else {
+    if (response.ok) {
+      await fetchBids();
+      alertMessage = "Bid placed successfully ;)";
+      alertType = "success";
+      showAlert = true;
+      showBidModal = false;
+      setTimeout(() => {
+        showAlert = false;
+      }, 4000);
+    } else {
       alertMessage = data.error;
       alertType = "error";
       showAlert = true;
@@ -202,17 +212,25 @@
   }
 
   async function deleteAuction() {
-      const response = await API.deleteAuctionAPI(auctionId, token);
-      const data = await response.json();
+    showAlert = false;
+    if (isNaN(auctionId) || auctionId < 0) {
+      showAlert = true;
+      alertMessage = "Invalid auctionId. Please contact admin";
+      alertType = "error";
+      return;
+    }
+    
+    const response = await API.deleteAuctionAPI(auctionId, token);
+    const data = await response.json();
 
-      if (response.ok) {
-              alertMessage = "Auction deleted successfully!";
+    if (response.ok) {
+      alertMessage = "Auction deleted successfully!";
       alertType = "success";
       showAlert = true;
       setTimeout(() => {
         router.redirect("/auctions");
       }, 3000);
-      } else {
+    } else {
       alertMessage = data.error;
       alertType = "error";
       showAlert = true;

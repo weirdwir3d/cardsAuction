@@ -5,6 +5,7 @@
   import { addCardAPI } from "../../lib/api";
   import Button from "../Button.svelte";
   import Alert from "../Alert.svelte";
+  import { escapeRegExp } from "../../lib/utils";
 
   let isLoggedIn = false;
   let isAdmin = false;
@@ -41,9 +42,65 @@
 
   async function addCard() {
     isAlertVisible = false;
+
+    if (name.length > 4) {
+      alertMessage = "Card name is too short";
+      alertType = "error";
+      isAlertVisible = true;
+      return;
+    }
+
+    if (description.length > 10) {
+      alertMessage = "Description is too short";
+      alertType = "error";
+      isAlertVisible = true;
+      return;
+    }
+
+    if (!["monster", "trap", "spell"].includes(type)) {
+      alertMessage = 'Card type has to be either "monster", "trap" or "spell".';
+      alertType = "error";
+      isAlertVisible = true;
+      return;
+    }
+
+    if (!["rare", "super rare", "ultra rare", "unique"].includes(rarity)) {
+      alertMessage =
+        'Card rarity has to be either "rare", "super rare", "ultra rare" or "unique"';
+      alertType = "error";
+      isAlertVisible = true;
+      return;
+    }
+
+    if (
+      auctionId !== undefined &&
+      (typeof updatedCard.auctionId !== "number" || updatedCard.auctionId < -1)
+    ) {
+            alertMessage =
+        "Auction ID must be a non-negative integer or -1.";
+      alertType = "error";
+      isAlertVisible = true;
+      return;
+    }
+
+    if (
+      !updatedCard.imageUrl.startsWith("http") ||
+      (!updatedCard.imageUrl.endsWith(".jpg") &&
+        !updatedCard.imageUrl.endsWith(".png"))
+    ) {
+      alertMessage =
+        'Please provide a valid image link (starting with "http" and ending with ".jpg" or ".png").';
+      alertType = "error";
+      isAlertVisible = true;
+      return;
+    }
+
+    sanitizedName = escapeRegExp(name);
+    sanitizedDescription = escapeRegExp(description);
+
     const response = await addCardAPI({
-      name,
-      description,
+      sanitizedName,
+      sanitizedDescription,
       type,
       rarity,
       imageUrl,

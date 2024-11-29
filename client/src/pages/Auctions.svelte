@@ -39,13 +39,13 @@
   });
 
   async function fetchAuctions() {
-      const response = await fetchAuctionsAPI(
+      let response = await fetchAuctionsAPI(
         selectedRarity,
         selectedType,
         maxPrice,
         searchQuery
       );
-      const data = await response.json();
+      let data = await response.json();
       // console.log("data:", data);
 
       if (response.ok) {
@@ -58,8 +58,8 @@
   }
 
   async function fetchCards() {
-      const response = await fetchCardsAPI();
-      const data = await response.json();
+      let response = await fetchCardsAPI();
+      let data = await response.json();
 
       // console.log('cards data:', data)
 
@@ -97,7 +97,7 @@
   }
 
   function getCardById(cardId) {
-    const matchedCard = cards.find((card) => card.id === cardId);
+    let matchedCard = cards.find((card) => card.id === cardId);
 
     // if (matchedCard) {
     //   console.log("matched card:", matchedCard);

@@ -5,6 +5,7 @@
   import Alert from "../components/Alert.svelte";
   import WelcomeSection from "../components/WelcomeSection.svelte";
   import { loginAPI } from "../lib/api";
+  import { escapeRegExp } from "../lib/utils";
 
   let isLoggedIn = false;
   let isAdmin = false;
@@ -23,7 +24,10 @@
     alertType = "error";
     showAlert = false;
 
-    const response = await loginAPI(email, password);
+    sanitizedEmail = escapeRegExp(email);
+    sanitizedPassword = escapeRegExp(password);
+
+    const response = await loginAPI(sanitizedEmail, sanitizedPassword);
     const data = await response.json();
 
     // console.log("response:", response);

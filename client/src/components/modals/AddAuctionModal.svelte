@@ -3,7 +3,7 @@
   import { createEventDispatcher, onMount } from "svelte";
   import Button from "../Button.svelte";
   import Alert from "../Alert.svelte";
-  import { formatDate } from "../../lib/utils";
+  import * as utils from "../../lib/utils";
   import AddCardModal from "./AddCardModal.svelte";
   import * as API from "../../lib/api.js";
 
@@ -50,14 +50,33 @@
   async function addAuction() {
     showAlert = false;
 
+    const parsedBasePrice = parseFloat(basePrice);
+
+    if (parsedBasePrice <= 0) {
+      alertMessage = "Base price cannot be zero or less";
+      alertType = "error";
+      showAlert = true;
+      return;
+    }
+
+    console.log("enddate and endTime:", endDate, endTime);
+
+    if (!utils.isValidDateTime(endDate + " " + endTime + ":00")) {
+      alertMessage = "Select end date and time";
+      alertType = "error";
+      showAlert = true;
+      return;
+    }
+
     const endDateTimeString = `${endDate}T${endTime}`;
     const endDateTime = new Date(endDateTimeString);
-    const formattedEndDateTime = formatDate(endDateTime);
-    const currentDateTime = formatDate(new Date());
+    const formattedEndDateTime = utils.formatDate(endDateTime);
+    console.log("formatted endTime:", formattedEndDateTime);
+    const currentDateTime = utils.formatDate(new Date());
 
     const auctionData = {
       cardId: selectedCardId,
-      basePrice: parseFloat(basePrice),
+      basePrice: parsedBasePrice,
       publishedDateTime: currentDateTime,
       endDateTime: formattedEndDateTime,
       token,

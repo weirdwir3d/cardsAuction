@@ -15,7 +15,7 @@
 
 {#if isVisible}
   <div
-    class="fixed z-50 inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+    class="fixed z-40 inset-0 bg-black bg-opacity-50 flex items-center justify-center"
   >
     <div class="bg-white p-4 rounded shadow-lg max-w-sm w-full">
       <h2 class="text-lg font-bold mb-4">New Bid</h2>

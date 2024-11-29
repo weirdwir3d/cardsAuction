@@ -20,7 +20,7 @@
 
 {#if isVisible}
   <div
-    class="fixed top-3/5 md:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-sm w-full border-l-4 p-4 rounded-lg shadow-lg {alertColors[
+    class="fixed z-50 top-3/5 md:top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-sm w-full border-l-4 p-4 rounded-lg shadow-lg {alertColors[
       type
     ]} z-20"
   >

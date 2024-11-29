@@ -20,10 +20,10 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     // console.log('new data:', updatedCard)
     // console.log(`Updating card with details: ${JSON.stringify(updatedCard)}`);
 
-    if (updatedCard.name && updatedCard.name.length < 3) {
+    if (updatedCard.name && updatedCard.name.length < 4) {
         // console.log(`Validation error: Card name is too short (${updatedCard.name.length} characters).`);
         return res.status(400).json({
-            error: "Card name is too short!", message: "Card name is too short!"});
+            error: "Card name is too short!" });
     }
 
     if (updatedCard.description === undefined || updatedCard.description.trim() === "") {

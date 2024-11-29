@@ -1,11 +1,14 @@
 <script>
+  import { escapeRegExp } from "../lib/utils";
+
   export let searchQuery = "";
   export let onSearchChange;
 
   function handleInput(event) {
     searchQuery = event.target.value;
+    let sanitizedSearchQuery = escapeRegExp(searchQuery);
     if (onSearchChange) {
-      onSearchChange(searchQuery);
+      onSearchChange(sanitizedSearchQuery);
     }
   }
 </script>
