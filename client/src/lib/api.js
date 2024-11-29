@@ -16,14 +16,11 @@ export async function fetchAuctionsAPI(selectedRarity, selectedType, maxPrice, s
 
     try {
         const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Http error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.auctions || [];
+
+        return response;
+
     } catch (error) {
-        console.error("Error retrieving auctions:", error);
-        throw new Error("Network error while trying to fetch auctions. Please try again later");
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -36,15 +33,12 @@ export async function fetchCardsAPI() {
             },
         });
 
-        if (!response.ok) {
-            throw new Error(`Http error! Status: ${response.status}`);
-        }
+        // console.log('response:', response)
 
-        const data = await response.json();
-        return data.cardsData || [];
+        return response;
+
     } catch (error) {
-        console.error("Error retrieving cards:", error);
-        throw new Error("Network error while trying to fetch cards. please try again later");
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -57,18 +51,14 @@ export async function fetchAuctionDetailsAPI(auctionId) {
             },
         });
 
-        if (!response.ok) {
-            throw new Error(`Http error! Status: ${response.status}`);
-        }
+        return response;
 
-        return await response.json();
     } catch (error) {
-        console.error("Error retrieving auction details:", error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
-export async function fetchCardAPI(cardId) {
+export async function fetchCardDetailsAPI(cardId) {
     try {
         const response = await fetch(`http://localhost:3000/cards/${cardId}`, {
             method: 'GET',
@@ -77,36 +67,22 @@ export async function fetchCardAPI(cardId) {
             },
         });
 
-        if (!response.ok) {
-            throw new Error(`Http error! status: ${response.status}`);
-        }
+        return response;
 
-        const data = await response.json();
-        return data.foundCard;
     } catch (error) {
-        console.error("Error retrieving card details:", error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
-// TODO: looks sus, might have to edit
 export async function fetchBidsAPI(params = {}) {
     try {
         const queryString = new URLSearchParams(params).toString();
         const response = await fetch(`http://localhost:3000/bids?${queryString}`);
 
-        if (response.ok) {
-            const data = await response.json();
-            return data.bids;
-        } else if (response.status === 404) {
-            return { bids: [] };
-        } else {
-            console.error('Could not retrieve bids:', response.statusText);
-            throw new Error(response.statusText);
-        }
+        return response;
+
     } catch (error) {
-        console.error('Error fetching bids:', error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -121,16 +97,10 @@ export async function updateBidAPI(bidId, updateData) {
             body: JSON.stringify(updateData),
         });
 
-        const data = await response.json();
+        return response;
 
-        if (data.error) {
-            throw new Error(data.error);
-        }
-
-        return data;
     } catch (error) {
-        console.error("error updating bid:", error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -143,14 +113,10 @@ export async function deleteBidAPI(bidId, token) {
             }
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to delete bid');
-        }
-
-        return bidId;
+        return response;
+        
     } catch (error) {
-        console.error('Error deleting bid:', error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -163,20 +129,15 @@ export async function fetchUsersAPI() {
             },
         });
 
-        const data = await response.json();
+        return response;
 
-        if (!response.ok) {
-            throw new Error('Error fetching users :c');
-        }
-
-        return data.usersData;
     } catch (error) {
-        console.error('Error fetching users:', error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
 export async function saveAuctionChangesAPI(auctionId, updatedAuction, token) {
+    // console.log("updated auctionb frontend before sending:", updatedAuction)
     try {
         const response = await fetch(`http://localhost:3000/auctions/${auctionId}`, {
             method: 'PUT',
@@ -187,14 +148,10 @@ export async function saveAuctionChangesAPI(auctionId, updatedAuction, token) {
             body: JSON.stringify(updatedAuction)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message);
-        }
+        return response;
 
-        return await response.json();
     } catch (error) {
-        throw new Error(error.message);
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -210,16 +167,8 @@ export async function saveCardChangesAPI(cardId, updatedCard, token) {
             body: JSON.stringify(updatedCard),
         });
 
-        // console.log('sending:', JSON.stringify(updatedCard))
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            console.error(`Error updating card : ${data.message}`);
-            throw new Error(data.message);
-        }
-
-        return data.card;
+        return response;
+        
     } catch (error) {
         console.error("Error updating card details:", error.message);
         throw error;
@@ -242,18 +191,10 @@ export async function addAuctionAPI({ cardId, basePrice, publishedDateTime, endD
             }),
         });
 
-        // console.log('response status:', response.status);
-        const data = await response.json();
-        // console.log('response data:', data);
+        return response;
 
-        if (response.status !== 201) {
-            throw new Error(data.error);
-        }
-
-        return data;
     } catch (error) {
-        console.error("Error adding auction:", error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -275,15 +216,8 @@ export async function addCardAPI({ name, description, type, rarity, imageUrl, au
             })
         });
 
-        // console.log('response status:', response.status);
-        const data = await response.json();
-        // console.log('response data:', data);
+        return response;
 
-        if (response.status !== 201) {
-            throw new Error(data.error);
-        }
-
-        return data;
     } catch (error) {
         console.error("Error adding card:", error);
         throw error;
@@ -301,15 +235,10 @@ export async function addBidAPI(newBid) {
             body: JSON.stringify(newBid),
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error);
-        }
+        return response;
 
-        return await response.json();
     } catch (error) {
-        console.error("Error trying to bid:", error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -322,14 +251,10 @@ export async function deleteAuctionAPI(auctionId, token) {
             }
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to delete auction');
-        }
+        return response;
 
-        return auctionId;
     } catch (error) {
-        console.error('Error deleting auction:', error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -343,13 +268,10 @@ export async function deleteCardAPI(cardId, token) {
             },
         });
 
-        if (!response.ok) {
-            throw new Error(`http error! Status: ${response.status}`);
-        }
-        return cardId;
+        return response;
+
     } catch (error) {
-        console.error("Error deleting card:", error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 
@@ -363,9 +285,8 @@ export async function loginAPI(email, password) {
             body: JSON.stringify({ email, password }),
         });
 
-        const data = await response.json();
-        console.log('data:', data)
-        return data;
+        return response;
+
     } catch (error) {
         throw new Error("Unexpected error occurred, please try again later");
     }
@@ -381,16 +302,10 @@ export async function registerUserAPI({ username, email, password, confirmPasswo
             body: JSON.stringify({ username, email, password, confirmPassword }),
         });
 
-        const data = await response.json();
+        return response;
 
-        if (!response.ok) {
-            throw new Error(data.message);
-        }
-
-        return data;
     } catch (error) {
-        console.error('error while registering:', error);
-        throw error;
+        throw new Error("Unexpected error occurred, please try again later");
     }
 }
 

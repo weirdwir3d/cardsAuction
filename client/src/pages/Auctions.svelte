@@ -39,31 +39,38 @@
   });
 
   async function fetchAuctions() {
-    try {
-      auctions = await fetchAuctionsAPI(
+      const response = await fetchAuctionsAPI(
         selectedRarity,
         selectedType,
         maxPrice,
         searchQuery
       );
-      // console.log("Received auctions:", auctions);
-    } catch (error) {
-      alertMessage = error.message;
+      const data = await response.json();
+      // console.log("data:", data);
+
+      if (response.ok) {
+        auctions = data.auctions;
+      } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
-      auctions = [];
-    }
+    } 
   }
 
   async function fetchCards() {
-    try {
-      cards = await fetchCardsAPI();
-      // console.log("Received cards:", cards);
-    } catch (error) {
-      alertMessage = "An error occurred while retrieving cards";
+      const response = await fetchCardsAPI();
+      const data = await response.json();
+
+      // console.log('cards data:', data)
+
+      if (response.ok) {
+        cards = data.cards;
+      } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
-    }
+    } 
+      // console.log("Received cards:", cards);
   }
 
   //auctions (cards) have to be retrieved dynamically at any searchbar change
@@ -135,7 +142,7 @@
     />
 
     <!-- Add auction btn (only visible to admin) -->
-    <div class="text-center mt-6">
+    <div class="text-center mt-6 hidden lg:block">
       {#if isAdmin}
       <Button label="Add auction" color="accent" onClick={() => (showNewAuctionModal = true)} />
       {/if}
@@ -160,7 +167,7 @@
       <p class="px-4">
         Found {auctions.length} auction{auctions.length !== 1 ? "s" : ""}.
       </p>
-      <div class="text-center mt-6">
+      <div class="text-center mt-6 lg:hidden">
         {#if isAdmin}
         <Button label="Add auction" color="accent" onClick={() => (showNewAuctionModal = true)} />
         {/if}

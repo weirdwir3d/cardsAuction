@@ -49,22 +49,7 @@
       minutes = 0;
       seconds = 0;
       auctionEnded = true;
-      setWinningBid();
       clearInterval(interval);
-    }
-  }
-
-  async function setWinningBid() {
-    try {
-      const bids = await API.fetchBidsAPI(auctionId);
-      if (bids.length === 0) return;
-
-      const highestBid = bids.reduce((prev, current) => (prev.bidAmount > current.bidAmount) ? prev : current);
-
-      const updateData = await API.updateBidAPI(highestBid.id, { hasWon: true });
-      // console.log("winning bid updated successfully:", updateData.bid);
-    } catch (error) {
-      console.error("error in setWinningBid:", error);
     }
   }
 

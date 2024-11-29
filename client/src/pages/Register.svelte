@@ -52,42 +52,32 @@
       return;
     }
 
-    try {
-      const response = await registerUserAPI({
-        username,
-        email,
-        password,
-        confirmPassword,
+    const response = await registerUserAPI({
+      username,
+      email,
+      password,
+      confirmPassword,
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+      tokenStore.set({ token: data.token });
+
+      tokenStore.subscribe((value) => {
+        if (value.token) {
+          //decode token without library (cause i dont want to import the jwt library for just one line of code): https://stackoverflow.com/questions/38552003/how-to-decode-jwt-token-in-javascript-without-using-a-library
+          const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
+          username = decodedToken.username;
+          isAdmin = decodedToken.isAdmin || false;
+          isLoggedIn = true;
+        }
       });
 
-      if (response.httpStatusCode === 409) {
-        alertMessage = "email address already in use";
-        alertType = "error";
-        showAlert = true;
-      } else if (response.httpStatusCode === 200) {
-        const data = response;
-        tokenStore.set({ token: data.token });
-        
-        tokenStore.subscribe((value) => {
-          if (value.token) {
-            //decode token without library (cause i dont want to import the jwt library for just one line of code): https://stackoverflow.com/questions/38552003/how-to-decode-jwt-token-in-javascript-without-using-a-library
-            const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
-            username = decodedToken.username || "User";
-            isAdmin = decodedToken.isAdmin || false;
-            isLoggedIn = true;
-          }
-        });
-
-        alertMessage = "Registration successful! :)";
-        alertType = "success";
-        showAlert = true;
-      } else {
-        alertMessage = "An unknown error occurred :(";
-        alertType = "error";
-        showAlert = true;
-      }
-    } catch (error) {
-      alertMessage = "An error occurred while trying to register :(";
+      alertMessage = "Registration successful!";
+      alertType = "success";
+      showAlert = true;
+    } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
     }

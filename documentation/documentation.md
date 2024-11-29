@@ -24,3 +24,9 @@ Every time the page is visited, all cards are fetched. Of course, this is not id
 
 ## api.js
 All API fetch calls to the backend are in this file.
+
+# Backend
+- I know that it's not RESTful to have verbs in your endpoints, and therefore the endpoints _auth/register_ and _auth/login_ are not very RESTful, but I think verbs like register, login and logout are a common exception to it. Since both registering and logging in create a resource (one creates a new user and the other creates a new token), they both do POST calls and therefore, if it wasn't for the verb it would be harder to distinguish them. Sure, I could use something like _auth/token_ for logging in and something like _auth/registration_ for registering, but I feel like that makes it more confusing to read and to intuitively grasp what they mean. I also think the choice I made is the most common one among developers.
+
+## Testing
+Testing looks a bit different than how described in the assignment, simply because I use VS Code and not Intellij. The plugins to test the endpoints are different

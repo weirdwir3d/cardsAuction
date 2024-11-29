@@ -14,33 +14,29 @@ router.post("/register", async (req, res) => {
 
     // validate password not empty
     if (!password) {
-        return res.json({
-            httpStatusCode: 400,
-            message: "Password cannot be empty"
+        return res.status(400).json({
+            error: "Password cannot be empty"
         });
     }
 
     // validate passwords are the same
     if (password !== confirmPassword) {
-        return res.json({
-            httpStatusCode: 401,
-            message: "Passwords don't match"
+        return res.status(401).json({
+            error: "Passwords don't match"
         });
     }
 
     // validate email format
     if (!utils.isValidEmail(email)) {
-        return res.json({
-            httpStatusCode: 400,
-            message: "Invalid email format"
+        return res.status(400).json({
+            error: "Invalid email"
         });
     }
 
     // validate username at least 4 chars
     if (username.length < 4) {
-        return res.json({
-            httpStatusCode: 400,
-            message: "Username must be at least 4 characters long"
+        return res.status(400).json({
+            error: "Username must be at least 4 characters long"
         });
     }
 
@@ -69,16 +65,14 @@ router.post("/register", async (req, res) => {
             await login(req, res);
 
         } catch (err) {
-            return res.json({
-                httpStatusCode: 500,
-                message: "Server error while registering, please contact admin"
+            return res.status(500).json({
+                error: "Server error while registering, please contact admin"
             });
         }
 
     } else {
-        return res.json({
-            httpStatusCode: 409,
-            message: "Email address already in use"
+        return res.status(409).json({
+            error: "Email address already in use"
         });
     }
 });
@@ -87,14 +81,14 @@ router.post("/login", async (req, res) => {
     await login(req, res);
 });
 
+//i googled it and apparently for logging out, POST is more used than DELETE
 router.post("/logout", middleware.isLoggedIn, async (req, res) => {
     res.cookie('authToken', '', {
         httpOnly: false,
         maxAge: 0
     });
 
-    return res.json({
-        httpStatusCode: 200,
+    return res.status(200).json({
         message: "Logged out successfully"
     });
 });
@@ -118,9 +112,8 @@ async function login(req, res) {
                 console.log('signing');
                 if (err) {
                     console.log(err);
-                    return res.json({
-                        httpStatusCode: 500,
-                        message: "Server error while logging in, please contact admin",
+                    return res.status(500).json({
+                        error: "Server error while generating token for log in, please contact admin",
                         token: token
                     });
                 }
@@ -133,25 +126,22 @@ async function login(req, res) {
                 });
 
                 console.log('logged in');
-                return res.json({
-                    httpStatusCode: 200,
+                return res.status(200).json({
                     message: "Logged in successfully",
                     token: token
                 });
             });
         } else {
             console.log('wrong password');
-            return res.json({
-                httpStatusCode: 401,
-                message: "Wrong password"
+            return res.status(401).json({
+                error: "Wrong password"
             });
         }
 
     } else {
         console.log('user not found');
-        return res.json({
-            httpStatusCode: 404,
-            message: "User not found"
+        return res.status(404).json({
+            error: "There is no account with this username"
         });
     }
 }

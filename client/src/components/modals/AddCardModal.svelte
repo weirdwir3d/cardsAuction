@@ -37,25 +37,22 @@
     type = "monster";
     rarity = "rare";
     imageUrl = "";
-    showAddCardModal = false;
   }
 
   async function addCard() {
     isAlertVisible = false;
+    const response = await addCardAPI({
+      name,
+      description,
+      type,
+      rarity,
+      imageUrl,
+      auctionId,
+      token,
+    });
+    const data = await response.json();
 
-    try {
-      const data = await addCardAPI({
-        name,
-        description,
-        type,
-        rarity,
-        imageUrl,
-        auctionId,
-        token,
-      });
-
-    //   console.log('new card data:', data);
-
+    if (response.ok) {
       alertMessage = "Card added successfully!";
       alertType = "success";
       isAlertVisible = true;
@@ -65,11 +62,10 @@
         close();
         dispatch("close");
       }, 1500);
-    } catch (error) {
-      alertMessage = error.message;
+    } else {
+      alertMessage = data.error;
       alertType = "error";
       isAlertVisible = true;
-      console.error("error adding card:", error);
     }
   }
 </script>
@@ -77,7 +73,9 @@
 <div
   class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4 sm:p-6 md:p-8"
 >
-  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg sm:w-11/12 md:w-3/4 lg:w-1/2">
+  <div
+    class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg sm:w-11/12 md:w-3/4 lg:w-1/2"
+  >
     <h2 class="text-2xl font-bold mb-4">Add New Card</h2>
 
     <!-- Alert -->
@@ -134,10 +132,10 @@
     <div
       class="mt-6 flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 sm:space-x-2"
     >
-    <!-- Add card btn -->
-     <Button label="Add card" color="confirmation" onClick={addCard} />
+      <!-- Add card btn -->
+      <Button label="Add card" color="confirmation" onClick={addCard} />
 
-     <Button label="Cancel" color="gray" onClick={() => (dispatch("close"))} />
+      <Button label="Cancel" color="gray" onClick={() => dispatch("close")} />
     </div>
   </div>
 </div>

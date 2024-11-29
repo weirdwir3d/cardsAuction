@@ -29,29 +29,38 @@
   let auctionWarningMessage = "";
   let showAuctionModal = false;
 
-    tokenStore.subscribe((value) => {
+  tokenStore.subscribe((value) => {
     token = value.token;
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
   });
 
-  onMount(() => {
+  onMount(async () => {
+    console.log("hi");
     cardId = window.location.pathname.split("/").pop();
-    fetchCardDetails();
+    await fetchCardDetails();
   });
 
   async function fetchCardDetails() {
-    try {
-      card = await API.fetchCardAPI(cardId);
+    const response = await API.fetchCardDetailsAPI(cardId);
+    const data = await response.json();
+
+    console.log("response:", data);
+
+    if (response.ok) {
+      card = data.card;
       updatedCard = { ...card };
-    } catch (error) {
-      console.error("Error retrieving card details:", error);
+    } else {
+      alertMessage = data.error;
+      alertType = "error";
+      showAlert = true;
     }
   }
 
   function handleDelete() {
     if (card.auctionId !== -1) {
-      auctionWarningMessage = 'This card is associated with an auction. Deleting the card will also delete the auction. Do you want to proceed?';
+      auctionWarningMessage =
+        "This card is associated with an auction. Deleting the card will also delete the auction. Do you want to proceed?";
       showModal = true;
     } else {
       deleteCard();
@@ -70,37 +79,48 @@
   }
 
   async function deleteCard() {
-    try {
-      await API.deleteCardAPI(cardId, token);
+    const response = await API.deleteCardAPI(cardId, token);
+    const data = await response.json();
+
+    if (response.ok) {
       alertMessage = "Card deleted successfully!";
       alertType = "success";
       showAlert = true;
       setTimeout(() => {
         router.redirect("/cards");
       }, 3000);
-    } catch (error) {
-      alertMessage = "Error deleting card";
+    } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
-      console.error("Error deleting card:", error);
     }
   }
 
   async function saveChanges(updatedCardData) {
     // console.log('updated Data: ', updatedCardData.detail)
-    try {
-      card = await API.saveCardChangesAPI(cardId, updatedCardData.detail, token);
+    const response = await API.saveCardChangesAPI(
+      cardId,
+      updatedCardData.detail,
+      token
+    );
+    const data = await response.json();
+
+    console.log("data:", data);
+
+    if (response.ok) {
       alertMessage = "Card edited successfully!";
       alertType = "success";
       showAlert = true;
       isEditing = false;
       fetchCardDetails();
-    } catch (error) {
-      (alertMessage = "Error updating card:"), error.message;
+    } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
-      console.error("Error updating card details:", error);
     }
+    setTimeout(() => {
+      showAlert = false;
+    }, 4000);
   }
 </script>
 
@@ -129,9 +149,17 @@
         <p><strong>Rarity:</strong> {card.rarity}</p>
 
         {#if card.auctionId !== -1}
-        <Button label="View Auction" color="business" onClick={() => router.redirect(`/auctions/${card.auctionId}`)} />
+          <Button
+            label="View Auction"
+            color="business"
+            onClick={() => router.redirect(`/auctions/${card.auctionId}`)}
+          />
         {:else if isAdmin && auctionId === -1}
-        <Button label="Put Up for Auction" color="confirmation" onClick={() => (showAuctionModal = true)} />
+          <Button
+            label="Put Up for Auction"
+            color="confirmation"
+            onClick={() => (showAuctionModal = true)}
+          />
         {/if}
       </div>
     </div>
@@ -145,7 +173,11 @@
       {/if}
     </div>
 
-    <Button label="Back to Cards" color="gray" onClick={() => router.redirect("/cards")} />
+    <Button
+      label="Back to Cards"
+      color="gray"
+      onClick={() => router.redirect("/cards")}
+    />
   </div>
 {/if}
 

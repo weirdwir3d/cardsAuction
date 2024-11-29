@@ -56,38 +56,56 @@
   });
 
   async function fetchAuctionDetails() {
-    try {
-      auction = await API.fetchAuctionDetailsAPI(auctionId);
+    const response = await API.fetchAuctionDetailsAPI(auctionId);
+    // console.log('response:', response)
+    const data = await response.json();
+
+    if (response.ok) {
+      // console.log('data:', data)
+      auction = data.auction;
       const parts = auction.endDateTime.split(" ");
       const [day, month, year] = parts[0].split("-");
       //formate in Date format before passing it to Countdown
       endDateTimeForCountdown = `${year}-${month}-${day}T${parts[1]}`;
       updatedAuction = { ...auction };
-    } catch (error) {
-      console.error("Error retrieving auction details:", error);
+    } else {
+      alertMessage = data.error;
+      alertType = "error";
+      showAlert = true;
     }
   }
 
   async function fetchCardDetails() {
-    try {
-      card = await API.fetchCardAPI(auction.cardId);
-    } catch (error) {
-      console.error("Error retrieving card details:", error);
+    const response = await API.fetchCardDetailsAPI(auction.cardId);
+    const data = await response.json();
+
+    if (response.ok) {
+      card = data.card;
+    } else {
+      alertMessage = data.error;
+      alertType = "error";
+      showAlert = true;
     }
   }
 
   async function fetchBids() {
-    try {
-      bids = await API.fetchBidsAPI({ auctionId });
-      // console.log("fetched bids:", bids);
-    } catch (error) {
-      console.error("Error fetching bids:", error);
+    const response = await API.fetchBidsAPI({ auctionId });
+    const data = await response.json();
+    if (response.ok) {
+      bids = data.bids;
+    } else {
+      alertMessage = data.error;
+      alertType = "error";
+      showAlert = true;
     }
   }
 
   async function deleteBid(bidId) {
-    try {
-      await API.deleteBidAPI(bidId, token);
+    const response = await API.deleteBidAPI(bidId, token);
+    const data = await response.json();
+    console.log("delete data:", data);
+
+    if (response.ok) {
       //i could or should fetch bids again after deleting one (instead of filtering), but there are already so many network calls in this file
       bids = bids.filter((bid) => bid.id !== bidId);
       alertMessage = "Bid deleted successfully!!";
@@ -96,20 +114,24 @@
       setTimeout(() => {
         showAlert = false;
       }, 3000);
-    } catch (error) {
-      alertMessage = "Error deleting bid";
+    } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
-      console.error("Error deleting bid:", error);
     }
   }
 
   //to display bidders
   async function fetchUsers() {
-    try {
-      users = await API.fetchUsersAPI();
-    } catch (error) {
-      console.error("Error fetching users:", error);
+    let response = await API.fetchUsersAPI();
+    const data = await response.json();
+
+    if (response.ok) {
+      users = data.users;
+    } else {
+      alertMessage = data.error;
+      alertType = "error";
+      showAlert = true;
     }
   }
 
@@ -119,26 +141,30 @@
   }
 
   async function saveChanges() {
-    try {
-      auction = await API.saveAuctionChangesAPI(
-        auctionId,
-        updatedAuction,
-        token
-      );
+    const response = await API.saveAuctionChangesAPI(
+      auctionId,
+      updatedAuction,
+      token
+    );
+    const data = await response.json();
+    // console.log("data:", data);
+
+    if (response.ok) {
+      auction = data.auction;
+
       showEditModal = false;
       alertMessage = "Auction edited successfully!";
       alertType = "success";
       showAlert = true;
       await fetchAuctionDetails();
-    } catch (error) {
-      alertMessage = error.message;
+    } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
-    } finally {
-      setTimeout(() => {
-        showAlert = false;
-      }, 4000);
     }
+    setTimeout(() => {
+      showAlert = false;
+    }, 4000);
   }
 
   function viewCardDetails() {
@@ -146,7 +172,6 @@
   }
 
   async function handleConfirmBid(bidAmount) {
-    try {
       //format current dateTime before sending it to backend. From Javascript Date format to 'dd-mm-yyyy hh:mm:ss'
       const currentDateTime = utils.formatDate(new Date());
       let newBid = {
@@ -155,18 +180,21 @@
         bidAmount: parseFloat(bidAmount),
         publishedDateTime: currentDateTime,
       };
-      await API.addBidAPI(newBid);
-      await fetchBids();
-      alertMessage = "Bid placed successfully ;)";
-      alertType = "success";
-      showAlert = true;
-      showBidModal = false;
-      setTimeout(() => {
-        showAlert = false;
-      }, 4000);
-    } catch (error) {
-      console.error("Error trying to place a bid:", error);
-      alertMessage = error.message || "Error placing bid. please try again";
+      const response = await API.addBidAPI(newBid);
+      const data = await response.json();
+      // console.log("data:", data);
+
+      if (response.ok) {
+        await fetchBids();
+        alertMessage = "Bid placed successfully ;)";
+        alertType = "success";
+        showAlert = true;
+        showBidModal = false;
+        setTimeout(() => {
+          showAlert = false;
+        }, 4000);
+      } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
       showBidModal = false;
@@ -174,19 +202,20 @@
   }
 
   async function deleteAuction() {
-    try {
-      await API.deleteAuctionAPI(auctionId, token);
-      alertMessage = "Auction deleted successfully!";
+      const response = await API.deleteAuctionAPI(auctionId, token);
+      const data = await response.json();
+
+      if (response.ok) {
+              alertMessage = "Auction deleted successfully!";
       alertType = "success";
       showAlert = true;
       setTimeout(() => {
         router.redirect("/auctions");
       }, 3000);
-    } catch (error) {
-      alertMessage = "Error deleting auction";
+      } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
-      console.error("Error deleting auction:", error);
     }
   }
 </script>
@@ -215,7 +244,6 @@
 {#if auction && card}
   <div class="flex flex-col min-h-screen">
     <div class="flex flex-col justify-between space-y-4 px-4">
-
       <!-- Card name -->
       <h1 class="text-2xl md:text-4xl font-bold mt-4 text-center">
         {card.name}
@@ -264,9 +292,8 @@
 
           <!-- Edit auction btn -->
           {#if isAdmin}
-          <Button label="Edit auction" color="warning" onClick={toggleEdit} />
+            <Button label="Edit auction" color="warning" onClick={toggleEdit} />
           {/if}
-
         </div>
 
         <!-- Bids table -->
@@ -283,7 +310,7 @@
           {/if}
 
           {#if !hasLastBidWon}
-          <!-- only if you are logged in you can bid -->
+            <!-- only if you are logged in you can bid -->
             <button
               on:click={() => (showBidModal = true)}
               class={`px-4 py-2 rounded hover:bg-green-600 ${isLoggedIn ? "bg-green-500 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"} mt-4`}
@@ -299,13 +326,25 @@
 
       <div class="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
         {#if isAdmin}
-        <Button label="View card" color="business" onClick={viewCardDetails} />
-        <Button label="Delete auction" color="accent" onClick={deleteAuction} />
+          <Button
+            label="View card"
+            color="business"
+            onClick={viewCardDetails}
+          />
+          <Button
+            label="Delete auction"
+            color="accent"
+            onClick={deleteAuction}
+          />
         {/if}
       </div>
 
       <div class="flex flex-wrap justify-center md:justify-start gap-4">
-        <Button label="Back to auctions" color="gray" onClick={() => router.redirect("/auctions")} />
+        <Button
+          label="Back to auctions"
+          color="gray"
+          onClick={() => router.redirect("/auctions")}
+        />
       </div>
       <div class="pb-16"></div>
     </div>

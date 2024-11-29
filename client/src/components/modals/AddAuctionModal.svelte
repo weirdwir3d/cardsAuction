@@ -29,16 +29,21 @@
     token = value.token;
   });
 
-    onMount(() => {
+  onMount(() => {
     fetchCards();
   });
 
   async function fetchCards() {
-    try {
-      cards = await API.fetchCardsAPI();
+    const response = await API.fetchCardsAPI();
+    const data = await response.json();
+
+    if (response.ok) {
+      cards = data.cards;
       cardsWithoutAuctions = cards.filter((card) => card.auctionId == -1);
-    } catch (error) {
-      console.error("Error fetching cards:", error);
+    } else {
+      alertMessage = data.error;
+      alertType = "error";
+      showAlert = true;
     }
   }
 
@@ -58,10 +63,12 @@
       token,
     };
 
-    try {
-      let data = await API.addAuctionAPI(auctionData);
-      // console.log('new auction being sent:', data)
+    const response = await API.addAuctionAPI(auctionData);
+    const data = await response.json();
 
+    console.log("data:", data);
+
+    if (response.ok) {
       alertMessage = "Auction added successfully!";
       alertType = "success";
       showAlert = true;
@@ -71,8 +78,8 @@
         showAlert = false;
         close();
       }, 2000);
-    } catch (error) {
-      alertMessage = error.message;
+    } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
     }
@@ -91,7 +98,7 @@
   <div
     class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4 sm:p-6 md:p-8"
   >
-  <!-- Alert -->
+    <!-- Alert -->
     <Alert message={alertMessage} type={alertType} isVisible={showAlert} />
 
     <div
@@ -149,10 +156,10 @@
       <div
         class="mt-6 flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0 sm:space-x-2"
       >
-      <!-- add auction btn -->
-       <Button label="Add auction" color="confirmation" onClick={addAuction} />
+        <!-- add auction btn -->
+        <Button label="Add auction" color="confirmation" onClick={addAuction} />
 
-       <Button label="Cancel" color="gray" onClick={close} />
+        <Button label="Cancel" color="gray" onClick={close} />
       </div>
     </div>
   </div>
@@ -161,7 +168,7 @@
   {#if showAddCardModal}
     <AddCardModal
       on:close={() => (showAddCardModal = false)}
-      on:cardAdded={() => (fetchCards())}
+      on:cardAdded={() => fetchCards()}
     />
   {/if}
 {/if}

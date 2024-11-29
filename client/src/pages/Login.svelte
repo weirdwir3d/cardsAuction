@@ -23,46 +23,31 @@
     alertType = "error";
     showAlert = false;
 
-    try {
-      const data = await loginAPI(email, password);
+    const response = await loginAPI(email, password);
+    const data = await response.json();
 
-      if (data.httpStatusCode === 200) {
-        tokenStore.set({ token: data.token });
+    // console.log("response:", response);
+    // console.log("data:", data);
 
-        tokenStore.subscribe((value) => {
-          isLoggedIn = checkLoggedIn(value.token);
-          isAdmin = isLoggedIn && checkIsAdmin(value.token);
+    if (response.ok) {
+      tokenStore.set({ token: data.token });
 
-          const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
-          username = decodedToken.username;
-        });
+      tokenStore.subscribe((value) => {
+        isLoggedIn = checkLoggedIn(value.token);
+        isAdmin = isLoggedIn && checkIsAdmin(value.token);
 
-        alertMessage = "Login successful!";
-        alertType = "success";
-        showAlert = true;
-      } else {
-        handleLoginError(data);
-      }
-    } catch (error) {
-      alertMessage = error.message;
+        const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
+        username = decodedToken.username;
+      });
+
+      alertMessage = "Login successful!";
+      alertType = "success";
+      showAlert = true;
+    } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
     }
-  }
-
-  function handleLoginError(data) {
-    // console.log("response is not okay. httpStatusCode:", data.httpStatusCode);
-    if (data.httpStatusCode === 401) {
-      alertMessage = "Incorrect password. Please try again";
-    } else if (data.httpStatusCode === 404) {
-      alertMessage = "User not found. Check your email input or register new account";
-    } else if (data.httpStatusCode === 500) {
-      alertMessage = "Server error, contact admin";
-    } else {
-      alertMessage = data.message;
-    }
-    alertType = "error";
-    showAlert = true;
   }
 </script>
 

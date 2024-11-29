@@ -199,7 +199,7 @@ router.get("/", async (req, res) => {
     const { auctionId, userId } = req.query;
 
     if (!auctionId && !userId) {
-        return res.status(400).json({ error: "Missing required auctionId or userId parameter." });
+        return res.status(400).json({ error: "Missing required auctionId or userId parameter" });
     }
 
     let filteredBids = bidsData;
@@ -210,10 +210,6 @@ router.get("/", async (req, res) => {
 
     if (userId) {
         filteredBids = filteredBids.filter(bid => bid.userId === parseInt(userId));
-    }
-
-    if (filteredBids.length === 0) {
-        return res.status(404).json({ error: "No bids found for the given filters." });
     }
 
     return res.status(200).json({ bids: filteredBids });
@@ -240,7 +236,7 @@ router.delete('/:id', middleware.isAdmin, (req, res) => {
         return res.status(404).json({ error: "Bid not found" });
     }
 
-    return res.status(202).json({ error: "Bid deleted: " + JSON.stringify(removedBid) });
+    return res.status(202).json({ message: "Bid deleted", bid: removedBid});
 });
 
 export default router;

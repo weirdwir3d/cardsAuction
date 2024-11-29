@@ -18,14 +18,19 @@
   });
 
   async function fetchCards() {
-    try {
-      cards = await fetchCardsAPI();
-      // console.log("received cards:  ", cards);
-    } catch (error) {
-      alertMessage = "An error occurred while retrieving cards :(";
+      const response = await fetchCardsAPI();
+      const data = await response.json();
+
+      // console.log('cards data:', data)
+
+      if (response.ok) {
+        cards = data.cards;
+      } else {
+      alertMessage = data.error;
       alertType = "error";
       showAlert = true;
-    }
+    } 
+      // console.log("Received cards:", cards);
   }
 </script>
 

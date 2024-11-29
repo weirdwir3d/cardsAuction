@@ -34,51 +34,49 @@
   });
 
   async function loadBids() {
-    try {
-      const data = await API.fetchBidsAPI({ userId });
-      //   console.log("fetchBidsAPI:", data);
-
-      if (!data) {
-        throw new Error("no bids found in response");
-      }
+      const response = await API.fetchBidsAPI({ userId });
+      const data = await response.json();
+      // console.log("fetchBidsAPI:", data);
 
       const latestBids = {};
 
-      for (const bid of data) {
-        const auctionId = bid.auctionId;
-        // check if this auction doesnt have a bid yet, or if the current bid is higher
-        if (
-          !latestBids[auctionId] ||
-          bid.bidAmount > latestBids[auctionId].bidAmount
-        ) {
-          latestBids[auctionId] = bid; //save current bid as the highest
+      if (response.ok) {
+        for (const bid of data.bids) {
+          const auctionId = bid.auctionId;
+          // check if this auction doesnt have a bid yet, or if the current bid is higher
+          if (
+            !latestBids[auctionId] ||
+            bid.bidAmount > latestBids[auctionId].bidAmount
+          ) {
+            latestBids[auctionId] = bid; //save current bid as the highest
+          }
         }
+        //   console.log("latest bids:", latestBids);
+
+        const arrayBids = Object.values(latestBids); //turn to array
+
+        //   console.log("unique bids:", arrayBids);
+
+        const bidsWithCardData = [];
+
+        for (const bid of arrayBids) {
+          const response = await API.fetchCardDetailsAPI(bid.auctionId);
+          const data = await response.json();
+          const card = data.card;
+          bidsWithCardData.push({
+            ...bid,
+            cardName: card.name,
+            cardImageUrl: card.imageUrl,
+          });
+        }
+
+        bids = bidsWithCardData;
+        //   console.log("Bids:", bids);
+      } else {
+        alertMessage = data.error;
+        alertType = "error";
+        isAlertVisible = true;
       }
-    //   console.log("latest bids:", latestBids);
-
-      const arrayBids = Object.values(latestBids); //turn to array
-
-    //   console.log("unique bids:", arrayBids);
-
-      const bidsWithCardData = [];
-
-      for (const bid of arrayBids) {
-        const card = await API.fetchCardAPI(bid.auctionId);
-        bidsWithCardData.push({
-          ...bid,
-          cardName: card.name,
-          cardImageUrl: card.imageUrl
-        });
-      }
-
-      bids = bidsWithCardData;
-      //   console.log("Bids:", bids);
-    } catch (error) {
-      console.error("Error retrieving bids:", error);
-      alertMessage = "an error occurred while retrieving bids.";
-      alertType = "error";
-      isAlertVisible = true;
-    }
   }
 </script>
 
