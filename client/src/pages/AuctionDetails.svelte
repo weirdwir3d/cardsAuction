@@ -98,9 +98,11 @@
       alertType = "error";
       showAlert = true;
     }
+    console.log(bids.map(bid => bid.id));
   }
 
   async function deleteBid(bidId) {
+    console.log('bid is:', bidId)
     const response = await API.deleteBidAPI(bidId, token);
     const data = await response.json();
     console.log("delete data:", data);
@@ -219,7 +221,7 @@
       alertType = "error";
       return;
     }
-    
+
     const response = await API.deleteAuctionAPI(auctionId, token);
     const data = await response.json();
 

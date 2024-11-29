@@ -81,7 +81,7 @@
 </script>
 
 <div
-  class="flex flex-col lg:flex-row justify-between space-y-4 lg:space-y-0 lg:space-x-4 px-4"
+  class="flex flex-col justify-between space-y-4 lg:space-y-0 lg:space-x-4 px-4"
 >
   <h1 class="text-2xl p-4 md:text-3xl lg:text-4xl font-bold text-center">
     Profile

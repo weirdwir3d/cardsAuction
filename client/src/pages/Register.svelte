@@ -4,7 +4,7 @@
   import WelcomeSection from "../components/WelcomeSection.svelte";
   import Button from "../components/Button.svelte";
   import Alert from "../components/Alert.svelte";
-  import { escapeRegExp, isValidEmail } from "../lib/utils";
+  import { isValidEmail } from "../lib/utils";
 
   let isLoggedIn = false;
   let isAdmin = false;
@@ -52,15 +52,11 @@
       return;
     }
 
-    sanitizedUsername = escapeRegExp(username);
-    sanitizedEmail = escapeRegExp(email);
-    sanitizedPassword = escapeRegExp(password);
-
     const response = await registerUserAPI({
-      sanitizedUsername,
-      sanitizedEmail,
-      sanitizedPassword,
-      confirmPassword,
+      username: username,
+      email: email,
+      password: password,
+      confirmPassword: confirmPassword
     });
     const data = await response.json();
 

@@ -273,7 +273,7 @@ export async function deleteCardAPI(cardId, token) {
     }
 }
 
-export async function loginAPI(email, password) {
+export async function loginAPI({ email, password }) {
     try {
         const response = await fetch("http://localhost:3000/auth/login", {
             method: "POST",
@@ -291,6 +291,7 @@ export async function loginAPI(email, password) {
 }
 
 export async function registerUserAPI({ username, email, password, confirmPassword }) {
+    // console.log('request:', username, email, password, confirmPassword)
     try {
         const response = await fetch("http://localhost:3000/auth/register", {
             method: "POST",
@@ -298,6 +299,23 @@ export async function registerUserAPI({ username, email, password, confirmPasswo
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ username, email, password, confirmPassword }),
+        });
+
+        return response;
+
+    } catch (error) {
+        throw new Error("Unexpected error occurred, please try again later");
+    }
+}
+
+export async function logoutAPI() {
+    // console.log('request:', username, email, password, confirmPassword)
+    try {
+        const response = await fetch("http://localhost:3000/auth/logout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
         });
 
         return response;

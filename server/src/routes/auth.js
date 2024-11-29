@@ -141,7 +141,7 @@ async function login(req, res) {
     } else {
         console.log('user not found');
         return res.status(404).json({
-            error: "There is no account with this username"
+            error: "No account associated to this email"
         });
     }
 }

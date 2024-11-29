@@ -8,16 +8,20 @@
   import Cards from "./pages/Cards.svelte";
   import CardDetails from "./pages/CardDetails.svelte";
   import Profile from "./pages/Profile.svelte";
-  import Logout from "./pages/Logout.svelte";
   import Login from "./pages/Login.svelte";
   import Register from "./pages/Register.svelte";
   import Forbidden from "./pages/Forbidden.svelte";
   import Unauthorized from "./pages/Unauthorized.svelte";
+  import Alert from './components/Alert.svelte';
 
   let page;
   let params;
   let currentRoute;
   let token;
+  //alert
+  let alertMessage = "";
+  let alertType = "error";
+  let alertVisible = false;
 
   tokenStore.subscribe((value) => {
     token = value.token;
@@ -78,11 +82,6 @@
     currentRoute = ctx.pathname;
   });
 
-  router("/logout", login_only, (ctx) => {
-    page = Logout;
-    currentRoute = ctx.pathname;
-  });
-
   router("/login", (ctx) => {
     page = Login;
     currentRoute = ctx.pathname;
@@ -108,6 +107,7 @@
 
 <main>
   <Navbar active={currentRoute} />
+  <Alert message={alertMessage} type={alertType} isVisible={alertVisible} />
 </main>
 
 <!-- constant top padding to compensate for navbar -->

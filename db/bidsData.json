@@ -32,7 +32,7 @@
         "publishedDateTime": "10-10-2024 08:30:00"
     },
         {
-        "id": 3,
+        "id": 4,
         "userId": 2,
         "auctionId": 0,
         "bidAmount": 600,
@@ -64,7 +64,7 @@
         "publishedDateTime": "20-09-2024 09:45:10"
     },
     {
-        "id": 7,
+        "id": 1,
         "userId": 3,
         "auctionId": 2,
         "bidAmount": 350,
@@ -72,7 +72,7 @@
         "publishedDateTime": "21-09-2024 11:15:00"
     },
         {
-        "id": 6,
+        "id": 2,
         "userId": 0,
         "auctionId": 2,
         "bidAmount": 400,
@@ -80,7 +80,7 @@
         "publishedDateTime": "20-09-2024 09:10:15"
     },
     {
-        "id": 7,
+        "id": 3,
         "userId": 3,
         "auctionId": 2,
         "bidAmount": 410,
@@ -88,7 +88,7 @@
         "publishedDateTime": "21-09-2024 11:15:00"
     },
         {
-        "id": 6,
+        "id": 4,
         "userId": 1,
         "auctionId": 2,
         "bidAmount": 500,
@@ -96,7 +96,7 @@
         "publishedDateTime": "20-09-2024 09:10:15"
     },
     {
-        "id": 7,
+        "id": 5,
         "userId": 4,
         "auctionId": 2,
         "bidAmount": 600,
