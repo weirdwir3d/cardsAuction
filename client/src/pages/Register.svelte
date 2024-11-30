@@ -2,9 +2,9 @@
   import { tokenStore } from "../lib/TokenStore";
   import { registerUserAPI } from "../lib/api";
   import WelcomeSection from "../components/WelcomeSection.svelte";
-  import Button from "../components/Button.svelte";
+  import Button from "../components/buttons/Button.svelte";
   import Alert from "../components/Alert.svelte";
-  import { isValidEmail } from "../lib/utils";
+  import { isValidEmail } from "../lib/helper";
 
   let isLoggedIn = false;
   let isAdmin = false;
@@ -56,7 +56,7 @@
       username: username,
       email: email,
       password: password,
-      confirmPassword: confirmPassword
+      confirmPassword: confirmPassword,
     });
     const data = await response.json();
 

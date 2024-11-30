@@ -3,9 +3,9 @@
   import { tokenStore } from "../../lib/TokenStore";
   import { createEventDispatcher } from "svelte";
   import { addCardAPI } from "../../lib/api";
-  import Button from "../Button.svelte";
+  import Button from "../buttons/Button.svelte";
   import Alert from "../Alert.svelte";
-  import { escapeRegExp } from "../../lib/utils";
+  import { escapeRegExp } from "../../lib/helper";
 
   let isLoggedIn = false;
   let isAdmin = false;
@@ -20,8 +20,8 @@
   let imageUrl = "";
   let auctionId = -1;
   //alert
-  let alertMessage = "";
-  let alertType = "";
+  let alertMessage;
+  let alertType;
   let isAlertVisible = false;
 
   tokenStore.subscribe((value) => {

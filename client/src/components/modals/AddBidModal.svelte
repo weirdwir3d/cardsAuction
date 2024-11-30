@@ -1,5 +1,5 @@
 <script>
-  import Button from "../Button.svelte";
+  import Button from "../buttons/Button.svelte";
   export let isVisible = false;
   export let onClose;
   export let onConfirm;

@@ -5,6 +5,7 @@
   import { logoutAPI } from "../lib/api";
   import logo from "../assets/Yugioh-logo.svg";
   import Alert from "./Alert.svelte";
+  import * as helper from '../lib/helper'
 
   export let active;
   let isLoggedIn = false;
@@ -12,9 +13,9 @@
 
   let isMenuOpen = false;
   //alert
-  let isVisible = false;
-  let alertMessage = "";
-  let alertType = "success";
+  let isAlertVisible = false;
+  let alertMessage;
+  let alertType;
 
   tokenStore.subscribe((token) => {
     // console.log('token from navbar:', token);
@@ -32,6 +33,7 @@
       isVisible = true;
 
       tokenStore.set({ token: null });
+      console.log('token store:', $tokenStore)
     } else {
       alertMessage = data.error;
       alertType = "error";
@@ -130,5 +132,5 @@
   </ul>
 
   <!-- Alert -->
-  <Alert message={alertMessage} type={alertType} {isVisible} />
+  <Alert message={alertMessage} type={alertType} {isAlertVisible} />
 </nav>

@@ -1,7 +1,7 @@
 <script>
   import { tokenStore } from "../lib/TokenStore";
   import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
-  import Button from "../components/Button.svelte";
+  import Button from "../components/buttons/Button.svelte";
   import Alert from "../components/Alert.svelte";
   import WelcomeSection from "../components/WelcomeSection.svelte";
   import { loginAPI } from "../lib/api";
@@ -34,13 +34,20 @@
 
     if (response.ok) {
       tokenStore.set({ token: data.token });
+      console.log("setting token in store:", $tokenStore);
 
       tokenStore.subscribe((value) => {
-        isLoggedIn = checkLoggedIn(value.token);
-        isAdmin = isLoggedIn && checkIsAdmin(value.token);
+        if (value.token) {
+          isLoggedIn = checkLoggedIn(value.token);
+          isAdmin = isLoggedIn && checkIsAdmin(value.token);
 
-        const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
-        username = decodedToken.username;
+          const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
+          username = decodedToken.username;
+        } else {
+          isLoggedIn = false;
+          isAdmin = false;
+          username = "";
+        }
       });
 
       alertMessage = "Login successful!";

@@ -50,6 +50,22 @@ export function formatDate(date) {
     return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 }
 
+//helper function to convert "dd-mm-yyyy hh:mm:ss" format to a Date object
+export function parseDateTime(dateString) {
+    const [datePart, timePart] = dateString.split(" ");
+    const [day, month, year] = datePart.split("-").map(Number);
+    let hours = 0, minutes = 0, seconds = 0;
+
+    if (timePart) {
+        const timeParts = timePart.split(":");
+        hours = Number(timeParts[0]);
+        minutes = Number(timeParts[1]);
+        seconds = Number(timeParts[2]);
+    }
+
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+}
+
 //from https://www.w3schools.com/js/js_cookies.asp
 export function getCookie(cname) {
     let name = cname + "=";

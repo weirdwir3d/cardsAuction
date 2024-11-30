@@ -2,13 +2,13 @@
   import { onMount } from "svelte";
   import { tokenStore } from "../lib/TokenStore";
   import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
-  import Button from "../components/Button.svelte";
+  import Button from "../components/buttons/Button.svelte";
   import Alert from "../components/Alert.svelte";
   import { fetchAuctionsAPI, fetchCardsAPI } from "../lib/api.js";
   import Filter from "../components/Filter.svelte";
   import SearchBar from "../components/SearchBar.svelte";
   import AddAuctionModal from "../components/modals/AddAuctionModal.svelte";
-  import AuctionContainer from "../components/AuctionContainer.svelte";
+  import AuctionContainer from "../components/containers/AuctionContainer.svelte";
 
   let isLoggedIn = false;
   let isAdmin = false;

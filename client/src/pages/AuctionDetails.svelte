@@ -6,11 +6,12 @@
   import AuctionBidsSection from "../components/AuctionBidsSection.svelte";
   import Countdown from "../components/Countdown.svelte";
   import CardDetails from "../components/CardInfo.svelte";
-  import NewBidModal from "../components/modals/NewBidModal.svelte";
+  import AddBidModal from "../components/modals/AddBidModal.svelte";
   import EditAuctionModal from "../components/modals/EditAuctionModal.svelte";
-  import Button from "../components/Button.svelte";
+  import Button from "../components/buttons/Button.svelte";
+  import PlaceBidButton from "../components/buttons/PlaceBidButton.svelte";
   import Alert from "../components/Alert.svelte";
-  import * as utils from "../lib/utils";
+  import * as helper from "../lib/helper";
   import * as API from "../lib/api";
 
   let token;
@@ -34,13 +35,13 @@
   let showEditModal = false;
 
   let endDateTimeForCountdown;
-  let hasLastBidWon = bids.length > 0 && bids[bids.length - 1].hasWon; //if last bid has won, then no more bids can be made
 
   tokenStore.subscribe((value) => {
     token = value.token;
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
     userId = getUserId();
+    console.log("userId:", userId);
   })();
 
   onMount(async () => {
@@ -98,12 +99,12 @@
       alertType = "error";
       showAlert = true;
     }
-    console.log(bids.map(bid => bid.id));
+    console.log(bids.map((bid) => bid.id));
   }
 
-  async function deleteBid(bidId) {
-    console.log('bid is:', bidId)
-    const response = await API.deleteBidAPI(bidId, token);
+  async function deleteBid(auctionId, bidId) {
+    console.log("bidId is:", bidId, "auctionId is", auctionId);
+    const response = await API.deleteBidAPI(auctionId, bidId, token);
     const data = await response.json();
     console.log("delete data:", data);
 
@@ -177,6 +178,13 @@
     showAlert = false;
     // console.log("being handled");
     // console.log("bid amount:", bidAmount);
+    if (hasAuctionEnded()) {
+            showAlert = true;
+      alertMessage = "You cannot place bids after the auction has ended";
+      alertType = "error";
+      return;
+    }
+
     if (bidAmount <= 0) {
       // console.log("is not valid");
       showAlert = true;
@@ -185,7 +193,7 @@
       return;
     }
     //format current dateTime before sending it to backend. From Javascript Date format to 'dd-mm-yyyy hh:mm:ss'
-    const currentDateTime = utils.formatDate(new Date());
+    const currentDateTime = helper.formatDate(new Date());
     let newBid = {
       userId: userId,
       auctionId: parseInt(auctionId),
@@ -238,13 +246,24 @@
       showAlert = true;
     }
   }
+
+    function hasAuctionEnded() {
+    //convert auction endDateTime to Date obj
+    const parsedEndDateTime = helper.parseDateTime(auction.endDateTime);
+    // const endDateTime = new Date(auction.endDateTime);
+    console.log(parsedEndDateTime, "for auctionId:", auction.id);
+
+    const now = new Date();
+  
+    return now > parsedEndDateTime;
+  }
 </script>
 
 <!-- Alert -->
 <Alert message={alertMessage} type={alertType} isVisible={showAlert} />
 
 <!-- Modal to add new bid -->
-<NewBidModal
+<AddBidModal
   isVisible={showBidModal}
   onClose={() => (showBidModal = false)}
   onConfirm={handleConfirmBid}
@@ -329,14 +348,14 @@
             <p>No bids found.</p>
           {/if}
 
-          {#if !hasLastBidWon}
+          {#if !hasAuctionEnded()}
             <!-- only if you are logged in you can bid -->
-            <button
-              on:click={() => (showBidModal = true)}
-              class={`px-4 py-2 rounded hover:bg-green-600 ${isLoggedIn ? "bg-green-500 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"} mt-4`}
-            >
-              {isLoggedIn ? "Place Bid" : "Log in to place a bid"}
-            </button>
+            <div class="hidden md:block">
+              <PlaceBidButton
+                {isLoggedIn}
+                onClick={() => (showBidModal = true)}
+              />
+            </div>
           {/if}
         </div>
       </div>
@@ -366,11 +385,11 @@
           onClick={() => router.redirect("/auctions")}
         />
       </div>
-      <div class="pb-16"></div>
+      <div class="pb-20"></div>
     </div>
 
     <!-- Bottom bar (only visible on phones), showing latest bid and btn to place bid -->
-    {#if bids && !hasLastBidWon}
+    {#if bids && !hasAuctionEnded()}
       <div
         class="fixed bottom-0 left-0 right-0 bg-primary shadow-md p-4 md:hidden flex justify-between items-center"
       >
@@ -383,13 +402,9 @@
             <strong>No bids yet. </strong>Be the first to bid!
           </p>
         {/if}
-        <button
-          on:click={() => (showBidModal = true)}
-          class={`px-4 py-2 rounded hover:bg-green-600 ${isLoggedIn ? "bg-green-500 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
-          disabled={!isLoggedIn}
-        >
-          {isLoggedIn ? "Place Bid" : "Log in to place a bid"}
-        </button>
+        <div>
+          <PlaceBidButton {isLoggedIn} onClick={() => (showBidModal = true)} />
+        </div>
       </div>
     {/if}
   </div>

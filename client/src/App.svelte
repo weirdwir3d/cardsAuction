@@ -12,16 +12,11 @@
   import Register from "./pages/Register.svelte";
   import Forbidden from "./pages/Forbidden.svelte";
   import Unauthorized from "./pages/Unauthorized.svelte";
-  import Alert from './components/Alert.svelte';
 
   let page;
   let params;
   let currentRoute;
   let token;
-  //alert
-  let alertMessage = "";
-  let alertType = "error";
-  let alertVisible = false;
 
   tokenStore.subscribe((value) => {
     token = value.token;
@@ -107,7 +102,6 @@
 
 <main>
   <Navbar active={currentRoute} />
-  <Alert message={alertMessage} type={alertType} isVisible={alertVisible} />
 </main>
 
 <!-- constant top padding to compensate for navbar -->

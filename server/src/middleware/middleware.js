@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken';
 import express from 'express';
 
 export function isLoggedIn(req, res, next) {
-    console.log('is logged in??')
+    // console.log('is logged in??')
     const token = req.cookies.authToken;
     if (!token) {
-        console.log('not logged in!')
+        // console.log('not logged in!')
         return res.json({
             httpStatusCode: 401,
             message: "Unauthorized: No token provided"
@@ -25,7 +25,7 @@ export function isLoggedIn(req, res, next) {
 }
 
 export function isAdmin(req, res, next) {
-    console.log('called middleware isAdmin function')
+    // console.log('called middleware isAdmin function')
     // Extract token from the Authorization header
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Assuming "Bearer <token>"

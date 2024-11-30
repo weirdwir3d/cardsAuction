@@ -1,10 +1,10 @@
 <script>
   import { onMount } from "svelte";
-  import CardContainer from "../components/CardContainer.svelte";
+  import CardContainer from "../components/containers/CardContainer.svelte";
   import AddCardModal from "../components/modals/AddCardModal.svelte";
   import { fetchCardsAPI } from "../lib/api";
   import Alert from "../components/Alert.svelte";
-  import Button from "../components/Button.svelte";
+  import Button from "../components/buttons/Button.svelte";
 
   let cards = [];
   let showNewCardModal = false;

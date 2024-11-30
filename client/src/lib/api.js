@@ -77,7 +77,8 @@ export async function fetchCardDetailsAPI(cardId) {
 export async function fetchBidsAPI(params = {}) {
     try {
         const queryString = new URLSearchParams(params).toString();
-        const response = await fetch(`http://localhost:3000/bids?${queryString}`);
+        let url = queryString ? "?" : "";
+        const response = await fetch(`http://localhost:3000/bids${url}${queryString}`);
 
         return response;
 
@@ -104,9 +105,9 @@ export async function updateBidAPI(bidId, updateData) {
     }
 }
 
-export async function deleteBidAPI(bidId, token) {
+export async function deleteBidAPI(auctionId, bidId, token) {
     try {
-        const response = await fetch(`http://localhost:3000/bids/${bidId}`, {
+        const response = await fetch(`http://localhost:3000/bids/${bidId}?auctionId=${auctionId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`

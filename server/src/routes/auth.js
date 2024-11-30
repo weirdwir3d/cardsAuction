@@ -4,7 +4,7 @@ import usersData from '../../../db/usersData.json' assert { type: 'json' };
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import * as middleware from '../middleware/middleware.js';
-import * as utils from '../utils.js'
+import * as helper from '../helper.js'
 
 const router = express.Router();
 dotenv.config();
@@ -27,7 +27,7 @@ router.post("/register", async (req, res) => {
     }
 
     // validate email format
-    if (!utils.isValidEmail(email)) {
+    if (!helper.isValidEmail(email)) {
         return res.status(400).json({
             error: "Invalid email"
         });
@@ -125,7 +125,9 @@ async function login(req, res) {
                     maxAge: 60 * 60 * 1000, //1h
                 });
 
-                console.log('logged in');
+                console.log(token)
+
+                // console.log('logged in');
                 return res.status(200).json({
                     message: "Logged in successfully",
                     token: token

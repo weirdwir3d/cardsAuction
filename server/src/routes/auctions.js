@@ -2,7 +2,7 @@ import express from 'express';
 import auctions from '../../../db/auctionsData.json' assert { type: 'json' };
 import cards from '../../../db/cardsData.json' assert { type: 'json' };
 import * as middleware from '../middleware/middleware.js';
-import { parseDateTime, isValidDateTime } from '../utils.js'
+import { parseDateTime, isValidDateTime } from '../helper.js'
 const router = express.Router();
 
 //edit auction
@@ -73,7 +73,7 @@ router.get("/:id", async (req, res) => {
 
         // console.log('Requested auction ID:', auctionId, 'Auction details:', auction);
 
-        res.status(200).json({auction: auction});
+        res.status(200).json({ auction: auction });
 
     } catch (error) {
         console.error('Error retrieving auction: ', error);

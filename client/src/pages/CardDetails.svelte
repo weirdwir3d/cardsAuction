@@ -7,7 +7,7 @@
   import EditCardModal from "../components/modals/EditCardModal.svelte";
   import ConfirmationModal from "../components/modals/ConfirmationModal.svelte";
   import Alert from "../components/Alert.svelte";
-  import Button from "../components/Button.svelte";
+  import Button from "../components/buttons/Button.svelte";
   import * as API from "../lib/api";
 
   let token;

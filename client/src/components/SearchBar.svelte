@@ -1,5 +1,5 @@
 <script>
-  import { escapeRegExp } from "../lib/utils";
+  import { escapeRegExp } from "../lib/helper";
 
   export let searchQuery = "";
   export let onSearchChange;

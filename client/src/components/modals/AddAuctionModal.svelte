@@ -1,9 +1,9 @@
 <script>
   import { tokenStore } from "../../lib/TokenStore";
   import { createEventDispatcher, onMount } from "svelte";
-  import Button from "../Button.svelte";
+  import Button from "../buttons/Button.svelte";
   import Alert from "../Alert.svelte";
-  import * as utils from "../../lib/utils";
+  import * as helper from "../../lib/helper";
   import AddCardModal from "./AddCardModal.svelte";
   import * as API from "../../lib/api.js";
 
@@ -21,8 +21,8 @@
   let selectedCardId;
   let showAddCardModal = false;
   //alert
-  let alertMessage = "";
-  let showAlert = false;
+  let alertMessage;
+  let isAlertVisible = false;
   let alertType = "";
 
   tokenStore.subscribe((value) => {
@@ -70,9 +70,9 @@
 
     const endDateTimeString = `${endDate}T${endTime}`;
     const endDateTime = new Date(endDateTimeString);
-    const formattedEndDateTime = utils.formatDate(endDateTime);
+    const formattedEndDateTime = helper.formatDate(endDateTime);
     console.log("formatted endTime:", formattedEndDateTime);
-    const currentDateTime = utils.formatDate(new Date());
+    const currentDateTime = helper.formatDate(new Date());
 
     const auctionData = {
       cardId: selectedCardId,
@@ -118,7 +118,7 @@
     class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4 sm:p-6 md:p-8"
   >
     <!-- Alert -->
-    <Alert message={alertMessage} type={alertType} isVisible={showAlert} />
+    <Alert message={alertMessage} type={alertType} isVisible={isAlertVisible} />
 
     <div
       class="bg-white rounded-lg p-6 md:p-8 max-w-full w-full sm:w-[400px] md:w-[500px] lg:w-[600px] shadow-lg"

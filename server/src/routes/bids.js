@@ -1,15 +1,17 @@
 import express from 'express';
-import bidsData from '../../../db/bidsData.json' assert { type: 'json' };
+import bids from '../../../db/bidsData.json' assert { type: 'json' };
 import auctionsData from '../../../db/auctionsData.json' assert { type: 'json' };
 import usersData from '../../../db/usersData.json' assert { type: 'json' };
 import * as middleware from '../middleware/middleware.js';
-import * as utils from '../utils.js'
+import * as helper from '../helper.js'
 const router = express.Router();
 
 //Edit a bid
 router.put('/:id', middleware.isAdmin, (req, res) => {
     const { bidAmount, publishedDateTime, hasWon } = req.body;
     const bidId = parseInt(req.params.id);
+
+    let bidsData = bids;
 
     // console.log(`received request to edit bid with id: ${bidId}`);
 
@@ -33,14 +35,14 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     // console.log(`Foud auction for bid:`, foundAuction);
 
     //validate new date format, if provided
-    if (publishedDateTime && !utils.isValidDateTime(publishedDateTime)) {
+    if (publishedDateTime && !helper.isValidDateTime(publishedDateTime)) {
         console.error(`Invalid date format: ${publishedDateTime}`);
         return res.status(400).json({ error: "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'" });
     }
 
     //Parse and validate new publishedDateTime
     if (publishedDateTime) {
-        const parsedPublishedDateTime = utils.parseDateTime(publishedDateTime);
+        const parsedPublishedDateTime = helper.parseDateTime(publishedDateTime);
         const currentDateTime = new Date();
         currentDateTime.setMilliseconds(0);
 
@@ -61,7 +63,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     // console.log(`Filtered auction bids:`, allAuctionBids);
 
     //sort existing bids by publishedDateTime
-    let sortedAuctionBids = allAuctionBids.sort((a, b) => utils.parseDateTime(a.publishedDateTime) - utils.parseDateTime(b.publishedDateTime));
+    let sortedAuctionBids = allAuctionBids.sort((a, b) => helper.parseDateTime(a.publishedDateTime) - helper.parseDateTime(b.publishedDateTime));
     let latestAuctionBid = sortedAuctionBids[sortedAuctionBids.length - 1];
 
     // console.log(`sorted auction bids:`, sortedAuctionBids);
@@ -107,7 +109,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
 router.post('/', middleware.isLoggedIn, (req, res) => {
     // console.log('in fucking method')
     const { userId, auctionId, bidAmount, publishedDateTime } = req.body;
-    // console.log('userId:', userId);
+    console.log('userId:', userId);
     // console.log('auctionId:', auctionId);
     // console.log('bidAmount:', bidAmount);
     // console.log('publishedDateTime:', publishedDateTime);
@@ -117,25 +119,25 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
 
     // console.log("received bid request:", req.body);
 
-    let foundUser = usersData.find(user => user.id == userId);
+    let foundUser = usersData.find(user => user.id === userId);
     // console.log("found user:", foundUser);
 
     if (!foundUser) {
         return res.status(404).json({ error: "User not found" });
     }
-    
-    let foundAuction = auctionsData.find(auction => auction.id == auctionId);
+
+    let foundAuction = auctionsData.find(auction => auction.id === auctionId);
     // console.log("found auction:", foundAuction);
 
     if (!foundAuction) {
         return res.status(404).json({ error: "Auction not found" });
     }
 
-    if (!utils.isValidDateTime(publishedDateTime)) {
+    if (!helper.isValidDateTime(publishedDateTime)) {
         return res.status(400).json({ error: "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'." });
     }
 
-    const parsedPublishedDateTime = utils.parseDateTime(publishedDateTime);
+    const parsedPublishedDateTime = helper.parseDateTime(publishedDateTime);
     const currentDateTime = new Date();
     currentDateTime.setMilliseconds(0); // 0 seconds by default
 
@@ -144,24 +146,18 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
     }
 
     //bid has to be higher than last bid, or basePrice if this is the first bid
-    let sortedBids = bidsData.sort(function (a, b) {
-        return (a.id - b.id);
-    });
-    let highestId = (sortedBids.length > 0) ? sortedBids[sortedBids.length - 1].id : -1;
-    let allAuctionBids = bidsData.filter(bid => bid.auctionId === auctionId);
-
+    let allAuctionBids = bids.filter(bid => bid.auctionId === auctionId);
     let minBidAmount;
 
-    if (!allAuctionBids) {
+    if (allAuctionBids.length === 0) {
         minBidAmount = foundAuction.basePrice;
     } else {
-        let sortedAuctionBids = allAuctionBids.sort((a, b) => utils.parseDateTime(a.publishedDateTime) - utils.parseDateTime(b.publishedDateTime));
-        let latestAuctionBid = sortedAuctionBids[sortedAuctionBids.length - 1];
-
-        if (latestAuctionBid.userId === userId) {
-            return res.status(400).json({ error: "You cannot make two consecutive bids." });
+        // determine highest bid by sorting by bidAmount in desc order
+        let highestBid = allAuctionBids.sort((a, b) => b.bidAmount - a.bidAmount)[0];
+        if (highestBid.userId === userId) {
+            return res.status(400).json({ error: "You cannot make two consecutive bids" });
         }
-        minBidAmount = latestAuctionBid.bidAmount;
+        minBidAmount = highestBid.bidAmount;
     }
 
     if (bidAmount <= minBidAmount) {
@@ -169,7 +165,7 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
     }
 
     const newBid = {
-        id: bidsData.length > 0 ? bidsData[bidsData.length - 1].id + 1 : 1,
+        id: bids.length > 0 ? bids[bids.length - 1].id + 1 : 1,
         userId: userId,
         auctionId: auctionId,
         bidAmount: bidAmount,
@@ -177,7 +173,7 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
         publishedDateTime: publishedDateTime
     };
 
-    bidsData.push(newBid);
+    bids.push(newBid);
     // console.log("New bid added:", newBid);
 
     res.status(200).json({
@@ -189,20 +185,16 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
 // GET one bid
 router.get("/:id", async (req, res) => {
     let wantedId = parseInt(req.params.id);
-    let foundBid = bidsData.find(bid => bid.id === wantedId)
+    let foundBid = bids.find(bid => bid.id === wantedId)
     // console.log('found id:', wantedId, 'foud bid:', foundBid)
     res.json({ foundBid })
 })
 
-//Get all bids for an auction or user
+//Get all bids, optional for an auction or user
 router.get("/", async (req, res) => {
     const { auctionId, userId } = req.query;
 
-    if (!auctionId && !userId) {
-        return res.status(400).json({ error: "Missing required auctionId or userId parameter" });
-    }
-
-    let filteredBids = bidsData;
+    let filteredBids = bids;
 
     if (auctionId) {
         filteredBids = filteredBids.filter(bid => bid.auctionId === parseInt(auctionId));
@@ -219,24 +211,27 @@ router.get("/", async (req, res) => {
 
 //DELETE one bid
 router.delete('/:id', middleware.isAdmin, (req, res) => {
-    let wantedId = parseInt(req.params.id);
-    let foundBid = bidsData.find(bid => bid.id === wantedId);
+    console.log("Bids before deletion:", bids);
+    const wantedId = parseInt(req.params.id);
+    const auctionId = parseInt(req.query.auctionId);
 
-    if (!foundBid) {
-        return res.status(404).json({ error: "Bid not found" });
+    if (isNaN(auctionId)) {
+        return res.status(400).json({ error: "Missing or invalid auctionId" });
     }
 
-    let removedBid;
-    const index = bidsData.indexOf(foundBid);
-    if (index > -1) {
-        removedBid = bidsData.splice(index, 1);
+    const foundBidIndex = bids.findIndex(bid => bid.id === wantedId && bid.auctionId === auctionId);
+
+    if (foundBidIndex === -1) {
+        return res.status(404).json({ error: "Bid not found for the specified auctionId" });
     }
 
-    if (!removedBid) {
-        return res.status(404).json({ error: "Bid not found" });
-    }
+    const removedBid = bids.splice(foundBidIndex, 1)[0];
 
-    return res.status(202).json({ message: "Bid deleted", bid: removedBid});
+    console.log("Removing bid:", removedBid);
+    console.log("Bids after deletion:", bids);
+
+
+    return res.status(202).json({ message: "Bid deleted", bid: removedBid });
 });
 
 export default router;

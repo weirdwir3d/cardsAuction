@@ -1,7 +1,7 @@
-import { setCookie } from './utils'
+import { setCookie } from './helper'
 import { writable } from 'svelte/store';
 
 export let tokenStore = writable({
-    token: ''
+    token: null
 });
-tokenStore.subscribe(value => setCookie('authToken', value.token, 1));
+tokenStore.subscribe(value => setCookie('authToken', value.token || '', 1));

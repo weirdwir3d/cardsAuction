@@ -39,7 +39,7 @@
             {#if isAdmin}
               <td class="border px-2 md:px-4 py-2 text-center">
                 <button
-                  on:click={() => onDeleteBid(bid.id)}
+                  on:click={() => onDeleteBid(bid.auctionId, bid.id)}
                   class="text-accent hover:text-red-700 flex justify-center"
                 >
                   <svg

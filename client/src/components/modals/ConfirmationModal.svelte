@@ -1,5 +1,5 @@
 <script>
-  import Button from "../Button.svelte";
+  import Button from "../buttons/Button.svelte";
   export let message;
   export let confirmAction;
   export let cancelAction;
