@@ -12,7 +12,7 @@
 </script>
 
 <div
-  class="bg-primary p-4 border rounded-lg shadow-md flex flex-col items-center transition-transform duration-200 transform hover:scale-105"
+  class="bg-background border-solid border-primary p-4 border-2 rounded-lg shadow-md flex flex-col items-center transition-transform duration-200 transform hover:scale-105"
 >
   <h2 class="text-lg font-bold mb-2">{bid.cardName}</h2>
   <img

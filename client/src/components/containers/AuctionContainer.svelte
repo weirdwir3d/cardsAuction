@@ -23,7 +23,7 @@
 </script>
 
 <div
-  class="bg-primary items-center p-2 shadow-md rounded-lg max-w-xs mx-auto cursor-pointer flex flex-col"
+  class="bg-background items-center border-solid border-2 border-accent p-2 shadow-md rounded-lg max-w-xs mx-auto cursor-pointer flex flex-col"
   on:click={() => router.redirect(`/auctions/${auction.id}`)}
   role="button"
   tabindex="0"
@@ -40,7 +40,7 @@
         class="w-full h-auto object-contain rounded-lg"
       />
     </div>
-    <p class="text-center font-semibold mt-2">
+    <p class="text-center text-accent font-semibold mt-2">
       {hasAuctionEnded() ? "Ended" : "Running"}
     </p>
   {:else}

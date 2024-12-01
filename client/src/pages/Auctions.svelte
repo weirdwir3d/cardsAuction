@@ -144,7 +144,7 @@
     <!-- Add auction btn (only visible to admin) -->
     <div class="text-center mt-6 hidden lg:block">
       {#if isAdmin}
-      <Button label="Add auction" color="accent" onClick={() => (showNewAuctionModal = true)} />
+      <Button label="Add auction" color="warning" onClick={() => (showNewAuctionModal = true)} />
       {/if}
     </div>
   </div>
@@ -169,11 +169,11 @@
       </p>
       <div class="text-center mt-6 lg:hidden">
         {#if isAdmin}
-        <Button label="Add auction" color="accent" onClick={() => (showNewAuctionModal = true)} />
+        <Button label="Add auction" color="warning" onClick={() => (showNewAuctionModal = true)} />
         {/if}
       </div>
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-6"
       >
         {#each auctions as auction}
           <AuctionContainer {auction} card={getCardById(auction.cardId)} />

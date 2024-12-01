@@ -19,6 +19,6 @@
     placeholder="Search auctions by card name..."
     bind:value={searchQuery}
     on:input={handleInput}
-    class="border-2 border-blue-500 rounded p-2 lg:mt-6 w-full outline-none focus:ring-4 focus:ring-blue-500"
+    class="border-2 rounded p-2 lg:mt-6 w-full outline-none focus:ring-4"
   />
 </div>

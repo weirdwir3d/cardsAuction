@@ -6,7 +6,7 @@
 
   // map color prop to tailwind classes
   $: colorClass = {
-    accent: "bg-accent text-white hover:bg-accent/90",
+    accent: "bg-red-700 text-white hover:bg-red-700/90",
     confirmation: "bg-confirmation text-white hover:bg-confirmation/90",
     warning: "bg-warning text-black hover:bg-warning/90",
     business: "bg-business text-white hover:bg-business/90",

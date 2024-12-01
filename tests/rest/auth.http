@@ -12,7 +12,7 @@ Content-Type: application/json
 
 > {%
     client.test("Status Code is 200", function() {
-        client.assert(response.body.httpStatusCode === 200, "Expected 200, got " + response.body.httpStatusCode);
+        client.assert(response.status == 200, "Expected 200, got " + response.status);
     });
 
     client.test("Message is 'Logged in successfully'", function() {
@@ -38,11 +38,11 @@ Content-Type: application/json
 
 > {%
     client.test("Status Code is 400", function() {
-        client.assert(response.body.httpStatusCode === 400, "Expected 400, got " + response.body.httpStatusCode);
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
     });
 
     client.test("Message is 'Password cannot be empty'", function() {
-        client.assert(response.body.message === "Password cannot be empty", "Expected 'Password cannot be empty', got " + response.body.message);
+        client.assert(response.body.error === "Password cannot be empty", "Expected 'Password cannot be empty', got " + response.body.error);
     });
 %}
 
@@ -60,11 +60,11 @@ Content-Type: application/json
 
 > {%
     client.test("Status Code is 401", function() {
-        client.assert(response.body.httpStatusCode === 401, "Expected 401, got " + response.body.httpStatusCode);
+        client.assert(response.status === 401, "Expected 401, got " + response.status);
     });
 
     client.test("Message is 'Passwords don't match'", function() {
-        client.assert(response.body.message === "Passwords don't match", "Expected 'Passwords don't match', got " + response.body.message);
+        client.assert(response.body.error === "Passwords don't match", "Expected 'Passwords don't match', got " + response.body.error);
     });
 %}
 
@@ -82,11 +82,11 @@ Content-Type: application/json
 
 > {%
     client.test("Status Code is 400", function() {
-        client.assert(response.body.httpStatusCode === 400, "Expected 400, got " + response.body.httpStatusCode);
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
     });
 
     client.test("Message is 'Invalid email format'", function() {
-        client.assert(response.body.message === "Invalid email format", "Expected 'Invalid email format', got " + response.body.message);
+        client.assert(response.body.error === "Invalid email", "Expected 'Invalid email', got " + response.body.error);
     });
 %}
 
@@ -104,11 +104,11 @@ Content-Type: application/json
 
 > {%
     client.test("Status Code is 400", function() {
-        client.assert(response.body.httpStatusCode === 400, "Expected 400, got " + response.body.httpStatusCode);
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
     });
 
     client.test("Message is 'Username must be at least 4 characters long'", function() {
-        client.assert(response.body.message === "Username must be at least 4 characters long", "Expected 'Username must be at least 4 characters long', got " + response.body.message);
+        client.assert(response.body.error === "Username must be at least 4 characters long", "Expected 'Username must be at least 4 characters long', got " + response.body.error);
     });
 %}
 
@@ -126,7 +126,7 @@ Content-Type: application/json
     client.test(
         "Successful login",
         function() {
-            client.assert(response.body.httpStatusCode === 200, "Response status is 200");
+            client.assert(response.status === 200, "Response status is 200");
             client.global.set("token", response.body.token);
         }
     );
@@ -144,11 +144,11 @@ Content-Type: application/json
 
 > {%
     client.test("Status Code is 401", function() {
-        client.assert(response.body.httpStatusCode === 401, "Expected 401, got " + response.body.httpStatusCode);
+        client.assert(response.status === 401, "Expected 401, got " + response.status);
     });
 
     client.test("Message is 'Wrong password'", function() {
-        client.assert(response.body.message === "Wrong password", "Expected 'Wrong password', got " + response.body.message);
+        client.assert(response.body.error === "Wrong password", "Expected 'Wrong password', got " + response.body.error);
     });
 %}
 
@@ -164,11 +164,11 @@ Content-Type: application/json
 
 > {%
     client.test("Status Code is 404", function() {
-        client.assert(response.body.httpStatusCode === 404, "Expected 404, got " + response.body.httpStatusCode);
+        client.assert(response.status === 404, "Expected 404, got " + response.status);
     });
 
     client.test("Message is 'User not found'", function() {
-        client.assert(response.body.message === "User not found", "Expected 'User not found', got " + response.body.message);
+        client.assert(response.body.error === "No account associated to this email", "Expected 'No account associated to this email', got " + response.body.error);
     });
 %}
 
@@ -180,7 +180,7 @@ Cookie: authToken={{token}}
 
 > {%
     client.test("Status Code is 200", function() {
-        client.assert(response.body.httpStatusCode === 200, "Expected 200, got " + response.body.httpStatusCode);
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
     });
 
     client.test("Message is 'Logged out successfully'", function() {

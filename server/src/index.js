@@ -10,7 +10,7 @@ import cards from './routes/cards.js';
 import auctions from './routes/auctions.js';
 import bids from './routes/bids.js';
 
-app.use(express.json()) 
+app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser()); // parsing cookies?
 //CORS for all origins
@@ -30,7 +30,7 @@ app.use("/bids", bids);
 app.get('/', (req, res) => {
   // console.log(req);
   // res.send('Hello World!')
-  res.json({ msg: "hello world"});
+  res.json({ msg: "hello world" });
 })
 
 const PORT = process.env.PORT || 3000;

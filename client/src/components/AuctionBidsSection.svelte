@@ -40,7 +40,7 @@
               <td class="border px-2 md:px-4 py-2 text-center">
                 <button
                   on:click={() => onDeleteBid(bid.auctionId, bid.id)}
-                  class="text-accent hover:text-red-700 flex justify-center"
+                  class="text-red-700 hover:text-red-700 flex justify-center"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

@@ -8,7 +8,7 @@
 </script>
 
 <div
-  class="bg-secondary p-2 shadow-md rounded-lg max-w-xs mx-auto cursor-pointer"
+  class="bg-background border-solid border-2 border-red-700 p-2 shadow-md rounded-lg max-w-xs mx-auto cursor-pointer"
   on:click={handleClick}
   role="button"
   tabindex="0"
@@ -22,6 +22,6 @@
   />
 
   {#if card.auctionId !== -1}
-    <p class="text-center font-semibold mt-2">In auction</p>
+    <p class="text-center text-red-700 font-semibold mt-2">In auction</p>
   {/if}
 </div>
