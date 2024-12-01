@@ -1,0 +1,151 @@
+### Log in admin
+# @name loginAsAdmin
+POST {{protocol}}{{host}}:{{port}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "adminPassword"
+}
+
+> {%
+    client.test(
+        "Admin login successful",
+        function() {
+            client.assert(response.status === 200, "Response status is 200");
+            client.global.set("adminToken", response.body.token);
+        }
+    );
+%}
+
+### Edit a bid successfully
+# @name editBid
+PUT {{protocol}}{{host}}:{{port}}/bids/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "bidAmount": 800,
+  "publishedDateTime": "02-12-2024 14:00:00",
+  "hasWon": true
+}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Message is 'Bid updated successfully!'", function() {
+        client.assert(response.body.message === "Bid updated successfully!", "Expected success message");
+    });
+%}
+
+### Edit a non-existent bid
+# @name editNonExistentBid
+PUT {{protocol}}{{host}}:{{port}}/bids/99
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "bidAmount": 700,
+  "publishedDateTime": "03-12-2024 12:00:00",
+  "hasWon": false
+}
+
+> {%
+    client.test("Status Code is 404", function() {
+        client.assert(response.status === 404, "Expected 404, got " + response.status);
+    });
+
+    client.test("Message is 'Bid not found'", function() {
+        client.assert(response.body.error === "Bid not found", "Expected 'Bid not found'");
+    });
+%}
+
+### Edit a bid with an invalid date format
+# @name editBidInvalidDate
+PUT {{protocol}}{{host}}:{{port}}/bids/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "bidAmount": 600,
+  "publishedDateTime": "invalid-date-format",
+  "hasWon": true
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Invalid date format. Please use \"dd-mm-yyyy hh:mm:ss\"'", function() {
+        client.assert(response.body.error === "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'", "Expected validation error for invalid date format.");
+    });
+%}
+
+### Edit a bid with a date in the past
+# @name editBidDateInPast
+PUT {{protocol}}{{host}}:{{port}}/bids/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "bidAmount": 700,
+  "publishedDateTime": "01-12-2023 14:00:00",
+  "hasWon": true
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Published date cannot be in the past.'", function() {
+        client.assert(response.body.error === "Published date cannot be in the past.", "Expected validation error for date in the past.");
+    });
+%}
+
+### Edit a bid with a lower bid amount
+# @name editBidLowerAmount
+PUT {{protocol}}{{host}}:{{port}}/bids/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "bidAmount": 300,
+  "publishedDateTime": "03-12-2024 14:00:00",
+  "hasWon": false
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Bid amount must be higher than the previous highest bid or base price.'", function() {
+        client.assert(response.body.error === "Bid amount must be higher than the previous highest bid or base price.", "Expected validation error for lower bid amount.");
+    });
+%}
+
+### Edit a bid with invalid hasWon value
+# @name editBidInvalidHasWon
+PUT {{protocol}}{{host}}:{{port}}/bids/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "bidAmount": 800,
+  "publishedDateTime": "03-12-2024 14:00:00",
+  "hasWon": "invalidValue"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'hasWon must be true or false.'", function() {
+        client.assert(response.body.error === "hasWon must be true or false.", "Expected validation error for invalid hasWon value.");
+    });
+%}
