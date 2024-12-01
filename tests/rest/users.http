@@ -12,7 +12,7 @@ Content-Type: application/json
     client.test(
         "Successful login",
         function() {
-            client.assert(response.body.httpStatusCode === 200, "Response status is 200");
+            client.assert(response.status === 200, "Response status is 200");
             client.global.set("token", response.body.token);
         }
     );
@@ -29,7 +29,7 @@ Content-Type: application/json
     });
 
     client.test("Response contains usersData", function() {
-        client.assert(response.body.usersData, "Expected usersData obj. containing array");
+        client.assert(response.body.users, "Expected usersData obj. containing array");
     });
 %}
 
