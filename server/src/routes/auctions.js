@@ -253,7 +253,7 @@ router.delete('/:id', middleware.isAdmin, (req, res) => {
     }
 
     return res.status(200).json({
-        message: `Auction deleted successfully`,
+        message: 'Auction deleted successfully!',
         removedAuction: foundAuction,
         updatedCard: foundCard || null
     });

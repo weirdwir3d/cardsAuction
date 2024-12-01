@@ -12,7 +12,7 @@ Content-Type: application/json
     client.test(
         "Admin login successful",
         function() {
-            client.assert(response.body.httpStatusCode === 200, "Response status is 200");
+            client.assert(response.status === 200, "Response status is 200");
             client.global.set("adminToken", response.body.token);
         }
     );
@@ -29,7 +29,7 @@ Content-Type: application/json
     });
 
     client.test("Response contains cardsData", function() {
-        client.assert(response.body.cardsData, "Expected cardsData obj");
+        client.assert(response.body.cards, "Expected cardsData obj");
     });
 %}
 
@@ -44,7 +44,7 @@ Content-Type: application/json
     });
 
     client.test("Response contains foundCard", function() {
-        client.assert(response.body.foundCard, "Expected foundCard object");
+        client.assert(response.body.card, "Expected foundCard object");
     });
 %}
 

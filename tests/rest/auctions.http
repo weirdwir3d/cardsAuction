@@ -1,0 +1,180 @@
+### Log in admin
+# @name loginAsAdmin
+POST {{protocol}}{{host}}:{{port}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "adminPassword"
+}
+
+> {%
+    client.test(
+        "Admin login successful",
+        function() {
+            client.assert(response.status === 200, "Response status is 200");
+            client.global.set("adminToken", response.body.token);
+        }
+    );
+%}
+
+### Get all auctions successfully
+# @name getAllAuctions
+GET {{protocol}}{{host}}:{{port}}/auctions
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Auctions are returned", function() {
+        client.assert(Array.isArray(response.body.auctions), "Expected auctions array, got " + typeof response.body.auctions);
+    });
+%}
+
+### Get auction by ID successfully
+# @name getAuctionById
+GET {{protocol}}{{host}}:{{port}}/auctions/1
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Auction data is returned", function() {
+        client.assert(response.body.auction, "Auction data is not returned");
+    });
+%}
+
+### Get auction with invalid ID
+# @name getAuctionInvalidId
+GET {{protocol}}{{host}}:{{port}}/auctions/invalid
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Error message is returned", function() {
+        client.assert(response.body.error === "Auction id must be a number!", "Expected 'Auction id must be a number!', got " + response.body.error);
+    });
+%}
+
+### Add auction successfully
+# @name addAuction
+POST {{protocol}}{{host}}:{{port}}/auctions
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "cardId": 3,
+  "basePrice": 500,
+  "publishedDateTime": "10-12-2024 12:00:00",
+  "endDateTime": "20-12-2024 12:00:00"
+}
+
+> {%
+    client.test("Status Code is 201", function() {
+        client.assert(response.status === 201, "Expected 201, got " + response.status);
+    });
+
+    client.test("Auction added successfully", function() {
+        client.assert(response.body.message === "Auction added successfully!", "Expected 'Auction added successfully!', got " + response.body.message);
+    });
+%}
+
+### Add auction with missing card ID
+# @name addAuctionMissingCard
+POST {{protocol}}{{host}}:{{port}}/auctions
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "basePrice": 500,
+  "publishedDateTime": "10-12-2024 12:00:00",
+  "endDateTime": "20-12-2024 12:00:00"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Error message is 'No card selected'", function() {
+        client.assert(response.body.error === "No card selected", "Expected 'No card selected', got " + response.body.error);
+    });
+%}
+
+### Edit auction successfully
+# @name editAuction
+PUT {{protocol}}{{host}}:{{port}}/auctions/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "basePrice": 1000,
+  "publishedDateTime": "11-12-2024 12:00:00",
+  "endDateTime": "25-12-2024 12:00:00"
+}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Auction updated successfully", function() {
+        client.assert(response.body.message === "Auction updated successfully!", "Expected 'Auction updated successfully!', got " + response.body.message);
+    });
+%}
+
+### Edit auction with invalid date
+# @name editAuctionInvalidDate
+PUT {{protocol}}{{host}}:{{port}}/auctions/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "basePrice": 1000,
+  "publishedDateTime": "invalid-date",
+  "endDateTime": "25-12-2024 12:00:00"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Error message is returned", function() {
+        client.assert(response.body.error === "Published date must be in the format 'dd-mm-yyyy hh:mm:ss'", "Expected 'Published date must be in the format...', got " + response.body.error);
+    });
+%}
+
+### Delete auction
+# @name deleteAuction
+DELETE {{protocol}}{{host}}:{{port}}/auctions/1
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Auction deleted successfully", function() {
+        client.assert(response.body.message === "Auction deleted successfully!", "Expected 'Auction deleted successfully!', got " + response.body.message);
+    });
+%}
+
+### Delete auction not found
+# @name deleteAuctionNotFound
+DELETE {{protocol}}{{host}}:{{port}}/auctions/1020
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Status Code is 404", function() {
+        client.assert(response.status === 404, "Expected 404, got " + response.status);
+    });
+
+    client.test("Auction not found", function() {
+        client.assert(response.body.error === "Auction not found", "Expected 'Auction not found', got " + response.body.error);
+    });
+%}
