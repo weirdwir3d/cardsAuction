@@ -35,8 +35,7 @@ export function isAdmin(req, res, next) {
     // Check if token exists
     if (!token) {
         return res.status(401).json({
-            httpStatusCode: 401,
-            message: "Unauthorized: No token provided"
+            error: "Unauthorized: No token provided"
         });
     }
 
@@ -44,8 +43,7 @@ export function isAdmin(req, res, next) {
     jwt.verify(token, process.env.SECRET, (err, decoded) => {
         if (err) {
             return res.status(401).json({
-                httpStatusCode: 401,
-                message: "Unauthorized: Invalid token"
+                error: "Unauthorized: Invalid token"
             });
         }
 
@@ -57,8 +55,7 @@ export function isAdmin(req, res, next) {
             next();
         } else {
             return res.status(403).json({
-                httpStatusCode: 403,
-                message: 'Access denied'
+                error: 'Access denied'
             });
         }
     });

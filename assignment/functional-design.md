@@ -38,8 +38,8 @@ The requirements for this project have been split into functional and non-functi
   - [x] When will the auction end
 - [x] It should be possible to search the list of auctions
 - [x] It should not be possible to remove or edit bids once they are made
-- [ ] Input is validated client side before sending it to the server
-- [ ] The server must perform server side validation
+- [x] Input is validated client side before sending it to the server
+- [x] The server must perform server side validation
 - [x] The list of auctions should be filterable on at least three attributes that are logical for the chosen service or product. I.e.:
   - [x] all trips in Twente 
   - [x] all yellow sneakers
@@ -56,7 +56,7 @@ The requirements for this project have been split into functional and non-functi
 - [x] Correct HTTP status codes have to be returned for every request.
 - [x] Both the front-end and backend provide descriptive error messages: 'You already placed a bid', 'Bid already exists', 'User X not allowed to do ...'
 - [x] Both front-end and backend code is logically separated. Specifically for the Express routes (use multiple files)
-- [ ] Endpoints have meaningful good and bad-weather tests
+- [x] Endpoints have meaningful good and bad-weather tests
 - [x] After registration the user should be logged in. They should not have to log in again before being able to place a bid
 - [x] The front-end is build using Svelte
 - [x] The backend is built using Node js with Express

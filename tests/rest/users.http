@@ -44,7 +44,7 @@ Content-Type: application/json
     });
 
     client.test("Response contains foundUser", function() {
-        client.assert(response.body.foundUser, "Expected foundUser");
+        client.assert(response.body.user, "Expected foundUser");
     });
 %}
 
@@ -80,17 +80,17 @@ Content-Type: application/json
 
 ### Delete one user successfully
 # @name deleteOneUser
-DELETE {{protocol}}{{host}}:{{port}}/users/1
+DELETE {{protocol}}{{host}}:{{port}}/users/3
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 > {%
-    client.test("Status Code is 202", function() {
-        client.assert(response.status === 202, "Expected 202, got " + response.status);
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
     });
 
     client.test("Message contains deleted user", function() {
-        client.assert(response.body.removedUser, "Expected removedUser");
+        client.assert(response.body.user, "Expected user");
     });
 %}
 
@@ -105,6 +105,6 @@ Content-Type: application/json
     });
 
     client.test("Message says 'Unauthorized: No token provided'", function() {
-        client.assert(response.body.message === 'Unauthorized: No token provided', "Expected 'Unauthorized: No token provided'");
+        client.assert(response.body.error === 'Unauthorized: No token provided', "Expected 'Unauthorized: No token provided'");
     });
 %}

@@ -21,7 +21,7 @@ router.post("/register", async (req, res) => {
 
     // validate passwords are the same
     if (password !== confirmPassword) {
-        return res.status(401).json({
+        return res.status(400).json({
             error: "Passwords don't match"
         });
     }
@@ -50,10 +50,10 @@ router.post("/register", async (req, res) => {
                 return (a.id - b.id);
             });
 
-            console.log(hashedPassword);
+            // console.log(hashedPassword);
             let highestId = (sortedUsers.length > 0) ? sortedUsers[sortedUsers.length - 1].id : -1;
 
-            console.log('highest id', highestId);
+            // console.log('highest id', highestId);
             usersData.push({
                 id: highestId + 1,
                 username: req.body.username,
@@ -94,13 +94,13 @@ router.post("/logout", middleware.isLoggedIn, async (req, res) => {
 });
 
 async function login(req, res) {
-    console.log('trying to log in');
+    // console.log('trying to log in');
     let email = req.body.email;
     let password = req.body.password;
 
     let foundUser = usersData.find(user => user.email === email);
 
-    console.log(`found user: ${JSON.stringify(foundUser)}`);
+    // console.log(`found user: ${JSON.stringify(foundUser)}`);
 
     //Find user
     if (foundUser) {
@@ -109,9 +109,9 @@ async function login(req, res) {
 
         if (isPasswordValid) {
             jwt.sign(foundUser, process.env.SECRET, { expiresIn: '1h' }, (err, token) => {
-                console.log('signing');
+                // console.log('signing');
                 if (err) {
-                    console.log(err);
+                    // console.log(err);
                     return res.status(500).json({
                         error: "Server error while generating token for log in, please contact admin",
                         token: token
@@ -125,7 +125,7 @@ async function login(req, res) {
                     maxAge: 60 * 60 * 1000, //1h
                 });
 
-                console.log(token)
+                // console.log(token)
 
                 // console.log('logged in');
                 return res.status(200).json({
@@ -134,14 +134,14 @@ async function login(req, res) {
                 });
             });
         } else {
-            console.log('wrong password');
+            // console.log('wrong password');
             return res.status(401).json({
                 error: "Wrong password"
             });
         }
 
     } else {
-        console.log('user not found');
+        // console.log('user not found');
         return res.status(404).json({
             error: "No account associated to this email"
         });

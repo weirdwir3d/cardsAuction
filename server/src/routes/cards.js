@@ -21,6 +21,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     // console.log(`Updating card with details: ${JSON.stringify(updatedCard)}`);
 
     if (updatedCard.name && updatedCard.name.length < 4) {
+        // console.log('card name is too short:', updatedCard.name);
         // console.log(`Validation error: Card name is too short (${updatedCard.name.length} characters).`);
         return res.status(400).json({
             error: "Card name is too short!"
@@ -33,6 +34,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     }
 
     if (updatedCard.description && updatedCard.description.length < 10) {
+        // console.log('card description is too short:', updatedCard.description);
         // console.log(`Validation error: Card description is too short (${updatedCard.description.length} characters).`);
         return res.status(400).json({ error: "Card description is too short!" });
     }
@@ -92,7 +94,7 @@ router.post('/', middleware.isAdmin, (req, res) => {
 
     // console.log("Received card data:", card);
 
-    if (card.name.length < 3) {
+    if (card.name.length < 4) {
         // console.log("Error: card name is too short");
         return res.status(400).json({ error: "Card name is too short!" });
     }
@@ -138,8 +140,9 @@ router.post('/', middleware.isAdmin, (req, res) => {
     cards.push(newCard);
     // console.log("New card added:", newCard);
 
-    res.status(201).json({
-        message: "Card added successfully!"
+    res.status(200).json({
+        message: "Card added successfully!",
+        card: newCard
     });
 });
 
@@ -175,7 +178,7 @@ router.delete('/:id', middleware.isAdmin, (req, res) => {
         }
     }
 
-    return res.status(202).json({ message: "Card deleted successfully!" });
+    return res.status(200).json({ message: "Card deleted successfully!", card: foundCard });
 });
 
 export default router;

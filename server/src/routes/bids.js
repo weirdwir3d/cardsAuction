@@ -19,7 +19,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     let foundBid = bidsData.find(bid => bid.id === bidId);
 
     if (!foundBid) {
-        console.error(`Bid with ID ${bidId} not found.`);
+        // console.error(`Bid with ID ${bidId} not found.`);
         return res.status(404).json({ error: "Bid not found" });
     }
 
@@ -28,7 +28,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     let foundAuction = auctionsData.find(auction => auction.id === foundBid.auctionId);
 
     if (!foundAuction) {
-        console.error(`Auction not found for bid with ID ${bidId}`);
+        // console.error(`Auction not found for bid with ID ${bidId}`);
         return res.status(404).json({ error: "Auction not found for this bid" });
     }
 
@@ -36,7 +36,7 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
 
     //validate new date format, if provided
     if (publishedDateTime && !helper.isValidDateTime(publishedDateTime)) {
-        console.error(`Invalid date format: ${publishedDateTime}`);
+        // console.error(`Invalid date format: ${publishedDateTime}`);
         return res.status(400).json({ error: "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'" });
     }
 
@@ -49,8 +49,8 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
         // console.log(`parsed publihed date: ${parsedPublishedDateTime}, current date: ${currentDateTime}`);
 
         if (parsedPublishedDateTime < currentDateTime) {
-            console.error(`Published date ${publishedDateTime} is in the past.`);
-            return res.status(400).json({ error: "Published date cannot be in the past." });
+            // console.error(`Published date ${publishedDateTime} is in the past.`);
+            return res.status(400).json({ error: "Published date cannot be in the past" });
         }
 
         foundBid.publishedDateTime = publishedDateTime;
@@ -74,8 +74,8 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     // console.log(`minimum allowed bid amount: ${minBidAmount}`);
 
     if (bidAmount !== undefined && bidAmount <= minBidAmount) {
-        console.error(`Bid amount ${bidAmount} is less than or equal to the minimum bid amount.`);
-        return res.status(400).json({ error: "Bid amount must be higher than the previous highest bid or base price." });
+        // console.error(`Bid amount ${bidAmount} is less than or equal to the minimum bid amount.`);
+        return res.status(400).json({ error: "Bid amount must be higher than the previous highest bid or base price" });
     }
 
     //  Update bid amount if provided
@@ -84,13 +84,14 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
         // console.log(`updated bid amount to: ${foundBid.bidAmount}`);
     }
 
-    //  Update hasWon if provided
-    if (typeof hasWon === 'boolean') {
-        foundBid.hasWon = hasWon;
-        // console.log(`updated hasWon to: ${foundBid.hasWon}`);
-    } else {
-        console.error(`Invalid hasWon value: ${hasWon}`);
-        return res.status(400).json({ error: "hasWon must be true or false." });
+    //  Update hasWon if provided and valid
+    if (hasWon !== undefined) {
+        if (hasWon === true || hasWon === false || hasWon === null) {
+            foundBid.hasWon = hasWon;
+        } else {
+            // console.error(`Invalid hasWon value: ${hasWon}`);
+            return res.status(400).json({ error: "hasWon must be true, false, or null" });
+        }
     }
 
     // console.log(`hasWon value is: ${hasWon}`);
@@ -104,17 +105,18 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     // console.log(`bid updated successfully:`, foundBid);
 });
 
-
 // POST new bid
 router.post('/', middleware.isLoggedIn, (req, res) => {
     // console.log('in fucking method')
     const { userId, auctionId, bidAmount, publishedDateTime } = req.body;
-    console.log('userId:', userId);
+    // console.log('userId:', userId);
     // console.log('auctionId:', auctionId);
     // console.log('bidAmount:', bidAmount);
     // console.log('publishedDateTime:', publishedDateTime);
-    if (userId == null || auctionId == null || bidAmount == null || !publishedDateTime) {
-        return res.status(400).json({ error: "Missing required fields" });
+
+    //javascript is so nice for treating '0' differently from the other numbers :)
+    if (userId == null || !auctionId || !bidAmount || !publishedDateTime) {
+        return res.status(400).json({ error: "Missing one of the required fields" });
     }
 
     // console.log("received bid request:", req.body);
@@ -134,7 +136,7 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
     }
 
     if (!helper.isValidDateTime(publishedDateTime)) {
-        return res.status(400).json({ error: "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'." });
+        return res.status(400).json({ error: "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'" });
     }
 
     const parsedPublishedDateTime = helper.parseDateTime(publishedDateTime);
@@ -161,7 +163,7 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
     }
 
     if (bidAmount <= minBidAmount) {
-        return res.status(400).json({ error: "Bid amount cannot be lower than the previous bid, or the base price of the card." });
+        return res.status(400).json({ error: "Bid amount cannot be lower than the previous bid, or the base price of the card" });
     }
 
     const newBid = {
@@ -185,14 +187,31 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
 // GET one bid
 router.get("/:id", async (req, res) => {
     let wantedId = parseInt(req.params.id);
+
+    if (isNaN(wantedId)) {
+        return res.status(400).json({ error: "Invalid id format" });
+    }
+
     let foundBid = bids.find(bid => bid.id === wantedId)
+
+    if (!foundBid) {
+        return res.status(404).json({ error: "Bid not found" });
+    }
     // console.log('found id:', wantedId, 'foud bid:', foundBid)
-    res.json({ foundBid })
+    res.status(200).json({ bid: foundBid })
 })
 
 //Get all bids, optional for an auction or user
 router.get("/", async (req, res) => {
     const { auctionId, userId } = req.query;
+
+    if (auctionId && isNaN(parseInt(auctionId))) {
+        return res.status(400).json({ error: "Invalid auctionId" });
+    }
+
+    if (userId && isNaN(parseInt(userId))) {
+        return res.status(400).json({ error: "Invalid userId" });
+    }
 
     let filteredBids = bids;
 
@@ -207,11 +226,9 @@ router.get("/", async (req, res) => {
     return res.status(200).json({ bids: filteredBids });
 });
 
-
-
 //DELETE one bid
 router.delete('/:id', middleware.isAdmin, (req, res) => {
-    console.log("Bids before deletion:", bids);
+    // console.log("Bids before deletion:", bids);
     const wantedId = parseInt(req.params.id);
     const auctionId = parseInt(req.query.auctionId);
 
@@ -227,11 +244,11 @@ router.delete('/:id', middleware.isAdmin, (req, res) => {
 
     const removedBid = bids.splice(foundBidIndex, 1)[0];
 
-    console.log("Removing bid:", removedBid);
-    console.log("Bids after deletion:", bids);
+    // console.log("Removing bid:", removedBid);
+    // console.log("Bids after deletion:", bids);
 
 
-    return res.status(202).json({ message: "Bid deleted", bid: removedBid });
+    return res.status(200).json({ message: "Bid deleted", bid: removedBid });
 });
 
 export default router;

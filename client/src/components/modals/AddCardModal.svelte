@@ -42,15 +42,17 @@
 
   async function addCard() {
     isAlertVisible = false;
-
-    if (name.length > 4) {
+    // console.log('card name:', name)
+    if (name.length < 4) {
+      // console.log('too short', name)
       alertMessage = "Card name is too short";
       alertType = "error";
       isAlertVisible = true;
       return;
     }
 
-    if (description.length > 10) {
+    if (description.length < 10) {
+      // console.log('too short')
       alertMessage = "Description is too short";
       alertType = "error";
       isAlertVisible = true;
@@ -74,19 +76,19 @@
 
     if (
       auctionId !== undefined &&
-      (typeof updatedCard.auctionId !== "number" || updatedCard.auctionId < -1)
+      (typeof auctionId !== "number" || auctionId < -1)
     ) {
             alertMessage =
-        "Auction ID must be a non-negative integer or -1.";
+        "Auction ID must be a non-negative integer or -1";
       alertType = "error";
       isAlertVisible = true;
       return;
     }
 
     if (
-      !updatedCard.imageUrl.startsWith("http") ||
-      (!updatedCard.imageUrl.endsWith(".jpg") &&
-        !updatedCard.imageUrl.endsWith(".png"))
+      !imageUrl.startsWith("http") ||
+      (!imageUrl.endsWith(".jpg") &&
+        !imageUrl.endsWith(".png"))
     ) {
       alertMessage =
         'Please provide a valid image link (starting with "http" and ending with ".jpg" or ".png").';
@@ -95,12 +97,14 @@
       return;
     }
 
-    sanitizedName = escapeRegExp(name);
-    sanitizedDescription = escapeRegExp(description);
+    let sanitizedName = escapeRegExp(name);
+    let sanitizedDescription = escapeRegExp(description);
+
+    // console.log(sanitizedName, sanitizedDescription)
 
     const response = await addCardAPI({
-      sanitizedName,
-      sanitizedDescription,
+      name: sanitizedName,
+      description: sanitizedDescription,
       type,
       rarity,
       imageUrl,

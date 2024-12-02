@@ -22,7 +22,7 @@ router.get("/:id", async (req, res) => {
         return res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json({ foundUser });
+    res.status(200).json({ user: foundUser });
 })
 
 // DELETE one user
@@ -43,7 +43,7 @@ router.delete('/:id', middleware.isAdmin, (req, res) => {
         removedUser = users.splice(index, 1);
     }
 
-    return res.status(202).json({ removedUser });
+    return res.status(200).json({ message: "User deleted successfully", user: removedUser });
 });
 
 export default router;

@@ -36,7 +36,7 @@
   async function loadBids() {
     const response = await API.fetchBidsAPI({ userId });
     const data = await response.json();
-    // console.log("fetchBidsAPI:", data);
+    // console.log("fetchBidsAPI:", data.bids);
 
     const latestBids = {};
 
@@ -67,25 +67,23 @@
         isAlertVisible = true;
       }
 
-      console.log("fetched auctions data:", auctionsData);
+      // console.log("fetched auctions data:", auctionsData);
 
       const bidsWithCardData = [];
 
       for (const bid of arrayBids) {
-        const auction = auctionsData.auctions.find(a => a.id === bid.auctionId);
+        const auction = auctionsData.auctions.find(
+          (auction) => auction.id === bid.auctionId
+        );
 
-        if (auction && auction.cardId) {
-          console.log("processing bid:", bid);
-          console.log("Linked auction info:", auction);
+        // console.log('auction:', auction)
+
+        if (auction && auction.cardId != null) {
+          // console.log("processing bid:", bid);
+          // console.log("Linked auction info:", auction);
 
           const response = await API.fetchCardDetailsAPI(auction.cardId);
           const data = await response.json();
-
-          console.log(
-            "card API response for cardId:",
-            auction.cardId,
-            data
-          );
 
           if (response.ok) {
             const card = data.card;
@@ -95,21 +93,17 @@
               cardImageUrl: card.imageUrl,
             });
           } else {
-            console.error(
-              `failed to fetch card details for cardId: ${auctionInfo.cardId}`
-            );
+            // console.error(
+            //   `failed to fetch card details for cardId: ${auctionInfo.cardId}`
+            // );
             alertMessage = "An error occurred while retrieving cards data";
             alertType = "error";
             isAlertVisible = true;
           }
-        } else {
-          console.warn(
-            `No auction info or cardId found for auctionId: ${bid.auctionId}`
-          );
         }
       }
 
-      console.log("Bids with Card Data:", bidsWithCardData);
+      // console.log("Bids with Card Data:", bidsWithCardData);
 
       bids = bidsWithCardData;
       //   console.log("Bids:", bids);

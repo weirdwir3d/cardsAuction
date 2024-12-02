@@ -32,8 +32,7 @@
             <td class="border px-2 md:px-4 py-2">${bid.bidAmount}</td>
             <td class="border px-2 md:px-4 py-2">{bid.publishedDateTime}</td>
             <td class="border px-2 md:px-4 py-2"
-              >{users.find((user) => user.id === bid.userId)?.username ||
-                "UnknownUser"}</td
+              >{users.find((user) => user.id === bid.userId)?.username}</td
             >
             <!-- admin can delete bids -->
             {#if isAdmin}

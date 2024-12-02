@@ -18,6 +18,183 @@ Content-Type: application/json
     );
 %}
 
+### Get all bids successfully
+# @name getAllBids
+GET {{protocol}}{{host}}:{{port}}/bids
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### Get all bids but invalid userId
+# @name getAllBidsInvalidUserId
+GET {{protocol}}{{host}}:{{port}}/bids?userId=ornitorinco
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Invalid userId'", function() {
+        client.assert(response.body.error === "Invalid userId", "Invalid userId' message");
+    });
+%}
+
+### Get all bids but invalid auctionId
+# @name getAllBidsInvalidAuctionId
+GET {{protocol}}{{host}}:{{port}}/bids?auctionId=simposio
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Invalid auctionId'", function() {
+        client.assert(response.body.error === "Invalid auctionId", "Invalid auctionId' message");
+    });
+%}
+
+### Get one bid successfully
+# @name getOneBid
+GET {{protocol}}{{host}}:{{port}}/bids/2
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### Get one bid but invalid id
+# @name getOneBidInvalidId
+GET {{protocol}}{{host}}:{{port}}/bids/libellula
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+%}
+
+### Add a new bid successfully
+# @name addBid
+POST {{protocol}}{{host}}:{{port}}/bids/
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "userId": 0,
+  "auctionId": 2,
+  "bidAmount": 850,
+  "publishedDateTime": "03-12-2024 14:00:00"
+}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Message is 'Bid added successfully!'", function() {
+        client.assert(response.body.message === "Bid added successfully!", "Expected 'Bid added successfully!' message");
+    });
+%}
+
+### Add a new bid but no auctionId
+# @name addBidNoAuctionId
+POST {{protocol}}{{host}}:{{port}}/bids/
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "userId": 0,
+  "bidAmount": 850,
+  "publishedDateTime": "03-12-2024 14:00:00"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Missing one of the required fields'", function() {
+        client.assert(response.body.error === "Missing one of the required fields", "Expected 'Missing one of the required fields' message");
+    });
+%}
+
+### Add a new bid but invalid publishedDateTime format
+# @name addBidInvalidPublishedDateTime
+POST {{protocol}}{{host}}:{{port}}/bids/
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "userId": 0,
+  "auctionId": 2,
+  "bidAmount": 850,
+  "publishedDateTime": "03-12-2024-14:00:00"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Missing one of the required fields'", function() {
+        client.assert(response.body.error === "Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'", "Expected 'Invalid date format. Please use 'dd-mm-yyyy hh:mm:ss'' message");
+    });
+%}
+
+### Add a new bid but user alredy bidded the last bid
+# @name addBidInvalidConsecutiveBids
+POST {{protocol}}{{host}}:{{port}}/bids/
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "userId": 0,
+  "auctionId": 2,
+  "bidAmount": 900,
+  "publishedDateTime": "04-12-2024 14:00:00"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'You cannot make two consecutive bids'", function() {
+        client.assert(response.body.error === "You cannot make two consecutive bids", "Expected 'You cannot make two consecutive bids' message");
+    });
+%}
+
+### Add a new bid but bidAmount lower than last bid
+# @name addBidInvalidLowBidAmount
+POST {{protocol}}{{host}}:{{port}}/bids/
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "userId": 0,
+  "auctionId": 1,
+  "bidAmount": 400,
+  "publishedDateTime": "13-12-2024 14:00:00"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Bid amount cannot be lower than the previous bid, or the base price of the card'", function() {
+        client.assert(response.body.error === "Bid amount cannot be lower than the previous bid, or the base price of the card", "Expected 'Bid amount cannot be lower than the previous bid, or the base price of the card' message");
+    });
+%}
+
 ### Edit a bid successfully
 # @name editBid
 PUT {{protocol}}{{host}}:{{port}}/bids/1
@@ -26,8 +203,7 @@ Authorization: Bearer {{adminToken}}
 
 {
   "bidAmount": 800,
-  "publishedDateTime": "02-12-2024 14:00:00",
-  "hasWon": true
+  "publishedDateTime": "31-12-2024 14:00:00"
 }
 
 > {%
@@ -101,8 +277,8 @@ Authorization: Bearer {{adminToken}}
         client.assert(response.status === 400, "Expected 400, got " + response.status);
     });
 
-    client.test("Message is 'Published date cannot be in the past.'", function() {
-        client.assert(response.body.error === "Published date cannot be in the past.", "Expected validation error for date in the past.");
+    client.test("Message is 'Published date cannot be in the past'", function() {
+        client.assert(response.body.error === "Published date cannot be in the past", "Expected validation error for date in the past");
     });
 %}
 
@@ -123,19 +299,19 @@ Authorization: Bearer {{adminToken}}
         client.assert(response.status === 400, "Expected 400, got " + response.status);
     });
 
-    client.test("Message is 'Bid amount must be higher than the previous highest bid or base price.'", function() {
-        client.assert(response.body.error === "Bid amount must be higher than the previous highest bid or base price.", "Expected validation error for lower bid amount.");
+    client.test("Message is 'Bid amount must be higher than the previous highest bid or base price'", function() {
+        client.assert(response.body.error === "Bid amount must be higher than the previous highest bid or base price", "Expected validation error for lower bid amount");
     });
 %}
 
 ### Edit a bid with invalid hasWon value
 # @name editBidInvalidHasWon
-PUT {{protocol}}{{host}}:{{port}}/bids/1
+PUT {{protocol}}{{host}}:{{port}}/bids/2
 Content-Type: application/json
 Authorization: Bearer {{adminToken}}
 
 {
-  "bidAmount": 800,
+  "bidAmount": 10000,
   "publishedDateTime": "03-12-2024 14:00:00",
   "hasWon": "invalidValue"
 }
@@ -145,7 +321,74 @@ Authorization: Bearer {{adminToken}}
         client.assert(response.status === 400, "Expected 400, got " + response.status);
     });
 
-    client.test("Message is 'hasWon must be true or false.'", function() {
-        client.assert(response.body.error === "hasWon must be true or false.", "Expected validation error for invalid hasWon value.");
+    client.test("Message is 'hasWon must be true, false, or null'", function() {
+        client.assert(response.body.error === "hasWon must be true, false, or null", "Expected validation error 'hasWon must be true, false, or null");
+    });
+%}
+
+### Delete a bid successfully
+# @name deleteBid
+DELETE {{protocol}}{{host}}:{{port}}/bids/5?auctionId=7
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Message is 'Bid deleted'", function() {
+        client.assert(response.body.message === "Bid deleted", "Expected 'Bid deleted', got " + response.body.message);
+    });
+
+    client.test("Deleted bid is returned", function() {
+        client.assert(response.body.bid && response.body.bid.id === 5, "Expected deleted bid with id 5");
+    });
+%}
+
+### Delete a bid with invalid auctionId
+# @name deleteBidInvalidAuctionId
+DELETE {{protocol}}{{host}}:{{port}}/bids/6?auctionId=hello
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Error is 'Missing or invalid auctionId'", function() {
+        client.assert(response.body.error === "Missing or invalid auctionId", "Expected 'Missing or invalid auctionId', got " + response.body.error);
+    });
+%}
+
+### Delete a bid not found for the specified auctionId
+# @name deleteBidNotFound
+DELETE {{protocol}}{{host}}:{{port}}/bids/99?auctionId=2
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Status Code is 404", function() {
+        client.assert(response.status === 404, "Expected 404, got " + response.status);
+    });
+
+    client.test("Error is 'Bid not found for the specified auctionId'", function() {
+        client.assert(response.body.error === "Bid not found for the specified auctionId", "Expected 'Bid not found for the specified auctionId', got " + response.body.error);
+    });
+%}
+
+### Unauthorized attempt to delete a bid
+# @name deleteBidUnauthorized
+DELETE {{protocol}}{{host}}:{{port}}/bids/8?auctionId=4
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 401", function() {
+        client.assert(response.status === 401, "Expected 403, got " + response.status);
+    });
+
+    client.test("Error is 'Unauthorized: No token provided'", function() {
+        client.assert(response.body.error === "Unauthorized: No token provided", "Expected 'Unauthorized: No token provided', got " + response.body.error);
     });
 %}

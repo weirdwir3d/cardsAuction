@@ -14,7 +14,7 @@
     //convert auction endDateTime to Date obj
     const parsedEndDateTime = helper.parseDateTime(auction.endDateTime);
     // const endDateTime = new Date(auction.endDateTime);
-    console.log(parsedEndDateTime, "for auctionId:", auction.id);
+    // console.log(parsedEndDateTime, "for auctionId:", auction.id);
 
     const now = new Date();
   

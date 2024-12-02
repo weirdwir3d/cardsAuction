@@ -22,8 +22,10 @@
   let showAddCardModal = false;
   //alert
   let alertMessage;
-  let isAlertVisible = false;
+  let showAlert = false;
   let alertType = "";
+
+  // console.log('showAlert aaaaaaaaaa:', showAlert);
 
   tokenStore.subscribe((value) => {
     token = value.token;
@@ -34,6 +36,7 @@
   });
 
   async function fetchCards() {
+    // console.log('showAlert or imma lose it:', showAlert);
     const response = await API.fetchCardsAPI();
     const data = await response.json();
 
@@ -50,7 +53,8 @@
   async function addAuction() {
     showAlert = false;
 
-    const parsedBasePrice = parseFloat(basePrice);
+    const parsedBasePrice = Number(basePrice);
+    // console.log('baseprice', basePrice);
 
     if (parsedBasePrice <= 0) {
       alertMessage = "Base price cannot be zero or less";
@@ -59,9 +63,14 @@
       return;
     }
 
-    console.log("enddate and endTime:", endDate, endTime);
+    // console.log("enddate and endTime:", endDate, endTime);
+    //problem is when a user picks a date with the calendar, endDate is in this format: yyy-mm-dd
+    // reformat to dd-mm-yyyy
+  const [year, month, day] = endDate.split("-");
+  const formattedEndDate = `${day}-${month}-${year}`;
+  const reformattedEndDateTime = `${formattedEndDate} ${endTime}:00`;
 
-    if (!utils.isValidDateTime(endDate + " " + endTime + ":00")) {
+    if (!helper.isValidDateTime(reformattedEndDateTime)) {
       alertMessage = "Select end date and time";
       alertType = "error";
       showAlert = true;
@@ -71,7 +80,7 @@
     const endDateTimeString = `${endDate}T${endTime}`;
     const endDateTime = new Date(endDateTimeString);
     const formattedEndDateTime = helper.formatDate(endDateTime);
-    console.log("formatted endTime:", formattedEndDateTime);
+    // console.log("formatted endTime:", formattedEndDateTime);
     const currentDateTime = helper.formatDate(new Date());
 
     const auctionData = {
@@ -85,7 +94,7 @@
     const response = await API.addAuctionAPI(auctionData);
     const data = await response.json();
 
-    console.log("data:", data);
+    // console.log("data:", data);
 
     if (response.ok) {
       alertMessage = "Auction added successfully!";
@@ -118,7 +127,7 @@
     class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4 sm:p-6 md:p-8"
   >
     <!-- Alert -->
-    <Alert message={alertMessage} type={alertType} isVisible={isAlertVisible} />
+    <Alert message={alertMessage} type={alertType} isVisible={showAlert} />
 
     <div
       class="bg-white rounded-lg p-6 md:p-8 max-w-full w-full sm:w-[400px] md:w-[500px] lg:w-[600px] shadow-lg"

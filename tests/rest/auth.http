@@ -59,8 +59,8 @@ Content-Type: application/json
 }
 
 > {%
-    client.test("Status Code is 401", function() {
-        client.assert(response.status === 401, "Expected 401, got " + response.status);
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 401, got " + response.status);
     });
 
     client.test("Message is 'Passwords don't match'", function() {

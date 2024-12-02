@@ -36,7 +36,6 @@
   });
 
   onMount(async () => {
-    console.log("hi");
     cardId = window.location.pathname.split("/").pop();
     await fetchCardDetails();
   });
@@ -45,7 +44,7 @@
     const response = await API.fetchCardDetailsAPI(cardId);
     const data = await response.json();
 
-    console.log("response:", data);
+    // console.log("response:", data);
 
     if (response.ok) {
       card = data.card;
@@ -98,6 +97,64 @@
 
   async function saveChanges(updatedCardData) {
     // console.log('updated Data: ', updatedCardData.detail)
+    // const { name, description, type, rarity, imageUrl } = updatedCardData.detail
+
+    if (updatedCardData.detail.name.length < 4) {
+      alertMessage = "Card name is too short";
+      alertType = "error";
+      showAlert = true;
+      return;
+    }
+
+    if (updatedCardData.detail.description.length < 10) {
+      alertMessage = "Description is too short";
+      alertType = "error";
+      showAlert = true;
+      return;
+    }
+
+    if (!["monster", "trap", "spell"].includes(updatedCardData.detail.type)) {
+      alertMessage = 'Card type has to be either "monster", "trap" or "spell".';
+      alertType = "error";
+      showAlert = true;
+      return;
+    }
+
+    if (
+      !["rare", "super rare", "ultra rare", "unique"].includes(
+        updatedCardData.detail.rarity
+      )
+    ) {
+      alertMessage =
+        'Card rarity has to be either "rare", "super rare", "ultra rare" or "unique"';
+      alertType = "error";
+      showAlert = true;
+      return;
+    }
+
+    if (
+      updatedCardData.detail.auctionId !== undefined &&
+      (typeof updatedCardData.detail.auctionId !== "number" ||
+        updatedCardData.detail.auctionId < -1)
+    ) {
+      alertMessage = "Auction ID must be a non-negative integer or -1";
+      alertType = "error";
+      showAlert = true;
+      return;
+    }
+
+    if (
+      !updatedCardData.detail.imageUrl.startsWith("http") ||
+      (!updatedCardData.detail.imageUrl.endsWith(".jpg") &&
+        !updatedCardData.detail.imageUrl.endsWith(".png"))
+    ) {
+      alertMessage =
+        'Please provide a valid image link (starting with "http" and ending with ".jpg" or ".png").';
+      alertType = "error";
+      showAlert = true;
+      return;
+    }
+
     const response = await API.saveCardChangesAPI(
       cardId,
       updatedCardData.detail,

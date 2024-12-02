@@ -5,7 +5,6 @@
   import { logoutAPI } from "../lib/api";
   import logo from "../assets/Yugioh-logo.svg";
   import Alert from "./Alert.svelte";
-  import * as helper from '../lib/helper'
 
   export let active;
   let isLoggedIn = false;
@@ -30,14 +29,14 @@
     if (response.ok) {
       alertMessage = "Logged out successfully!";
       alertType = "success";
-      isVisible = true;
+      isAlertVisible = true;
 
       tokenStore.set({ token: null });
-      console.log('token store:', $tokenStore)
+      // console.log('token store:', $tokenStore)
     } else {
       alertMessage = data.error;
       alertType = "error";
-      isVisible = true;
+      isAlertVisible = true;
     }
 
     setTimeout(() => {

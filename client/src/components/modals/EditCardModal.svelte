@@ -40,6 +40,16 @@
       </select>
     </div>
 
+    <div class="mb-4">
+      <label class="block text-sm font-semibold">Image URL</label>
+      <input
+        bind:value={updatedCard.imageUrl}
+        class="w-full p-2 border rounded"
+        type="text"
+        placeholder="Enter image URL"
+      />
+    </div>
+
     <div class="flex justify-end space-x-4">
       <Button label="Cancel" color="gray" onClick={() => dispatch("cancel")} />
       <Button

@@ -327,5 +327,5 @@ export async function logoutAPI() {
 }
 
 export async function fetchCard() {
-    console.log('eheh')
+    // console.log('eheh')
 }

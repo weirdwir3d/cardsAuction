@@ -41,7 +41,7 @@
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
     userId = getUserId();
-    console.log("userId:", userId);
+    // console.log("userId:", userId);
   })();
 
   onMount(async () => {
@@ -99,14 +99,14 @@
       alertType = "error";
       showAlert = true;
     }
-    console.log(bids.map((bid) => bid.id));
+    // console.log(bids.map((bid) => bid.id));
   }
 
   async function deleteBid(auctionId, bidId) {
-    console.log("bidId is:", bidId, "auctionId is", auctionId);
+    // console.log("bidId is:", bidId, "auctionId is", auctionId);
     const response = await API.deleteBidAPI(auctionId, bidId, token);
     const data = await response.json();
-    console.log("delete data:", data);
+    // console.log("delete data:", data);
 
     if (response.ok) {
       //i could or should fetch bids again after deleting one (instead of filtering), but there are already so many network calls in this file
@@ -185,6 +185,8 @@
       return;
     }
 
+    // console.log('bidAmount', bidAmount)
+
     if (bidAmount <= 0) {
       // console.log("is not valid");
       showAlert = true;
@@ -251,7 +253,7 @@
     //convert auction endDateTime to Date obj
     const parsedEndDateTime = helper.parseDateTime(auction.endDateTime);
     // const endDateTime = new Date(auction.endDateTime);
-    console.log(parsedEndDateTime, "for auctionId:", auction.id);
+    // console.log(parsedEndDateTime, "for auctionId:", auction.id);
 
     const now = new Date();
   
