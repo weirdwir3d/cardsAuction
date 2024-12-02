@@ -44,8 +44,6 @@
     const response = await API.fetchCardDetailsAPI(cardId);
     const data = await response.json();
 
-    // console.log("response:", data);
-
     if (response.ok) {
       card = data.card;
       updatedCard = { ...card };
@@ -96,9 +94,6 @@
   }
 
   async function saveChanges(updatedCardData) {
-    // console.log('updated Data: ', updatedCardData.detail)
-    // const { name, description, type, rarity, imageUrl } = updatedCardData.detail
-
     if (updatedCardData.detail.name.length < 4) {
       alertMessage = "Card name is too short";
       alertType = "error";
@@ -161,8 +156,6 @@
       token
     );
     const data = await response.json();
-
-    console.log("data:", data);
 
     if (response.ok) {
       alertMessage = "Card edited successfully!";

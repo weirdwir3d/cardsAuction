@@ -42,9 +42,8 @@
 
   async function addCard() {
     isAlertVisible = false;
-    // console.log('card name:', name)
+
     if (name.length < 4) {
-      // console.log('too short', name)
       alertMessage = "Card name is too short";
       alertType = "error";
       isAlertVisible = true;
@@ -52,7 +51,6 @@
     }
 
     if (description.length < 10) {
-      // console.log('too short')
       alertMessage = "Description is too short";
       alertType = "error";
       isAlertVisible = true;
@@ -99,8 +97,6 @@
 
     let sanitizedName = escapeRegExp(name);
     let sanitizedDescription = escapeRegExp(description);
-
-    // console.log(sanitizedName, sanitizedDescription)
 
     const response = await addCardAPI({
       name: sanitizedName,

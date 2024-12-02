@@ -21,7 +21,7 @@
   tokenStore.subscribe((value) => {
     token = value.token;
     // if (token) {
-    //   console.log('token is available');
+    //   ('token is available');
     // }
   });
 

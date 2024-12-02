@@ -17,7 +17,6 @@
   let alertType;
 
   tokenStore.subscribe((token) => {
-    // console.log('token from navbar:', token);
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
   });
@@ -32,7 +31,6 @@
       isAlertVisible = true;
 
       tokenStore.set({ token: null });
-      // console.log('token store:', $tokenStore)
     } else {
       alertMessage = data.error;
       alertType = "error";

@@ -46,7 +46,6 @@
         searchQuery
       );
       let data = await response.json();
-      // console.log("data:", data);
 
       if (response.ok) {
         auctions = data.auctions;
@@ -61,8 +60,6 @@
       let response = await fetchCardsAPI();
       let data = await response.json();
 
-      // console.log('cards data:', data)
-
       if (response.ok) {
         cards = data.cards;
       } else {
@@ -70,7 +67,6 @@
       alertType = "error";
       showAlert = true;
     } 
-      // console.log("Received cards:", cards);
   }
 
   //auctions (cards) have to be retrieved dynamically at any searchbar change
@@ -84,8 +80,6 @@
     auctions = auctions.filter((auction) =>
       filteredCards.some((card) => card.auctionId === auction.id)
     );
-
-    // console.log("filtered auctions:", auctions);
   }
 
   async function handleApplyFilters(event) {
@@ -98,12 +92,6 @@
 
   function getCardById(cardId) {
     let matchedCard = cards.find((card) => card.id === cardId);
-
-    // if (matchedCard) {
-    //   console.log("matched card:", matchedCard);
-    // } else {
-    //   console.log("No card found for cardId:", cardId);
-    // }
 
     // if no card matching auction is found, return placeholder
     return (

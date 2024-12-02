@@ -41,28 +41,21 @@
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
     userId = getUserId();
-    // console.log("userId:", userId);
   })();
 
   onMount(async () => {
     auctionId = window.location.pathname.split("/").pop();
-    try {
-      await fetchAuctionDetails();
-      await fetchCardDetails();
-      await fetchUsers();
-      await fetchBids();
-    } catch (error) {
-      console.error("error fetching data:", error);
-    }
+    await fetchAuctionDetails();
+    await fetchCardDetails();
+    await fetchUsers();
+    await fetchBids();
   });
 
   async function fetchAuctionDetails() {
     const response = await API.fetchAuctionDetailsAPI(auctionId);
-    // console.log('response:', response)
     const data = await response.json();
 
     if (response.ok) {
-      // console.log('data:', data)
       auction = data.auction;
       const parts = auction.endDateTime.split(" ");
       const [day, month, year] = parts[0].split("-");
@@ -99,14 +92,11 @@
       alertType = "error";
       showAlert = true;
     }
-    // console.log(bids.map((bid) => bid.id));
   }
 
   async function deleteBid(auctionId, bidId) {
-    // console.log("bidId is:", bidId, "auctionId is", auctionId);
     const response = await API.deleteBidAPI(auctionId, bidId, token);
     const data = await response.json();
-    // console.log("delete data:", data);
 
     if (response.ok) {
       //i could or should fetch bids again after deleting one (instead of filtering), but there are already so many network calls in this file
@@ -150,7 +140,6 @@
       token
     );
     const data = await response.json();
-    // console.log("data:", data);
 
     if (response.ok) {
       auction = data.auction;
@@ -176,19 +165,15 @@
 
   async function handleConfirmBid(bidAmount) {
     showAlert = false;
-    // console.log("being handled");
-    // console.log("bid amount:", bidAmount);
+
     if (hasAuctionEnded()) {
-            showAlert = true;
+      showAlert = true;
       alertMessage = "You cannot place bids after the auction has ended";
       alertType = "error";
       return;
     }
 
-    // console.log('bidAmount', bidAmount)
-
     if (bidAmount <= 0) {
-      // console.log("is not valid");
       showAlert = true;
       alertMessage = "Bid amount cannot be zero or less";
       alertType = "error";
@@ -204,7 +189,6 @@
     };
     const response = await API.addBidAPI(newBid);
     const data = await response.json();
-    // console.log("data:", data);
 
     if (response.ok) {
       await fetchBids();
@@ -249,14 +233,11 @@
     }
   }
 
-    function hasAuctionEnded() {
+  function hasAuctionEnded() {
     //convert auction endDateTime to Date obj
     const parsedEndDateTime = helper.parseDateTime(auction.endDateTime);
-    // const endDateTime = new Date(auction.endDateTime);
-    // console.log(parsedEndDateTime, "for auctionId:", auction.id);
-
     const now = new Date();
-  
+
     return now > parsedEndDateTime;
   }
 </script>

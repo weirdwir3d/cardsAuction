@@ -1,8 +1,7 @@
 <script>
-  import { onMount } from 'svelte';
-  import { tokenStore } from '../lib/TokenStore';
+  import { onMount } from "svelte";
+  import { tokenStore } from "../lib/TokenStore";
   import { checkLoggedIn, checkIsAdmin } from "../lib/middleware";
-  import * as API from '../lib/api.js';
 
   export let auctionId;
   export let endDateTime;
@@ -17,11 +16,10 @@
   let interval;
   let auctionEnded = false;
 
-  tokenStore.subscribe(value => {
+  tokenStore.subscribe((value) => {
     token = value.token;
     isLoggedIn = checkLoggedIn(token);
     isAdmin = isLoggedIn && checkIsAdmin(token);
-    // console.log('token dio cane:', token)
   })();
 
   function calculateTimeLeft() {
@@ -29,7 +27,6 @@
     const end = new Date(endDateTime).getTime();
 
     if (isNaN(end)) {
-      // console.error("invalid date format for endDateTime:", endDateTime);
       clearInterval(interval);
       return;
     }
@@ -55,7 +52,6 @@
 
   onMount(() => {
     if (!endDateTime) {
-      console.error("no endDateTime provided to Countdown component");
       return;
     }
     calculateTimeLeft();

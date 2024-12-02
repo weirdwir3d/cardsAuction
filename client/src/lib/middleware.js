@@ -5,12 +5,7 @@ let decodedToken = null;
 
 tokenStore.subscribe(value => {
     if (value.token) {
-        try {
-            decodedToken = jwtDecode(value.token);
-            // console.log('decoded token:', decodedToken);
-        } catch (error) {
-            console.error('error decoding token:', error);
-        }
+        decodedToken = jwtDecode(value.token);
     } else {
         decodedToken = null;
     }

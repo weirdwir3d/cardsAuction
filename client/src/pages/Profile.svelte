@@ -22,11 +22,8 @@
       //load bids is userId !== null (0 is the userId for admin)
       if (userId || userId === 0) {
         await loadBids();
-      } else {
-        throw new Error("user id is not available");
       }
     } catch (error) {
-      console.error("Error getting usre data:", error);
       alertMessage = "An error occurred while retrieving user info";
       alertType = "error";
       isAlertVisible = true;
@@ -36,7 +33,6 @@
   async function loadBids() {
     const response = await API.fetchBidsAPI({ userId });
     const data = await response.json();
-    // console.log("fetchBidsAPI:", data.bids);
 
     const latestBids = {};
 
@@ -51,11 +47,8 @@
           latestBids[auctionId] = bid; //save current bid as the highest
         }
       }
-      //   console.log("latest bids:", latestBids);
 
       const arrayBids = Object.values(latestBids); //turn to array
-
-      //   console.log("unique bids:", arrayBids);
 
       //fetch all auctions and map them to cards
       const auctionsResponse = await API.fetchAuctionsAPI("All", "All", "", "");
@@ -67,8 +60,6 @@
         isAlertVisible = true;
       }
 
-      // console.log("fetched auctions data:", auctionsData);
-
       const bidsWithCardData = [];
 
       for (const bid of arrayBids) {
@@ -76,12 +67,7 @@
           (auction) => auction.id === bid.auctionId
         );
 
-        // console.log('auction:', auction)
-
         if (auction && auction.cardId != null) {
-          // console.log("processing bid:", bid);
-          // console.log("Linked auction info:", auction);
-
           const response = await API.fetchCardDetailsAPI(auction.cardId);
           const data = await response.json();
 
@@ -93,22 +79,15 @@
               cardImageUrl: card.imageUrl,
             });
           } else {
-            // console.error(
-            //   `failed to fetch card details for cardId: ${auctionInfo.cardId}`
-            // );
             alertMessage = "An error occurred while retrieving cards data";
             alertType = "error";
             isAlertVisible = true;
           }
         }
       }
-
-      // console.log("Bids with Card Data:", bidsWithCardData);
-
       bids = bidsWithCardData;
-      //   console.log("Bids:", bids);
+
     } else {
-      console.error("Error fetching bids:", data.error);
       alertMessage = data.error;
       alertType = "error";
       isAlertVisible = true;

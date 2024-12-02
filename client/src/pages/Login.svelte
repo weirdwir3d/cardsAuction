@@ -29,12 +29,8 @@
     });
     const data = await response.json();
 
-    // console.log("response:", response);
-    // console.log("data:", data);
-
     if (response.ok) {
       tokenStore.set({ token: data.token });
-      console.log("setting token in store:", $tokenStore);
 
       tokenStore.subscribe((value) => {
         if (value.token) {

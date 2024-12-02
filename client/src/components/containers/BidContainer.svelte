@@ -1,6 +1,5 @@
 <script>
   export let bid;
-  //   console.log("one bid:", bid);
 
   let statusSymbol = "Auction still running"; // default, in case hasWon == null
   if (bid.hasWon === true) {

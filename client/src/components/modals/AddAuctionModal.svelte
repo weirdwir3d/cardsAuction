@@ -25,8 +25,6 @@
   let showAlert = false;
   let alertType = "";
 
-  // console.log('showAlert aaaaaaaaaa:', showAlert);
-
   tokenStore.subscribe((value) => {
     token = value.token;
   });
@@ -36,7 +34,6 @@
   });
 
   async function fetchCards() {
-    // console.log('showAlert or imma lose it:', showAlert);
     const response = await API.fetchCardsAPI();
     const data = await response.json();
 
@@ -54,7 +51,6 @@
     showAlert = false;
 
     const parsedBasePrice = Number(basePrice);
-    // console.log('baseprice', basePrice);
 
     if (parsedBasePrice <= 0) {
       alertMessage = "Base price cannot be zero or less";
@@ -63,7 +59,6 @@
       return;
     }
 
-    // console.log("enddate and endTime:", endDate, endTime);
     //problem is when a user picks a date with the calendar, endDate is in this format: yyy-mm-dd
     // reformat to dd-mm-yyyy
   const [year, month, day] = endDate.split("-");
@@ -80,7 +75,6 @@
     const endDateTimeString = `${endDate}T${endTime}`;
     const endDateTime = new Date(endDateTimeString);
     const formattedEndDateTime = helper.formatDate(endDateTime);
-    // console.log("formatted endTime:", formattedEndDateTime);
     const currentDateTime = helper.formatDate(new Date());
 
     const auctionData = {
@@ -93,8 +87,6 @@
 
     const response = await API.addAuctionAPI(auctionData);
     const data = await response.json();
-
-    // console.log("data:", data);
 
     if (response.ok) {
       alertMessage = "Auction added successfully!";

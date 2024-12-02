@@ -36,4 +36,3 @@ All API fetch calls to the backend are in this file.
 ## Other notes
 - I included the .env file in the submission. I know it should normally be kept private, but the requirements only mention to not include the node_modules, it doesn't say anything ebout .env files.
 - To change environment without causing errors, edit the FRONTEND_PORT to the desired port number. 4173 is for production, 5173 is for development
-- I left a lot of console.log code on purpose so that you can easily debug or check how the code works in more detail

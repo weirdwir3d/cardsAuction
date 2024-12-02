@@ -12,8 +12,6 @@ export async function fetchAuctionsAPI(selectedRarity, selectedType, maxPrice, s
         url += `${url.includes("?") ? "&" : "?"}search=${searchQuery}`;
     }
 
-    // console.log('fetching auctions with url:', url);
-
     try {
         const response = await fetch(url);
 
@@ -32,8 +30,6 @@ export async function fetchCardsAPI() {
                 "Content-Type": "application/json",
             },
         });
-
-        // console.log('response:', response)
 
         return response;
 
@@ -138,7 +134,6 @@ export async function fetchUsersAPI() {
 }
 
 export async function saveAuctionChangesAPI(auctionId, updatedAuction, token) {
-    // console.log("updated auctionb frontend before sending:", updatedAuction)
     try {
         const response = await fetch(`http://localhost:3000/auctions/${auctionId}`, {
             method: 'PUT',
@@ -292,7 +287,6 @@ export async function loginAPI({ email, password }) {
 }
 
 export async function registerUserAPI({ username, email, password, confirmPassword }) {
-    // console.log('request:', username, email, password, confirmPassword)
     try {
         const response = await fetch("http://localhost:3000/auth/register", {
             method: "POST",
@@ -310,7 +304,6 @@ export async function registerUserAPI({ username, email, password, confirmPasswo
 }
 
 export async function logoutAPI() {
-    // console.log('request:', username, email, password, confirmPassword)
     try {
         const response = await fetch("http://localhost:3000/auth/logout", {
             method: "POST",
@@ -324,8 +317,4 @@ export async function logoutAPI() {
     } catch (error) {
         throw new Error("Unexpected error occurred, please try again later");
     }
-}
-
-export async function fetchCard() {
-    // console.log('eheh')
 }

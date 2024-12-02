@@ -21,8 +21,6 @@
       const response = await fetchCardsAPI();
       const data = await response.json();
 
-      // console.log('cards data:', data)
-
       if (response.ok) {
         cards = data.cards;
       } else {
@@ -30,7 +28,6 @@
       alertType = "error";
       showAlert = true;
     } 
-      // console.log("Received cards:", cards);
   }
 </script>
 
