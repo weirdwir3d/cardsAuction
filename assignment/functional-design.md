@@ -38,8 +38,8 @@ The requirements for this project have been split into functional and non-functi
   - [x] When will the auction end
 - [x] It should be possible to search the list of auctions
 - [x] It should not be possible to remove or edit bids once they are made
-- [ ] Input is validated client side before sending it to the server
-- [ ] The server must perform server side validation
+- [x] Input is validated client side before sending it to the server
+- [x] The server must perform server side validation
 - [x] The list of auctions should be filterable on at least three attributes that are logical for the chosen service or product. I.e.:
   - [x] all trips in Twente 
   - [x] all yellow sneakers
@@ -47,16 +47,16 @@ The requirements for this project have been split into functional and non-functi
 
 ### Non functional
 
-- [ ] The API is expected to return JSON, accompanied by an appropriate [HTTP status code](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
-- [ ] The REST API has to be designed using the most important REST principles:
-  - [ ] HTTP request methods are used as intended. A GET request may never update a resource.
-  - [ ] URI paths represent resources or a set of resources, not actions. POST /addProduct/ is not acceptable. 
-  - [ ] Query parameters are meant for querying, so it should limit the results from a GET request. I.e. they can be used to filter certain values, sort or limit result sets by requesting only the first 10 results.
-- [ ] All response bodies (including errors) must return valid JSON
-- [ ] Correct HTTP status codes have to be returned for every request.
+- [x] The API is expected to return JSON, accompanied by an appropriate [HTTP status code](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
+- [x] The REST API has to be designed using the most important REST principles:
+  - [x] HTTP request methods are used as intended. A GET request may never update a resource.
+  - [x] URI paths represent resources or a set of resources, not actions. POST /addProduct/ is not acceptable. 
+  - [x] Query parameters are meant for querying, so it should limit the results from a GET request. I.e. they can be used to filter certain values, sort or limit result sets by requesting only the first 10 results.
+- [x] All response bodies (including errors) must return valid JSON
+- [x] Correct HTTP status codes have to be returned for every request.
 - [x] Both the front-end and backend provide descriptive error messages: 'You already placed a bid', 'Bid already exists', 'User X not allowed to do ...'
 - [x] Both front-end and backend code is logically separated. Specifically for the Express routes (use multiple files)
-- [ ] Endpoints have meaningful good and bad-weather tests
+- [x] Endpoints have meaningful good and bad-weather tests
 - [x] After registration the user should be logged in. They should not have to log in again before being able to place a bid
 - [x] The front-end is build using Svelte
 - [x] The backend is built using Node js with Express
@@ -64,13 +64,13 @@ The requirements for this project have been split into functional and non-functi
 
 ## Userstories
 
-- [ ] As an administrator I want to be able to add, remove and modify auctions, so I can maintain the website
+- [x] As an administrator I want to be able to add, remove and modify auctions, so I can maintain the website
 - [x] As a user I want to be able to register (wth email-address and password), so I can use the website
 - [x] As an administrator I want to be able to log in, so I can maintain the auction site.
 - [x] As a user I want to be able to log in, so I can place bids
 - [x] As a user I want to be able to place a bid on an auction, so I have a chance of winning the item
 - [x] As a user I want to be able to remove my bid, so I can correct any mistakes 
-- [ ] As I want to see a list of all auctions I won, so I can see how much I have to pay
+- [x] As I want to see a list of all auctions I won, so I can see how much I have to pay
 - [x] As a user I want to see a countdown of the number of days, hours, minutes and seconds I have left to bid
 
 ## Wireframes

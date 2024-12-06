@@ -2,17 +2,17 @@
     {
         "id": 0,
         "userId": 2,
-        "auctionId": 4,
+        "auctionId": 0,
         "bidAmount": 350,
-        "hasWon": "false",
+        "hasWon": false,
         "publishedDateTime": "07-09-2024 12:03:22"
     },
     {
         "id": 1,
         "userId": 1,
-        "auctionId": 4,
+        "auctionId": 0,
         "bidAmount": 370,
-        "hasWon": "true",
+        "hasWon": false,
         "publishedDateTime": "08-09-2024 14:15:45"
     },
     {
@@ -20,151 +20,127 @@
         "userId": 3,
         "auctionId": 0,
         "bidAmount": 500,
-        "hasWon": "false",
-        "publishedDateTime": "04-09-2024 10:25:30"
+        "hasWon": false,
+        "publishedDateTime": "05-10-2024 10:25:30"
     },
     {
         "id": 3,
         "userId": 4,
         "auctionId": 0,
         "bidAmount": 550,
-        "hasWon": "true",
-        "publishedDateTime": "05-09-2024 08:30:00"
+        "hasWon": false,
+        "publishedDateTime": "10-10-2024 08:30:00"
     },
-    {
+        {
         "id": 4,
-        "userId": 2,
-        "auctionId": 1,
-        "bidAmount": 290,
-        "hasWon": "false",
-        "publishedDateTime": "06-09-2024 11:12:22"
+        "userId": 1,
+        "auctionId": 0,
+        "bidAmount": 600,
+        "hasWon": true,
+        "publishedDateTime": "19-10-2024 08:30:00"
     },
     {
         "id": 5,
-        "userId": 1,
-        "auctionId": 1,
-        "bidAmount": 310,
-        "hasWon": "true",
-        "publishedDateTime": "07-09-2024 09:45:10"
+        "userId": 2,
+        "auctionId": 7,
+        "bidAmount": 290,
+        "hasWon": false,
+        "publishedDateTime": "15-10-2024 11:12:22"
     },
     {
         "id": 6,
-        "userId": 0,
-        "auctionId": 2,
+        "userId": 1,
+        "auctionId": 7,
         "bidAmount": 300,
-        "hasWon": "false",
-        "publishedDateTime": "20-09-2024 09:10:15"
+        "hasWon": false,
+        "publishedDateTime": "16-10-2024 09:10:15"
     },
-    {
+        {
         "id": 7,
-        "userId": 3,
-        "auctionId": 2,
-        "bidAmount": 350,
-        "hasWon": "true",
-        "publishedDateTime": "21-09-2024 11:15:00"
+        "userId": 2,
+        "auctionId": 7,
+        "bidAmount": 310,
+        "hasWon": false,
+        "publishedDateTime": "20-10-2024 09:45:10"
     },
     {
         "id": 8,
         "userId": 4,
-        "auctionId": 3,
-        "bidAmount": 700,
-        "hasWon": "true",
-        "publishedDateTime": "05-09-2024 12:30:00"
+        "auctionId": 7,
+        "bidAmount": 350,
+        "hasWon": false,
+        "publishedDateTime": "21-10-2024 11:15:00"
     },
-    {
+        {
         "id": 9,
-        "userId": 2,
-        "auctionId": 3,
-        "bidAmount": 650,
-        "hasWon": "false",
-        "publishedDateTime": "04-09-2024 14:00:00"
+        "userId": 1,
+        "auctionId": 7,
+        "bidAmount": 400,
+        "hasWon": false,
+        "publishedDateTime": "22-10-2024 09:10:15"
     },
     {
         "id": 10,
-        "userId": 1,
-        "auctionId": 5,
-        "bidAmount": 580,
-        "hasWon": "false",
-        "publishedDateTime": "12-10-2024 09:15:30"
+        "userId": 4,
+        "auctionId": 7,
+        "bidAmount": 410,
+        "hasWon": false,
+        "publishedDateTime": "23-10-2024 11:15:00"
     },
-    {
+        {
         "id": 11,
-        "userId": 3,
-        "auctionId": 5,
-        "bidAmount": 600,
-        "hasWon": "true",
-        "publishedDateTime": "13-10-2024 10:00:00"
+        "userId": 1,
+        "auctionId": 7,
+        "bidAmount": 500,
+        "hasWon": false,
+        "publishedDateTime": "27-10-2024 22:10:15"
     },
     {
         "id": 12,
-        "userId": 0,
-        "auctionId": 6,
-        "bidAmount": 750,
-        "hasWon": "false",
-        "publishedDateTime": "15-10-2024 14:12:30"
+        "userId": 4,
+        "auctionId": 7,
+        "bidAmount": 600,
+        "hasWon": false,
+        "publishedDateTime": "15-11-2024 11:15:00"
     },
     {
         "id": 13,
-        "userId": 2,
-        "auctionId": 6,
-        "bidAmount": 800,
-        "hasWon": "true",
-        "publishedDateTime": "14-10-2024 11:00:00"
-    },
-    {
-        "id": 14,
-        "userId": 1,
+        "userId": 3,
         "auctionId": 7,
-        "bidAmount": 320,
-        "hasWon": "false",
-        "publishedDateTime": "12-09-2024 08:30:30"
+        "bidAmount": 700,
+        "hasWon": true,
+        "publishedDateTime": "22-11-2024 19:22:30"
     },
     {
         "id": 15,
-        "userId": 4,
-        "auctionId": 7,
-        "bidAmount": 340,
-        "hasWon": "true",
-        "publishedDateTime": "13-09-2024 09:45:00"
+        "userId": 3,
+        "auctionId": 1,
+        "bidAmount": 580,
+        "hasWon": null,
+        "publishedDateTime": "12-10-2024 09:15:30"
     },
     {
         "id": 16,
-        "userId": 1,
-        "auctionId": 7,
-        "bidAmount": 360,
-        "hasWon": "false",
-        "publishedDateTime": "14-09-2024 10:00:00"
+        "userId": 3,
+        "auctionId": 2,
+        "bidAmount": 600,
+        "hasWon": null,
+        "publishedDateTime": "03-11-2024 10:00:00"
     },
     {
         "id": 17,
-        "userId": 2,
-        "auctionId": 8,
-        "bidAmount": 450,
-        "hasWon": "true",
-        "publishedDateTime": "15-09-2024 13:30:00"
+        "userId": 0,
+        "auctionId": 2,
+        "bidAmount": 750,
+        "hasWon": null,
+        "publishedDateTime": "05-11-2024 14:12:30"
     },
     {
         "id": 18,
-        "userId": 3,
-        "auctionId": 8,
-        "bidAmount": 470,
+        "userId": 2,
+        "auctionId": 2,
+        "bidAmount": 800,
         "hasWon": null,
-        "publishedDateTime": "16-09-2024 09:15:00"
-    },
-    {
-        "id": 19,
-        "userId": 1,
-        "auctionId": 8,
-        "bidAmount": 490,
-        "hasWon": null,
-        "publishedDateTime": "17-09-2024 08:30:00"
-    },
-    {
-        "id": 20,
-        "userId": 4,
-        "auctionId": 11,
-        "bidAmount": 380,
-        "hasWon": null,
-        "publishedDateTime": "12-10-2024 10:00:00"
+        "publishedDateTime": "06-11-2024 11:00:00"
     }
 ]

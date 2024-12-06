@@ -1,135 +1,149 @@
 <script>
-    import TextInput from "../lib/TextInput.svelte";
-    import EmailInput from "../lib/EmailInput.svelte";
-    import PasswordInput from "../lib/PasswordInput.svelte";
-    import Button from "../lib/Button.svelte";
-    import Alert from "../lib/Alert.svelte"; 
-    import WelcomeSection from "../lib/WelcomeSection.svelte";
-    import { tokenStore } from '../TokenStore'; // Import the tokenStore
+  import { tokenStore } from "../lib/TokenStore";
+  import { registerUserAPI } from "../lib/api";
+  import WelcomeSection from "../components/WelcomeSection.svelte";
+  import Button from "../components/buttons/Button.svelte";
+  import Alert from "../components/Alert.svelte";
+  import { isValidEmail } from "../lib/helper";
 
-    let username = "";
-    let email = "";
-    let password = "";
-    let confirmPassword = "";
+  let isLoggedIn = false;
+  let isAdmin = false;
 
-    let alertMessage = "";
-    let alertType = "error";
-    let isAlertVisible = false;
-    let isLoggedIn = false;
-    let isAdmin = false;
+  let username = "";
+  let email = "";
+  let password = "";
+  let confirmPassword = "";
+  //alert
+  let alertMessage = "";
+  let alertType = "error";
+  let showAlert = false;
 
-    // Reset alert and login state
-    function resetAlert() {
-        alertMessage = "";
-        alertType = "error";
-        isAlertVisible = false;
+  async function handleRegister(event) {
+    event.preventDefault();
+    alertMessage = "";
+    alertType = "error";
+    showAlert = false;
+
+    if (username.length < 4) {
+      alertMessage = "Username must be at least 4 characters long";
+      alertType = "error";
+      showAlert = true;
+      return;
     }
 
-    // Helper function to validate email format
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+    if (!isValidEmail(email)) {
+      alertMessage = "Please enter a valid email address";
+      alertType = "error";
+      showAlert = true;
+      return;
     }
 
-    async function handleRegister(event) {
-        event.preventDefault();
-
-        // Frontend validation with console logs
-        console.log('Starting registration process');
-
-        resetAlert();
-
-        if (username.length < 4) {
-            console.log('Username validation failed');
-            alertMessage = "Username must be at least 4 characters long.";
-            alertType = "error";
-            isAlertVisible = true;
-            return;
-        }
-
-        if (!isValidEmail(email)) {
-            console.log('Email validation failed');
-            alertMessage = "Please enter a valid email address.";
-            alertType = "error";
-            isAlertVisible = true;
-            return;
-        }
-
-        if (!password) {
-            console.log('Password is empty');
-            alertMessage = "Password cannot be empty.";
-            alertType = "error";
-            isAlertVisible = true;
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            console.log('Passwords do not match');
-            alertMessage = "Passwords don't match!";
-            alertType = "error";
-            isAlertVisible = true;
-            return;
-        }
-
-        // Proceed with registration if validations pass
-        console.log('All validations passed, sending registration request');
-        const response = await fetch("http://localhost:3000/auth/register", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, email, password, confirmPassword }),
-        });
-
-        const data = await response.json();
-        console.log('Received response from server:', data);
-
-        if (response.ok) {
-            console.log('Registration successful, updating token store');
-            tokenStore.set({ token: data.token }); // Update the tokenStore
-
-            // Immediately check the stored token
-            tokenStore.subscribe(value => {
-                console.log('Token stored in tokenStore:', value.token); // Log the token
-                
-                if (value.token) {
-                    // Decode the token to get the username and admin status
-                    const decodedToken = JSON.parse(atob(value.token.split('.')[1]));
-                    username = decodedToken.username || "User";
-                    isAdmin = decodedToken.isAdmin || false;
-
-                    // Set isLoggedIn to true after successful registration
-                    isLoggedIn = true;
-                }
-            })();
-
-            alertMessage = "Registration successful!";
-            alertType = "success";
-            isAlertVisible = true;
-        }
+    if (!password) {
+      alertMessage = "Password cannot be empty";
+      alertType = "error";
+      showAlert = true;
+      return;
     }
+
+    if (password !== confirmPassword) {
+      alertMessage = "Passwords don't match!!";
+      alertType = "error";
+      showAlert = true;
+      return;
+    }
+
+    const response = await registerUserAPI({
+      username: username,
+      email: email,
+      password: password,
+      confirmPassword: confirmPassword,
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+      tokenStore.set({ token: data.token });
+
+      tokenStore.subscribe((value) => {
+        if (value.token) {
+          //decode token without library (cause i dont want to import the jwt library for just one line of code): https://stackoverflow.com/questions/38552003/how-to-decode-jwt-token-in-javascript-without-using-a-library
+          const decodedToken = JSON.parse(atob(value.token.split(".")[1]));
+          username = decodedToken.username;
+          isAdmin = decodedToken.isAdmin || false;
+          isLoggedIn = true;
+        }
+      });
+
+      alertMessage = "Registration successful!";
+      alertType = "success";
+      showAlert = true;
+    } else {
+      alertMessage = data.error;
+      alertType = "error";
+      showAlert = true;
+    }
+  }
 </script>
 
-<h1 class="text-3xl font-bold">Register</h1>
+<div class="flex flex-col pb-6">
+  <h1 class="text-2xl p-4 md:text-3xl lg:text-4xl font-bold text-center">
+    Register
+  </h1>
 
-{#if isAlertVisible}
-  <Alert message={alertMessage} type={alertType} isVisible={isAlertVisible} />
-{/if}
+  {#if showAlert}
+    <Alert message={alertMessage} type={alertType} isVisible={showAlert} />
+  {/if}
 
-{#if isLoggedIn}
-  <WelcomeSection {username} {isAdmin} /> <!-- Show welcome section when logged in -->
-{:else}
-  <form on:submit={handleRegister} class="p-4">
-    <TextInput placeholder="Username" bind:value={username} />
-    <EmailInput placeholder="Email" bind:value={email} />
-    <PasswordInput placeholder="Type your password here" bind:value={password} />
-    <PasswordInput placeholder="Confirm your password" bind:value={confirmPassword} />
-    
-    <div class="flex items-center justify-between mt-4">
-        <Button label="Register" type="submit" />
-        <a href="/login" class="text-tertiary underline hover:text-secondary transition duration-150 ease-in-out">
+  {#if isLoggedIn}
+    <WelcomeSection {username} {isAdmin} />
+  {:else}
+    <div class="flex justify-center py-4">
+      <form
+        on:submit={handleRegister}
+        class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-4/6 lg:1/6"
+      >
+        <div class="flex flex-col mb-4">
+          <input
+            type="text"
+            placeholder="Username"
+            bind:value={username}
+            class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary w-full"
+          />
+        </div>
+        <div class="flex flex-col mb-4">
+          <input
+            type="email"
+            placeholder="Email"
+            bind:value={email}
+            class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary w-full"
+          />
+        </div>
+        <div class="flex flex-col mb-4">
+          <input
+            type="password"
+            placeholder="Type your password here"
+            bind:value={password}
+            class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary w-full"
+          />
+        </div>
+        <div class="flex flex-col mb-4">
+          <input
+            type="password"
+            placeholder="Confirm your password"
+            bind:value={confirmPassword}
+            class="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-primary w-full"
+          />
+        </div>
+
+        <div class="flex items-center justify-start mt-4">
+          <Button label="Register" color="accent" onClick={handleRegister} />
+          <a
+            href="/login"
+            class="text-accent underline hover:text-secondary px-2"
+          >
             Log in
-        </a>
+          </a>
+        </div>
+      </form>
     </div>
-  </form>
-{/if}
+  {/if}
+</div>

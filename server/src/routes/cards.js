@@ -1,14 +1,14 @@
 import express from 'express';
-import cardsData from '../../../db/cardsData.json' assert { type: 'json' };
-import auctionsData from '../../../db/auctionsData.json' assert { type: 'json' };
+import cards from '../../../db/cardsData.json' assert { type: 'json' };
+import auctions from '../../../db/auctionsData.json' assert { type: 'json' };
 import * as middleware from '../middleware/middleware.js';
-
 const router = express.Router();
 
-// Edit a card
+// edit card
 router.put('/:id', middleware.isAdmin, (req, res) => {
     let wantedId = parseInt(req.params.id);
-    let foundCard = cardsData.find(card => card.id === wantedId);
+
+    let foundCard = cards.find(card => card.id === wantedId);
 
     if (!foundCard) {
         return res.status(404).json({ error: "Card not found" });
@@ -16,8 +16,14 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
 
     const updatedCard = req.body;
 
-    if (updatedCard.name && updatedCard.name.length < 3) {
-        return res.status(400).json({ error: "Card name is too short!" });
+    if (updatedCard.name && updatedCard.name.length < 4) {
+        return res.status(400).json({
+            error: "Card name is too short!"
+        });
+    }
+
+    if (updatedCard.description === undefined || updatedCard.description.trim() === "") {
+        return res.status(400).json({ error: "Card description is required!" });
     }
 
     if (updatedCard.description && updatedCard.description.length < 10) {
@@ -41,12 +47,12 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     }
 
     // Update card details
-    foundCard.name = updatedCard.name || foundCard.name;
-    foundCard.description = updatedCard.description || foundCard.description;
-    foundCard.type = updatedCard.type || foundCard.type;
-    foundCard.rarity = updatedCard.rarity || foundCard.rarity;
-    foundCard.imageUrl = updatedCard.imageUrl || foundCard.imageUrl;
-    foundCard.auctionId = updatedCard.auctionId !== undefined ? updatedCard.auctionId : foundCard.auctionId;
+    foundCard.name = updatedCard.name;
+    foundCard.description = updatedCard.description;
+    foundCard.type = updatedCard.type;
+    foundCard.rarity = updatedCard.rarity;
+    foundCard.imageUrl = updatedCard.imageUrl;
+    foundCard.auctionId = updatedCard.auctionId;
 
     res.status(200).json({
         message: "Card updated successfully!",
@@ -54,57 +60,50 @@ router.put('/:id', middleware.isAdmin, (req, res) => {
     });
 });
 
-// GET one card
-router.get("/:id", async (req, res) => {
+
+//GET one card
+router.get("/:id", (req, res) => {
     let wantedId = parseInt(req.params.id);
-    let foundCard = cardsData.find(card => card.id === wantedId);
-    res.json({ foundCard });
+    let foundCard = cards.find(card => card.id === wantedId);
+
+    if (!foundCard) {
+        return res.status(404).json({ error: "Card not found" });
+    }
+
+    res.status(200).json({ card: foundCard });
 });
 
-// Add a new card
+// POST new card
 router.post('/', middleware.isAdmin, (req, res) => {
     const card = req.body;
 
-    // Log the received card data
-    console.log("Received card data:", card);
-
-    if (card.name.length < 3) {
-        console.log("Error: Card name is too short");
+    if (card.name.length < 4) {
         return res.status(400).json({ error: "Card name is too short!" });
     }
 
     if (card.description.length < 10) {
-        console.log("Error: Card description is too short");
         return res.status(400).json({ error: "Card description is too short!" });
     }
 
     if (!["monster", "trap", "spell"].includes(card.type)) {
-        console.log("Error: Invalid card type", card.type);
         return res.status(400).json({ error: `Card type has to be either "monster", "trap" or "spell".` });
     }
 
     if (!["rare", "super rare", "ultra rare", "unique"].includes(card.rarity)) {
-        console.log("Error: Invalid card rarity", card.rarity);
         return res.status(400).json({ error: `Card rarity has to be either "rare", "super rare", "ultra rare" or "unique".` });
     }
 
     if (!card.imageUrl.startsWith("http") || (!card.imageUrl.endsWith(".jpg") && !card.imageUrl.endsWith(".png"))) {
-        console.log("Error: Invalid image URL", card.imageUrl);
         return res.status(400).json({ error: `Please provide a valid image link (starting with "http" and ending with ".jpg" or ".png").` });
     }
 
-    if (card.auctionId !== undefined && (typeof card.auctionId !== 'number' || card.auctionId < -1)) {
-        console.log("Error: Invalid auction ID", card.auctionId);
+    if (typeof card.auctionId !== 'number' || card.auctionId < -1) {
         return res.status(400).json({ error: "Auction ID must be a non-negative integer or -1." });
     }
 
-    // Sort and find the highest ID
-    let sortedCards = cardsData.sort((a, b) => a.id - b.id);
+    let sortedCards = cards.sort((a, b) => a.id - b.id);
     let highestId = (sortedCards.length > 0) ? sortedCards[sortedCards.length - 1].id : -1;
 
-    console.log("Highest card ID found:", highestId);
-
-    // Add the new card to cardsData
     const newCard = {
         id: highestId + 1,
         name: card.name,
@@ -112,53 +111,50 @@ router.post('/', middleware.isAdmin, (req, res) => {
         type: card.type,
         rarity: card.rarity,
         imageUrl: card.imageUrl,
-        auctionId: card.auctionId !== undefined ? card.auctionId : -1
+        auctionId: card.auctionId || -1
     };
 
-    cardsData.push(newCard);
-    console.log("New card added:", newCard);
+    cards.push(newCard);
 
-    res.status(201).json({
-        message: "Card added successfully!"
+    res.status(200).json({
+        message: "Card added successfully!",
+        card: newCard
     });
 });
 
 
-// Get all cards
+//get all cards
 router.get("/", async (req, res) => {
-    if (!cardsData) {
-        return res.json({ error: "no cards" });
-    }
-    res.json({ cardsData });
+    return res.status(200).json({ cards });
 });
 
-// Delete a card
+//delete a card
 router.delete('/:id', middleware.isAdmin, (req, res) => {
     let wantedId = parseInt(req.params.id);
-    let foundCard = cardsData.find(card => card.id === wantedId);
+    let foundCard = cards.find(card => card.id === wantedId);
 
     if (!foundCard) {
         return res.status(404).json({ error: "Card not found" });
     }
 
-    const index = cardsData.indexOf(foundCard);
+    const index = cards.indexOf(foundCard);
     if (index > -1) {
-        cardsData.splice(index, 1);
+        cards.splice(index, 1);
     }
 
-    //delete associated auctions
-    let foundAuction = auctionsData.find(auction => auction.cardId === wantedId)
+    //delete associated auction
+    let foundAuction = auctions.find(auction => auction.cardId === wantedId)
     let removedAuction;
-    const auctionIndex = auctionsData.indexOf(foundAuction);
+    const auctionIndex = auctions.indexOf(foundAuction);
     if (auctionIndex > -1) {
-        removedAuction = auctionsData.splice(auctionIndex, 1);
+        removedAuction = auctions.splice(auctionIndex, 1);
 
         if (!removedAuction) {
             return res.status(404).json({ error: "Auction not found" });
         }
     }
 
-    return res.status(202).json({ message: "Card deleted successfully!" });
+    return res.status(200).json({ message: "Card deleted successfully!", card: foundCard });
 });
 
 export default router;

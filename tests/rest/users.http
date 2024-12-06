@@ -1,0 +1,110 @@
+### Log in user
+# @name loginSuccessful
+POST {{protocol}}{{host}}:{{port}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "adminPassword"
+}
+
+> {%
+    client.test(
+        "Successful login",
+        function() {
+            client.assert(response.status === 200, "Response status is 200");
+            client.global.set("token", response.body.token);
+        }
+    );
+%}
+
+### Get all users successfully
+# @name getAllUsers
+GET {{protocol}}{{host}}:{{port}}/users
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Response contains usersData", function() {
+        client.assert(response.body.users, "Expected usersData obj. containing array");
+    });
+%}
+
+### Get one user successfully
+# @name getOneUser
+GET {{protocol}}{{host}}:{{port}}/users/0
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Response contains foundUser", function() {
+        client.assert(response.body.user, "Expected foundUser");
+    });
+%}
+
+### Get one user but invalid is
+# @name getOneUserInvalidId
+GET {{protocol}}{{host}}:{{port}}/users/hello
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Invalid user ID'", function() {
+        client.assert(response.body.error === 'Invalid user ID', "Expected 'Invalid user ID'");
+    });
+%}
+
+### Get one user but not found
+# @name getOneUserNotFound
+GET {{protocol}}{{host}}:{{port}}/users/99
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 404", function() {
+        client.assert(response.status === 404, "Expected 404, got " + response.status);
+    });
+
+    client.test("Message is 'User not found'", function() {
+        client.assert(response.body.error === 'User not found', "Expected 'User not found'");
+    });
+%}
+
+### Delete one user successfully
+# @name deleteOneUser
+DELETE {{protocol}}{{host}}:{{port}}/users/3
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Message contains deleted user", function() {
+        client.assert(response.body.user, "Expected user");
+    });
+%}
+
+### Delete one user but no token provided
+# @name getOneUserNoToken
+DELETE {{protocol}}{{host}}:{{port}}/users/1
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 401", function() {
+        client.assert(response.status === 401, "Expected 401, got " + response.status);
+    });
+
+    client.test("Message says 'Unauthorized: No token provided'", function() {
+        client.assert(response.body.error === 'Unauthorized: No token provided', "Expected 'Unauthorized: No token provided'");
+    });
+%}

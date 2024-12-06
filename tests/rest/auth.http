@@ -1,5 +1,120 @@
+### Register user successfully
+# @name registerUserSuccessfully
+POST {{protocol}}{{host}}:{{port}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "supernewuser@gmail.com",
+  "username": "newuser",
+  "password": "password123",
+  "confirmPassword": "password123"
+}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status == 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Message is 'Logged in successfully'", function() {
+        client.assert(response.body.message === "Logged in successfully", "Expected 'Logged in successfully', got " + response.body.message);
+    });
+
+    client.test("Token is returned", function() {
+        client.assert(response.body.token, "Token is not returned");
+    });
+%}
+
+### Register user with empty password
+# @name registerEmptyPassword
+POST {{protocol}}{{host}}:{{port}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser1@gmail.com",
+  "username": "newuser",
+  "password": "",
+  "confirmPassword": ""
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Password cannot be empty'", function() {
+        client.assert(response.body.error === "Password cannot be empty", "Expected 'Password cannot be empty', got " + response.body.error);
+    });
+%}
+
+### Register user with mismatched passwords
+# @name registerMismatchedPasswords
+POST {{protocol}}{{host}}:{{port}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuse2r@gmail.com",
+  "username": "newuser",
+  "password": "password123",
+  "confirmPassword": "password321"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 401, got " + response.status);
+    });
+
+    client.test("Message is 'Passwords don't match'", function() {
+        client.assert(response.body.error === "Passwords don't match", "Expected 'Passwords don't match', got " + response.body.error);
+    });
+%}
+
+### Register user with wrong email format
+# @name registerWrongEmailFormat
+POST {{protocol}}{{host}}:{{port}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuse2rgmail.com",
+  "username": "newuser",
+  "password": "password123",
+  "confirmPassword": "password123"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Invalid email format'", function() {
+        client.assert(response.body.error === "Invalid email", "Expected 'Invalid email', got " + response.body.error);
+    });
+%}
+
+### Register user with wrong email format
+# @name registerWrongEmailFormat
+POST {{protocol}}{{host}}:{{port}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuse2r@gmail.com",
+  "username": "hi",
+  "password": "password123",
+  "confirmPassword": "password123"
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Message is 'Username must be at least 4 characters long'", function() {
+        client.assert(response.body.error === "Username must be at least 4 characters long", "Expected 'Username must be at least 4 characters long', got " + response.body.error);
+    });
+%}
+
 ### Log in user
-POST http://localhost:3000/auth/login
+# @name loginSuccessful
+POST {{protocol}}{{host}}:{{port}}/auth/login
 Content-Type: application/json
 
 {
@@ -7,14 +122,68 @@ Content-Type: application/json
   "password": "adminPassword"
 }
 
-### register user
-POST http://localhost:3000/auth/register
+> {%
+    client.test(
+        "Successful login",
+        function() {
+            client.assert(response.status === 200, "Response status is 200");
+            client.global.set("token", response.body.token);
+        }
+    );
+%}
+
+### Log in user with wrong password
+# @name loginWrongPassword
+POST {{protocol}}{{host}}:{{port}}/auth/login
 Content-Type: application/json
 
 {
   "email": "admin@gmail.com",
-  "username": "admin",
-  "password": "adminPassword",
-  "confirmPassword": "adminPassword",
-  "isAdmin": true
+  "password": "adminPasssword"
 }
+
+> {%
+    client.test("Status Code is 401", function() {
+        client.assert(response.status === 401, "Expected 401, got " + response.status);
+    });
+
+    client.test("Message is 'Wrong password'", function() {
+        client.assert(response.body.error === "Wrong password", "Expected 'Wrong password', got " + response.body.error);
+    });
+%}
+
+### Log in user with wrong email
+# @name loginWrongEmail
+POST {{protocol}}{{host}}:{{port}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admn@gmail.com",
+  "password": "adminPassword"
+}
+
+> {%
+    client.test("Status Code is 404", function() {
+        client.assert(response.status === 404, "Expected 404, got " + response.status);
+    });
+
+    client.test("Message is 'User not found'", function() {
+        client.assert(response.body.error === "No account associated to this email", "Expected 'No account associated to this email', got " + response.body.error);
+    });
+%}
+
+### Logout successfully with valid authToken
+# @name logoutSuccessfully
+POST {{protocol}}{{host}}:{{port}}/auth/logout
+Content-Type: application/json
+Cookie: authToken={{token}}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Message is 'Logged out successfully'", function() {
+        client.assert(response.body.message === "Logged out successfully", "Expected 'Logged out successfully', got " + response.body.message);
+    });
+%}

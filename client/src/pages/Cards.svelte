@@ -1,65 +1,65 @@
-<h1 class="text-3xl font-bold">Cards</h1>
-
-<!-- Button to trigger modal -->
-<div class="text-center md:text-left mt-6">
-  <button 
-    on:click={() => showModal = true} 
-    class="px-6 py-3 bg-tertiary text-white rounded hover:bg-blue-600 transition-colors"
-  >
-    Add card
-  </button>
-</div>
-
 <script>
   import { onMount } from "svelte";
-  import router from 'page';
-  import CardContainer from "../lib/CardContainer.svelte";
-  import { tokenStore } from '../TokenStore';
-  import ModalAddCard from "../lib/ModalAddCard.svelte"; // New Modal for adding cards
+  import CardContainer from "../components/containers/CardContainer.svelte";
+  import AddCardModal from "../components/modals/AddCardModal.svelte";
+  import { fetchCardsAPI } from "../lib/api";
+  import Alert from "../components/Alert.svelte";
+  import Button from "../components/buttons/Button.svelte";
 
   let cards = [];
-  let showModal = false; // Modal visibility
+  let showNewCardModal = false;
+  //alert
   let alertMessage = "";
   let alertType = "";
-  let isAlertVisible = false;
-
-  async function retrieveCards() {
-    try {
-      const response = await fetch("http://localhost:3000/cards", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
-      cards = data.cardsData;
-    } catch (error) {
-      alertMessage = "An error occurred while retrieving cards.";
-      alertType = "error";
-      isAlertVisible = true;
-    }
-  }
+  let showAlert = false;
 
   onMount(() => {
-    retrieveCards();
+    fetchCards();
   });
+
+  async function fetchCards() {
+      const response = await fetchCardsAPI();
+      const data = await response.json();
+
+      if (response.ok) {
+        cards = data.cards;
+      } else {
+      alertMessage = data.error;
+      alertType = "error";
+      showAlert = true;
+    } 
+  }
 </script>
 
-<!-- Alert for errors -->
-{#if isAlertVisible}
-  <div class={`alert ${alertType === 'error' ? 'bg-red-500 text-white' : ''} p-4 rounded`}>
-    {alertMessage}
+<div class="flex flex-col justify-between space-y-4 px-4">
+  <!-- Alert -->
+  <Alert message={alertMessage} type={alertType} isVisible={showAlert} />
+
+  <!-- Page title -->
+  <h1 class="text-2xl p-4 md:text-3xl lg:text-4xl font-bold text-center">
+    Cards
+  </h1>
+
+  <!-- Add card btn -->
+  <div class="text-center mt-6">
+    <Button label="Add card" color="accent" onClick={() => (showNewCardModal = true)} />
   </div>
-{/if}
 
-<!-- Cards grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6">
-  {#each cards as card}
-    <CardContainer {card} />
-  {/each}
+  <!-- Cards grid -->
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-6"
+  >
+    {#each cards as card}
+      <CardContainer {card} />
+    {/each}
+  </div>
+
+  <!-- Modal for adding new card -->
+{#if showNewCardModal}
+  <AddCardModal
+    bind:isVisible={showNewCardModal}
+    on:close={() => (showNewCardModal = false)}
+    on:cardAdded={fetchCards}
+  />
+{/if}
 </div>
-
-<!-- Modal for adding a card -->
-{#if showModal}
-  <ModalAddCard on:close={() => showModal = false} on:cardAdded={retrieveCards} />
-{/if}

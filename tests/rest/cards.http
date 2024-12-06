@@ -1,0 +1,246 @@
+### Log in admin
+# @name loginAsAdmin
+POST {{protocol}}{{host}}:{{port}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "adminPassword"
+}
+
+> {%
+    client.test(
+        "Admin login successful",
+        function() {
+            client.assert(response.status === 200, "Response status is 200");
+            client.global.set("adminToken", response.body.token);
+        }
+    );
+%}
+
+### Get all cards successfully
+# @name getAllCards
+GET {{protocol}}{{host}}:{{port}}/cards
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Response contains cardsData", function() {
+        client.assert(response.body.cards, "Expected cardsData obj");
+    });
+%}
+
+### Get one card successfully
+# @name getOneCard
+GET {{protocol}}{{host}}:{{port}}/cards/0
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Response contains foundCard", function() {
+        client.assert(response.body.card, "Expected foundCard object");
+    });
+%}
+
+### Get one card not found
+# @name getOneCardNotFound
+GET {{protocol}}{{host}}:{{port}}/cards/99
+Content-Type: application/json
+
+> {%
+    client.test("Status Code is 404", function() {
+        client.assert(response.status === 404, "Expected 404, got " + response.status);
+    });
+
+    client.test("Message is 'Card not found'", function() {
+        client.assert(response.body.error === 'Card not found', "Expected 'Card not found'");
+    });
+%}
+
+### Add a new card successfully
+# @name addCard
+POST {{protocol}}{{host}}:{{port}}/cards
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Blue Eyes White Dragon",
+  "description": "A powerful dragon known for its destructive abilities.",
+  "type": "monster",
+  "rarity": "ultra rare",
+  "imageUrl": "http://example.com/blueeyes.jpg",
+  "auctionId": -1
+}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Message is 'Card added successfully!'", function() {
+        client.assert(response.body.message === "Card added successfully!", "Expected successful message");
+    });
+%}
+
+### Add a card with invalid name
+# @name addCardInvalidName
+POST {{protocol}}{{host}}:{{port}}/cards
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "A",
+  "description": "The design of this card is so cool",
+  "type": "spell",
+  "rarity": "ultra rare",
+  "imageUrl": "https://youre.outof.games/media/uploads/0b/79/0b796ad1-fed8-48a7-a232-d2ada8043b17/43378048.jpg",
+  "auctionId": -1
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Response contains error 'Card name is too short!'", function() {
+        client.assert(response.body.error === 'Card name is too short!', "Expected error 'Card name is too short!'");
+    });
+%}
+
+### Add a card with invalid type
+# @name addCardInvalidName
+POST {{protocol}}{{host}}:{{port}}/cards
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Cosmic Blazar Dragon",
+  "description": "The design of this card is so cool",
+  "type": "another type",
+  "rarity": "unique",
+  "imageUrl": "https://youre.outof.games/media/uploads/05/5e/055e597f-06df-4d87-9b46-36c17823c610/21123811.jpg",
+  "auctionId": -1
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Response contains error 'Card type has to be either \"monster\", \"trap\" or \"spell\".'", function() {
+        client.assert(response.body.error === 'Card type has to be either \"monster\", \"trap\" or \"spell\".', "Expected error 'Card type has to be either \"monster\", \"trap\" or \"spell\".'");
+    });
+%}
+
+### Edit a card successfully
+# @name editCard
+PUT {{protocol}}{{host}}:{{port}}/cards/0
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Dark Magician",
+  "description": "A skilled and powerful wizard.",
+  "type": "spell",
+  "rarity": "rare",
+  "imageUrl": "http://example.com/darkmagician.jpg",
+  "auctionId": -1
+}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Message is 'Card updated successfully!'", function() {
+        client.assert(response.body.message === "Card updated successfully!", "Expected success message");
+    });
+%}
+
+### Edit a card with invalid description
+# @name editCardInvalidDescription
+PUT {{protocol}}{{host}}:{{port}}/cards/0
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Neo Blue-Eyes Ultimate Dragon",
+  "description": "tooShort",
+  "type": "monster",
+  "rarity": "super rare",
+  "imageUrl": "https://youre.outof.games/media/uploads/d6/77/d6772a90-1445-48ed-89de-ad00c2bc43c7/56532353.jpg",
+  "auctionId": -1
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Response contains error: 'Card description is too short!'", function() {
+        client.assert(response.body.error === 'Card description is too short!', "Expected validation error 'Card description is too short!'");
+    });
+%}
+
+### Edit a card with invalid URL
+# @name editCardInvalidUrl
+PUT {{protocol}}{{host}}:{{port}}/cards/0
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "name": "Neo Blue-Eyes Ultimate Dragon",
+  "description": "Long enough card description",
+  "type": "monster",
+  "rarity": "super rare",
+  "imageUrl": "https://totally.valid.url",
+  "auctionId": -1
+}
+
+> {%
+    client.test("Status Code is 400", function() {
+        client.assert(response.status === 400, "Expected 400, got " + response.status);
+    });
+
+    client.test("Response contains error: 'Please provide a valid image link (starting with \"http\" and ending with \".jpg\" or \".png\").'", function() {
+        client.assert(response.body.error === 'Please provide a valid image link (starting with \"http\" and ending with \".jpg\" or \".png\").', "Expected validation error 'Please provide a valid image link (starting with \"http\" and ending with \".jpg\" or \".png\").'");
+    });
+%}
+
+### Delete a card successfully
+# @name deleteCard
+DELETE {{protocol}}{{host}}:{{port}}/cards/1
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Status Code is 200", function() {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+
+    client.test("Message is 'Card deleted successfully!'", function() {
+        client.assert(response.body.message === "Card deleted successfully!", "Expected success message");
+    });
+%}
+
+### Delete a card not found
+# @name deleteCardNotFound
+DELETE {{protocol}}{{host}}:{{port}}/cards/99
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+> {%
+    client.test("Status Code is 404", function() {
+        client.assert(response.status === 404, "Expected 404, got " + response.status);
+    });
+
+    client.test("Message is 'Card not found'", function() {
+        client.assert(response.body.error === "Card not found", "Expected 'Card not found'");
+    });
+%}

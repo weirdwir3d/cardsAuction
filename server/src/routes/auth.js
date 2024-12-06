@@ -4,53 +4,44 @@ import usersData from '../../../db/usersData.json' assert { type: 'json' };
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import * as middleware from '../middleware/middleware.js';
+import * as helper from '../helper.js'
 
 const router = express.Router();
 dotenv.config();
 
-// Helper function to validate email format
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
 router.post("/register", async (req, res) => {
-    let { password, confirmPassword, email, isAdmin, username } = req.body;
+    let { password, confirmPassword, email, username } = req.body;
 
-    // Validate if password is not empty
+    // validate password not empty
     if (!password) {
-        return res.json({
-            httpStatusCode: 400,
-            message: "Password cannot be empty"
+        return res.status(400).json({
+            error: "Password cannot be empty"
         });
     }
 
-    // Validate if passwords are the same
+    // validate passwords are the same
     if (password !== confirmPassword) {
-        return res.json({
-            httpStatusCode: 401,
-            message: "Passwords don't match"
+        return res.status(400).json({
+            error: "Passwords don't match"
         });
     }
 
-    // Validate email format
-    if (!isValidEmail(email)) {
-        return res.json({
-            httpStatusCode: 400,
-            message: "Invalid email format"
+    // validate email format
+    if (!helper.isValidEmail(email)) {
+        return res.status(400).json({
+            error: "Invalid email"
         });
     }
 
-    // Validate username length (must be at least 4 characters)
+    // validate username at least 4 chars
     if (username.length < 4) {
-        return res.json({
-            httpStatusCode: 400,
-            message: "Username must be at least 4 characters long"
+        return res.status(400).json({
+            error: "Username must be at least 4 characters long"
         });
     }
 
     let foundUser = usersData.find(user => user.email === email);
-    // Register if email is unused
+    // proceed with registering if email unused
     if (!foundUser) {
         try {
             let hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALT_ROUNDS));
@@ -59,31 +50,27 @@ router.post("/register", async (req, res) => {
                 return (a.id - b.id);
             });
 
-            console.log(hashedPassword);
             let highestId = (sortedUsers.length > 0) ? sortedUsers[sortedUsers.length - 1].id : -1;
 
-            console.log('highest id', highestId);
             usersData.push({
                 id: highestId + 1,
                 username: req.body.username,
                 email: email,
                 password: hashedPassword,
-                isAdmin: (isAdmin)
+                isAdmin: false
             });
 
             await login(req, res);
 
         } catch (err) {
-            return res.json({
-                httpStatusCode: 500,
-                message: "Server error while registering, please contact admin"
+            return res.status(500).json({
+                error: "Server error while registering, please contact admin"
             });
         }
 
     } else {
-        return res.json({
-            httpStatusCode: 409,
-            message: "Email address already in use"
+        return res.status(409).json({
+            error: "Email address already in use"
         });
     }
 });
@@ -92,71 +79,60 @@ router.post("/login", async (req, res) => {
     await login(req, res);
 });
 
+//i googled it and apparently for logging out, POST is more used than DELETE
 router.post("/logout", middleware.isLoggedIn, async (req, res) => {
     res.cookie('authToken', '', {
         httpOnly: false,
         maxAge: 0
     });
 
-    return res.json({
-        httpStatusCode: 200,
+    return res.status(200).json({
         message: "Logged out successfully"
     });
 });
 
 async function login(req, res) {
-    console.log('trying to log in');
     let email = req.body.email;
     let password = req.body.password;
 
     let foundUser = usersData.find(user => user.email === email);
 
-    console.log(`found user: ${JSON.stringify(foundUser)}`);
-
-    // Find user
+    //Find user
     if (foundUser) {
 
         let isPasswordValid = await bcrypt.compare(password, foundUser.password);
 
         if (isPasswordValid) {
             jwt.sign(foundUser, process.env.SECRET, { expiresIn: '1h' }, (err, token) => {
-                console.log('signing');
+
                 if (err) {
-                    console.log(err);
-                    return res.json({
-                        httpStatusCode: 500,
-                        message: "Server error while logging in, please contact admin",
+                    return res.status(500).json({
+                        error: "Server error while generating token for log in, please contact admin",
                         token: token
                     });
                 }
 
-                // Set cookie in HTTP response
+                //set cookie in response
                 res.cookie('authToken', token, {
                     httpOnly: false,
                     SameSite: 'None',
-                    maxAge: 60 * 60 * 1000, // 1h
+                    maxAge: 60 * 60 * 1000, //1h
                 });
 
-                console.log('logged in');
-                return res.json({
-                    httpStatusCode: 200,
+                return res.status(200).json({
                     message: "Logged in successfully",
                     token: token
                 });
             });
         } else {
-            console.log('wrong password');
-            return res.json({
-                httpStatusCode: 401,
-                message: "Wrong password"
+            return res.status(401).json({
+                error: "Wrong password"
             });
         }
 
     } else {
-        console.log('user not found');
-        return res.json({
-            httpStatusCode: 404,
-            message: "User not found"
+        return res.status(404).json({
+            error: "No account associated to this email"
         });
     }
 }
